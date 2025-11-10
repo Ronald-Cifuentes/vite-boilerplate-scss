@@ -1,7 +1,7 @@
 {
   "usesTypeScript": true,
-  "usesCssModule": false,
-  "cssPreprocessor": "css",
+  "usesCssModule": true,
+  "cssPreprocessor": "scss",
   "testLibrary": "Testing Library",
   "component": {
     "default": {
@@ -9,7 +9,7 @@
         "index": "templates/component/index.ts",
         "interfaces": "templates/component/interfaces.ts",
         "component": "templates/component/TemplateName.tsx",
-        "style": "templates/component/TemplateName.styled.tsx",
+        "style": "templates/component/TemplateName.module.scss",
         "test": "templates/component/TemplateName.spec.tsx"
       },
       "path": "src/components",
@@ -60,5 +60,5 @@
       "withInterfaces": false
     }
   },
-  "usesStyledComponents": true
+  "usesStyledComponents": false
 }
