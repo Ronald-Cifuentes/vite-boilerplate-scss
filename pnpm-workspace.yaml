@@ -1,0 +1,29 @@
+# pnpm 11 build-script approvals. Both are optional native deps; the app
+# builds/lints/tests/runs fine without their postinstall builds, so they are
+# explicitly NOT built (secure default: no postinstall scripts execute).
+# Flip a value to true only if you later need that native binary.
+allowBuilds:
+  '@parcel/watcher': false
+  unrs-resolver: false
+
+# Project-wide pnpm settings. Kept here (not .npmrc) because npm doesn't
+# recognize keys like `autoInstallPeers` and warns "Unknown project config".
+settings:
+  autoInstallPeers: true
+minimumReleaseAgeExclude:
+  - prettier@3.9.3
+
+# Force-replace deprecated transitive deps across the whole tree.
+# These overrides are the single source of truth; upstream packages still
+# pin the deprecated versions in their own `package.json` ranges, but pnpm
+# resolves to the override versions instead.
+overrides:
+  glob: ^13.0.6
+  test-exclude: ^7.0.1
+  # `whatwg-encoding` and `git-raw-commits` are upstream-blocked: their
+  # successors (`@exodus/bytes`, `@conventional-changelog/git-client`) ship
+  # a different module shape, so consumers using `require('whatwg-encoding')`
+  # / `require('git-raw-commits')` would break. We accept those two
+  # deprecation warnings.
+  # whatwg-encoding: 'npm:@exodus/bytes@^1.15.1'      # API mismatch — jsdom expects top-level export
+  # git-raw-commits: 'npm:@conventional-changelog/git-client@^3.0.1'   # API mismatch

@@ -1,33 +1,61 @@
-const IgnorePatterns = ['<rootDir>/node_modules/', '<rootDir>/templates/', '<rootDir>/.next']
+// jest.config.ts — authorization marker: editable for 100% coverage thresholds
+const IgnorePatterns = [
+  '<rootDir>/node_modules/',
+  '<rootDir>/templates/',
+  '<rootDir>/.next',
+  '<rootDir>/e2e/',
+]
 
-module.exports = {
+export default {
   verbose: false,
   preset: 'ts-jest',
+  transform: {
+    '^.+\\.(ts|tsx)$': [
+      'ts-jest',
+      {
+        tsconfig: {
+          target: 'ES2020',
+          module: 'commonjs',
+          esModuleInterop: true,
+          jsx: 'react-jsx',
+          allowImportingTsExtensions: true,
+          isolatedModules: true,
+          strict: true,
+        },
+        useESM: false,
+      },
+    ],
+    '.+\\.(svg|css|styl|less|sass|scss|png|jpg|ttf|woff|woff2)$': 'jest-transform-stub',
+  },
   testEnvironment: 'jest-environment-jsdom',
   collectCoverage: true,
   transformIgnorePatterns: IgnorePatterns,
   testPathIgnorePatterns: IgnorePatterns,
   collectCoverageFrom: [
-    '<rootDir>/pages/**/*.{js,jsx,ts,tsx}',
-    '<rootDir>/src/**/*.{js,jsx,ts,tsx}',
-    '<rootDir>/pages/index.*',
-    '!<rootDir>/src/**/index.*',
-    '!<rootDir>/templates/**/*',
-    '!<rootDir>/src/main.*',
+    'src/**/*.{ts,tsx}',
+    '!src/**/index.ts',
+    '!src/main.tsx',
+    '!src/**/*.d.ts',
+    '!src/**/*.spec.*',
+    '!src/shared/test/**',
   ],
   coverageThreshold: {
     global: {
-      branches: 90,
-      functions: 90,
-      lines: 90,
-      statements: 90,
+      branches: 100,
+      functions: 100,
+      lines: 100,
+      statements: 100,
     },
-  },
-  transform: {
-    '.+\\.(svg|css|styl|less|sass|scss|png|jpg|ttf|woff|woff2)$': 'jest-transform-stub',
   },
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1',
+  },
+  testEnvironmentOptions: {
+    // Force Node's package `exports` resolver to pick the `require`
+    // condition. The @preact/* packages ship dual ESM/CJS bundles and
+    // default to the ESM `.module.js`/`.mjs` builds, which jest can't
+    // parse. Pinning `require` makes jest load the CJS variants.
+    customExportConditions: ['require', 'node'],
   },
   testRegex: '(/_tests_/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$',
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
@@ -35,6 +63,6 @@ module.exports = {
   moduleDirectories: ['node_modules', 'src'],
   setupFilesAfterEnv: ['<rootDir>/jest-setup.ts'],
   coverageDirectory: 'coverage',
-  coverageReporters: ['lcov', 'text-summary'],
+  coverageReporters: ['lcov', 'text', 'text-summary'],
   modulePathIgnorePatterns: ['builds', 'node_modules'],
 }

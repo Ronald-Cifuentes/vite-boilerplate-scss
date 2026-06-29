@@ -12,7 +12,23 @@
         "style": "templates/component/TemplateName.module.scss",
         "test": "templates/component/TemplateName.spec.tsx"
       },
-      "path": "src/components",
+      "path": "src/shared/components",
+      "withStyle": true,
+      "withTest": true,
+      "withStory": false,
+      "withLazy": false,
+      "withIndex": true,
+      "withInterfaces": true
+    },
+    "feature": {
+      "customTemplates": {
+        "index": "templates/component/index.ts",
+        "interfaces": "templates/component/interfaces.ts",
+        "component": "templates/component/TemplateName.tsx",
+        "style": "templates/component/TemplateName.module.scss",
+        "test": "templates/component/TemplateName.spec.tsx"
+      },
+      "path": "src/features",
       "withStyle": true,
       "withTest": true,
       "withStory": false,
@@ -27,7 +43,7 @@
         "component": "templates/hook/useTemplateName.ts",
         "test": "templates/hook/useTemplateName.spec.ts"
       },
-      "path": "src/hooks",
+      "path": "src/shared/hooks",
       "withStyle": false,
       "withTest": true,
       "withStory": false,
@@ -39,7 +55,7 @@
       "customTemplates": {
         "test": "templates/component/TemplateName.spec.tsx"
       },
-      "path": "src/components",
+      "path": "src/shared/components",
       "withTest": true,
       "withStyle": false,
       "withStory": false,
@@ -51,7 +67,7 @@
       "customTemplates": {
         "test": "templates/hook/useTemplateName.spec.ts"
       },
-      "path": "src/hooks",
+      "path": "src/shared/hooks",
       "withTest": true,
       "withStyle": false,
       "withStory": false,

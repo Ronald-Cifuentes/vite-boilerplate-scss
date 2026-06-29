@@ -1,0 +1,27 @@
+version: '3.9'
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: vite-boilerplate-scss:latest
+    container_name: vite-boilerplate-frontend
+    ports:
+      - '3000:80'
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'wget', '--quiet', '--tries=1', '--spider', 'http://localhost:80/health']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    environment:
+      # No runtime env vars needed for SPA (config baked at build time)
+      - NODE_ENV=production
+    networks:
+      - frontend-network
+
+networks:
+  frontend-network:
+    driver: bridge

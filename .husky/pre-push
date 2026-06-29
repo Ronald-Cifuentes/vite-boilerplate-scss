@@ -1,2 +1,12 @@
 #!/usr/bin/env sh
-yarn run test
+# Run unit tests, then fetch the SonarQube quality-gate snapshot for the
+# current branch. The Sonar call is best-effort when SONAR_TOKEN is unset
+# (the script is designed to refuse to run with a placeholder token); we
+# fall through if the script exits because of a missing token, but any
+# other failure (auth, network, parse) still aborts the push.
+
+pnpm test
+
+if [ -n "${SONAR_TOKEN:-}" ]; then
+  pnpm sonar:report
+fi
