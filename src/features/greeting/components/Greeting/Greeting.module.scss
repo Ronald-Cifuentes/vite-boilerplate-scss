@@ -1,35 +1,55 @@
+@use '../../../../shared/ds/settings/tokens' as t;
+@use '../../../../shared/ds/tools/responsive' as r;
+@use '../../../../shared/ds/tools/typography' as typo;
+@use '../../../../shared/ds/tools/animation' as anim;
+
 .greeting {
   text-align: center;
-  padding: 1rem;
+  padding: t.$space-4;
+  @include anim.theme-transition;
 }
 
 .title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin: 0 0 0.5rem;
-  color: inherit;
+  @include typo.text-2xl;
+  @include typo.font-bold;
+  margin: 0 0 t.$space-2;
+  color: var(--color-text-primary);
 
-  @media (min-width: 768px) {
-    font-size: 2rem;
+  @include r.media-md {
+    @include typo.text-3xl;
   }
 
-  @media (min-width: 1440px) {
-    font-size: 2.5rem;
+  @include r.media-2xl {
+    @include typo.text-4xl;
   }
 }
 
 .subtitle {
-  font-size: 1rem;
-  font-weight: 400;
-  margin: 0;
-  color: inherit;
-  opacity: 0.8;
+  @include typo.text-base;
+  @include typo.font-normal;
+  margin: 0 0 t.$space-4;
+  color: var(--color-text-secondary);
 
-  @media (min-width: 768px) {
-    font-size: 1.125rem;
+  @include r.media-md {
+    @include typo.text-lg;
   }
 
-  @media (min-width: 1440px) {
-    font-size: 1.25rem;
+  @include r.media-2xl {
+    @include typo.text-xl;
+  }
+}
+
+.formatted {
+  @include typo.text-sm;
+  margin: t.$space-2 0;
+  color: var(--color-text-secondary);
+
+  strong {
+    color: var(--color-text-primary);
+    @include typo.font-semibold;
+  }
+
+  @include r.media-md {
+    @include typo.text-base;
   }
 }

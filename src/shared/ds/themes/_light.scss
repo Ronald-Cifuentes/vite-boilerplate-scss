@@ -1,0 +1,53 @@
+// ==========================================================================
+// LIGHT THEME - Light Mode CSS Custom Properties
+// ==========================================================================
+
+@use '../settings/palette' as p;
+@use '../settings/tokens' as t;
+
+[data-theme='light'] {
+  // Surface colors (backgrounds)
+  --color-surface-base: #{p.$palette-gray-50};
+  --color-surface-raised: #{p.$palette-white};
+  --color-surface-overlay: #{p.$palette-white};
+
+  // Text colors
+  --color-text-primary: #{p.$palette-gray-900};
+  --color-text-secondary: #{p.$palette-gray-600};
+  --color-text-muted: #{p.$palette-gray-400};
+  --color-text-inverse: #{p.$palette-white};
+
+  // Interactive colors
+  --color-interactive-primary: #{p.$palette-blue-600};
+  --color-interactive-primary-hover: #{p.$palette-blue-700};
+  --color-interactive-primary-active: #{p.$palette-blue-800};
+  --color-interactive-secondary: #{p.$palette-gray-200};
+  --color-interactive-secondary-hover: #{p.$palette-gray-300};
+
+  // Feedback colors
+  --color-feedback-success: #{p.$palette-green-600};
+  --color-feedback-warning: #{p.$palette-amber-500};
+  --color-feedback-error: #{p.$palette-red-600};
+  --color-feedback-info: #{p.$palette-blue-500};
+
+  // Border colors
+  --color-border-default: #{p.$palette-gray-200};
+  --color-border-strong: #{p.$palette-gray-400};
+  --color-border-focus: #{p.$palette-blue-500};
+
+  // Shadows
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+
+  // Typography
+  --font-family-base: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  --font-family-mono: 'Fira Code', Consolas, 'Courier New', monospace;
+
+  // Transitions
+  --transition-fast: #{t.$transition-duration-fast} #{t.$transition-timing-default};
+  --transition-normal: #{t.$transition-duration-normal} #{t.$transition-timing-default};
+
+  // Browser hint for native form controls
+  color-scheme: light;
+}

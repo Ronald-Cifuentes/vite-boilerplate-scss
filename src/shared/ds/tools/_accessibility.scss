@@ -1,0 +1,55 @@
+// ==========================================================================
+// ACCESSIBILITY - A11y Mixins (NO CSS OUTPUT)
+// ==========================================================================
+// Accessibility utility mixins for screen readers and focus states.
+// ==========================================================================
+
+@use '../settings/tokens' as t;
+
+// Screen reader only - visually hidden but accessible to AT
+@mixin sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+// Remove sr-only when focused (for skip links)
+@mixin not-sr-only {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: 0;
+  margin: 0;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+// Focus visible ring - uses CSS custom properties for theming
+@mixin focus-ring {
+  outline: t.$focus-ring-width solid var(--color-border-focus);
+  outline-offset: t.$focus-ring-offset;
+}
+
+// Remove default focus styles and apply custom focus-visible
+@mixin focus-visible-ring {
+  &:focus {
+    outline: none;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// Minimum touch target
+@mixin touch-target {
+  min-width: t.$touch-target-min;
+  min-height: t.$touch-target-min;
+}

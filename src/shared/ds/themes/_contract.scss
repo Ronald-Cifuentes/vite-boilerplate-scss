@@ -1,0 +1,37 @@
+// ==========================================================================
+// THEME CONTRACT - Required CSS Custom Properties
+// ==========================================================================
+// Every theme MUST define all these properties. The :root block serves as
+// documentation - actual values come from _light.scss and _dark.scss.
+// ==========================================================================
+
+// This file documents the contract but outputs no CSS.
+// Theme implementations (_light.scss, _dark.scss) fulfill this contract.
+
+// REQUIRED CUSTOM PROPERTIES:
+// --color-surface-base        : Main background
+// --color-surface-raised      : Cards, modals
+// --color-surface-overlay     : Dropdowns, tooltips
+// --color-text-primary        : Main text
+// --color-text-secondary      : Subdued text
+// --color-text-muted          : Disabled, placeholder
+// --color-text-inverse        : Text on primary/accent backgrounds
+// --color-interactive-primary : Primary actions
+// --color-interactive-primary-hover
+// --color-interactive-primary-active
+// --color-interactive-secondary
+// --color-interactive-secondary-hover
+// --color-feedback-success
+// --color-feedback-warning
+// --color-feedback-error
+// --color-feedback-info
+// --color-border-default
+// --color-border-strong
+// --color-border-focus        : Focus rings
+// --shadow-sm
+// --shadow-md
+// --shadow-lg
+// --font-family-base
+// --font-family-mono
+// --transition-fast
+// --transition-normal

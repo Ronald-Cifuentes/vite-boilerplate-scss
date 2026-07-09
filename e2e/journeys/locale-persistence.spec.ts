@@ -12,15 +12,16 @@ test.describe('Locale Persistence Journey', () => {
   }) => {
     // Given - user visits and switches language
     await page.goto('/')
-    await page.getByRole('combobox').selectOption('es')
-    await expect(page.getByTestId('greeting-title')).toHaveText('Hola')
+    const langTrigger = page.getByTestId('app-navbar-language-trigger')
+    await langTrigger.click()
+    await page.getByTestId('app-navbar-language-option-es').click()
+    await expect(page.getByTestId('app-greeting-title')).toHaveText('Hola')
 
     // When - user reloads the page
     await page.reload()
 
     // Then - preference is restored
-    await expect(page.getByTestId('greeting-title')).toHaveText('Hola')
-    await expect(page.getByRole('combobox')).toHaveValue('es')
+    await expect(page.getByTestId('app-greeting-title')).toHaveText('Hola')
     await expect(page.locator('html')).toHaveAttribute('lang', 'es')
   })
 
@@ -37,8 +38,7 @@ test.describe('Locale Persistence Journey', () => {
     await page.goto('/')
 
     // Then - Spanish is used from the start
-    await expect(page.getByTestId('greeting-title')).toHaveText('Hola')
-    await expect(page.getByRole('combobox')).toHaveValue('es')
+    await expect(page.getByTestId('app-greeting-title')).toHaveText('Hola')
   })
 
   test('Given a user with English preference, When they switch to Spanish and close/reopen, Then Spanish persists', async ({
@@ -46,10 +46,12 @@ test.describe('Locale Persistence Journey', () => {
   }) => {
     // Given - start fresh
     await page.goto('/')
-    await expect(page.getByTestId('greeting-title')).toHaveText('Hello')
+    await expect(page.getByTestId('app-greeting-title')).toHaveText('Hello')
 
-    // When - switch to Spanish
-    await page.getByRole('combobox').selectOption('es')
+    // When - switch to Spanish via dropdown
+    const langTrigger = page.getByTestId('app-navbar-language-trigger')
+    await langTrigger.click()
+    await page.getByTestId('app-navbar-language-option-es').click()
 
     // Verify localStorage was updated
     const storedLocale = await page.evaluate(() => localStorage.getItem('app-locale'))
@@ -60,6 +62,6 @@ test.describe('Locale Persistence Journey', () => {
     await page.goto('/')
 
     // Then - Spanish persists
-    await expect(page.getByTestId('greeting-title')).toHaveText('Hola')
+    await expect(page.getByTestId('app-greeting-title')).toHaveText('Hola')
   })
 })

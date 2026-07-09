@@ -1,0 +1,38 @@
+// ==========================================================================
+// OBJECTS GRID - CSS Grid Layout (Outputs CSS)
+// ==========================================================================
+
+@use '../settings/tokens' as t;
+@use '../tools/responsive' as r;
+
+.o-grid {
+  display: grid;
+  gap: t.$space-4;
+}
+
+// Column variants
+.o-grid--cols-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.o-grid--cols-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.o-grid--cols-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+// Auto-fit responsive grid
+.o-grid--auto {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+}
+
+// Gap variants
+.o-grid--gap-sm {
+  gap: t.$space-2;
+}
+
+.o-grid--gap-lg {
+  gap: t.$space-6;
+}

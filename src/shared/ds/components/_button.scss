@@ -1,0 +1,79 @@
+// ==========================================================================
+// COMPONENT BUTTON - Base Button Styles (Outputs CSS)
+// ==========================================================================
+
+@use '../settings/tokens' as t;
+@use '../tools/accessibility' as a11y;
+@use '../tools/animation' as anim;
+@use '../tools/typography' as typo;
+
+.c-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: t.$space-2;
+  padding: t.$space-2 t.$space-4;
+  border-radius: t.$radius-md;
+  @include typo.text-sm;
+  @include typo.font-medium;
+  @include a11y.focus-visible-ring;
+  @include a11y.touch-target;
+  @include anim.transition(background-color, color, border-color, transform);
+  @include anim.press-animation;
+  cursor: pointer;
+
+  // Primary variant (default)
+  &--primary {
+    background-color: var(--color-interactive-primary);
+    color: var(--color-text-inverse);
+
+    &:hover {
+      background-color: var(--color-interactive-primary-hover);
+    }
+
+    &:active {
+      background-color: var(--color-interactive-primary-active);
+    }
+  }
+
+  // Secondary variant
+  &--secondary {
+    background-color: var(--color-interactive-secondary);
+    color: var(--color-text-primary);
+
+    &:hover {
+      background-color: var(--color-interactive-secondary-hover);
+    }
+  }
+
+  // Ghost variant
+  &--ghost {
+    background-color: transparent;
+    color: var(--color-text-primary);
+
+    &:hover {
+      background-color: var(--color-interactive-secondary);
+    }
+  }
+
+  // Size variants
+  &--sm {
+    padding: t.$space-1 t.$space-2;
+    @include typo.text-xs;
+  }
+
+  &--lg {
+    padding: t.$space-3 t.$space-6;
+    @include typo.text-base;
+  }
+
+  // Disabled state
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+
+    &:active {
+      transform: none;
+    }
+  }
+}

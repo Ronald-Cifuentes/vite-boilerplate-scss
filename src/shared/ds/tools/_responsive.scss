@@ -1,0 +1,51 @@
+// ==========================================================================
+// RESPONSIVE - Media Query Mixins (NO CSS OUTPUT)
+// ==========================================================================
+// Mobile-first responsive mixins. All min-width based.
+// ==========================================================================
+
+@use '../settings/breakpoints' as bp;
+
+// Mobile-first breakpoint mixins
+@mixin media-sm {
+  @media (min-width: bp.$breakpoint-sm) {
+    @content;
+  }
+}
+
+@mixin media-md {
+  @media (min-width: bp.$breakpoint-md) {
+    @content;
+  }
+}
+
+@mixin media-lg {
+  @media (min-width: bp.$breakpoint-lg) {
+    @content;
+  }
+}
+
+@mixin media-xl {
+  @media (min-width: bp.$breakpoint-xl) {
+    @content;
+  }
+}
+
+@mixin media-2xl {
+  @media (min-width: bp.$breakpoint-2xl) {
+    @content;
+  }
+}
+
+// Dynamic breakpoint mixin
+@mixin breakpoint($name) {
+  $value: map-get(bp.$breakpoints, $name);
+  @if $value {
+    @media (min-width: $value) {
+      @content;
+    }
+  } @else {
+    @warn "Unknown breakpoint: #{$name}";
+    @content;
+  }
+}

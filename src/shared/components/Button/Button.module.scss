@@ -1,0 +1,70 @@
+@use '../../ds/settings/tokens' as t;
+@use '../../ds/tools/accessibility' as a11y;
+@use '../../ds/tools/animation' as anim;
+@use '../../ds/tools/typography' as typo;
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: t.$space-2;
+  border: none;
+  border-radius: t.$radius-md;
+  cursor: pointer;
+  @include typo.font-medium;
+  @include a11y.focus-visible-ring;
+  @include a11y.touch-target;
+  @include anim.transition(background-color, color, transform);
+  @include anim.press-animation;
+
+  &--primary {
+    background-color: var(--color-interactive-primary);
+    color: var(--color-text-inverse);
+
+    &:hover:not(:disabled) {
+      background-color: var(--color-interactive-primary-hover);
+    }
+
+    &:active:not(:disabled) {
+      background-color: var(--color-interactive-primary-active);
+    }
+  }
+
+  &--secondary {
+    background-color: var(--color-interactive-secondary);
+    color: var(--color-text-primary);
+
+    &:hover:not(:disabled) {
+      background-color: var(--color-interactive-secondary-hover);
+    }
+  }
+
+  &--ghost {
+    background-color: transparent;
+    color: var(--color-text-primary);
+
+    &:hover:not(:disabled) {
+      background-color: var(--color-interactive-secondary);
+    }
+  }
+
+  &--sm {
+    padding: t.$space-1 t.$space-2;
+    @include typo.text-xs;
+  }
+
+  &--md {
+    padding: t.$space-2 t.$space-4;
+    @include typo.text-sm;
+  }
+
+  &--lg {
+    padding: t.$space-3 t.$space-6;
+    @include typo.text-base;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}

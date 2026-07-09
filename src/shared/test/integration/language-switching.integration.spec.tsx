@@ -1,55 +1,115 @@
-import { render, screen, fireEvent, RenderResult } from '@testing-library/react'
+import { render, screen, fireEvent, RenderResult, act, within } from '@testing-library/react'
 import { I18nProvider } from '../../../i18n'
-import { LanguageSelector } from '../../../features/language-selector'
+import { LanguageDropdown } from '../../../features/navbar'
 import { Greeting } from '../../../features/greeting'
+import { ThemeProvider } from '../../../theme'
+import { RegionProvider } from '../../../region'
+import { CurrencyProvider } from '../../../currency'
+import { localeSignal } from '../../../i18n/signals/locale-signal'
+
+// Full provider wrapper for dropdown components
+const TestWrapper = ({ children }: { children: React.ReactNode }): React.JSX.Element => (
+  <ThemeProvider>
+    <RegionProvider>
+      <CurrencyProvider>
+        <I18nProvider initialLocale='en'>{children}</I18nProvider>
+      </CurrencyProvider>
+    </RegionProvider>
+  </ThemeProvider>
+)
 
 describe('Language Switching Integration', () => {
   beforeEach(() => {
     localStorage.clear()
     document.documentElement.lang = ''
+    localeSignal.value = 'en'
+    jest.useFakeTimers()
   })
 
-  describe('Given LanguageSelector and Greeting are rendered together', () => {
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+
+  describe('Given LanguageDropdown and Greeting are rendered together', () => {
     const renderComponents = (): RenderResult =>
       render(
-        <I18nProvider initialLocale='en'>
-          <LanguageSelector />
+        <TestWrapper>
+          <LanguageDropdown dataTestId='lang-dropdown' />
           <Greeting />
-        </I18nProvider>
+        </TestWrapper>
       )
 
     it('Then both display initial English content', () => {
       renderComponents()
 
-      expect(screen.getByText('Language')).toBeInTheDocument()
+      // Trigger shows language icon with proper aria-label
+      expect(screen.getByTestId('lang-dropdown-trigger')).toHaveAttribute(
+        'aria-label',
+        expect.stringMatching(/english/i)
+      )
+      // Greeting shows English text
       expect(screen.getByTestId('greeting-title')).toHaveTextContent('Hello')
     })
 
-    it('When language is switched to Spanish, Then both update', () => {
+    it('When Spanish is selected via dropdown, Then both update', () => {
       renderComponents()
 
-      fireEvent.change(screen.getByRole('combobox'), { target: { value: 'es' } })
+      // Open the dropdown
+      fireEvent.click(screen.getByTestId('lang-dropdown-trigger'))
 
-      expect(screen.getByText('Idioma')).toBeInTheDocument()
+      // Find and click Spanish option
+      const panel = screen.getByRole('listbox')
+      const spanishOption = within(panel).getByText(/espa/i)
+      fireEvent.click(spanishOption)
+
+      // Advance timers for announcer debounce
+      act(() => {
+        jest.advanceTimersByTime(100)
+      })
+
+      // Trigger shows Spanish in aria-label
+      expect(screen.getByTestId('lang-dropdown-trigger')).toHaveAttribute(
+        'aria-label',
+        expect.stringMatching(/espa/i)
+      )
+      // Greeting shows Spanish text
       expect(screen.getByTestId('greeting-title')).toHaveTextContent('Hola')
       expect(screen.getByTestId('greeting-subtitle')).toHaveTextContent(
-        'Bienvenido a la aplicación'
+        'Bienvenido a la aplicacion'
       )
     })
 
-    it('When switching multiple times, Then state remains consistent', () => {
+    it('When switching languages multiple times, Then state remains consistent', () => {
       renderComponents()
 
       // Switch to Spanish
-      fireEvent.change(screen.getByRole('combobox'), { target: { value: 'es' } })
+      fireEvent.click(screen.getByTestId('lang-dropdown-trigger'))
+      fireEvent.click(within(screen.getByRole('listbox')).getByText(/espa/i))
+
+      act(() => {
+        jest.advanceTimersByTime(100)
+      })
+
       expect(screen.getByTestId('greeting-title')).toHaveTextContent('Hola')
 
       // Switch back to English
-      fireEvent.change(screen.getByRole('combobox'), { target: { value: 'en' } })
+      fireEvent.click(screen.getByTestId('lang-dropdown-trigger'))
+      fireEvent.click(within(screen.getByRole('listbox')).getByText(/english/i))
+
+      act(() => {
+        jest.advanceTimersByTime(100)
+      })
+
       expect(screen.getByTestId('greeting-title')).toHaveTextContent('Hello')
 
       // Switch to Spanish again
-      fireEvent.change(screen.getByRole('combobox'), { target: { value: 'es' } })
+      fireEvent.click(screen.getByTestId('lang-dropdown-trigger'))
+      fireEvent.click(within(screen.getByRole('listbox')).getByText(/espa/i))
+
+      act(() => {
+        jest.advanceTimersByTime(100)
+      })
+
       expect(screen.getByTestId('greeting-title')).toHaveTextContent('Hola')
     })
   })
@@ -57,20 +117,32 @@ describe('Language Switching Integration', () => {
   describe('Given multiple components consuming i18n', () => {
     it('Then all components update on locale change', () => {
       render(
-        <I18nProvider initialLocale='en'>
-          <LanguageSelector dataTestId='selector-1' />
-          <LanguageSelector dataTestId='selector-2' />
+        <TestWrapper>
+          <LanguageDropdown dataTestId='dropdown-1' />
+          <LanguageDropdown dataTestId='dropdown-2' />
           <Greeting dataTestId='greeting-1' />
           <Greeting dataTestId='greeting-2' />
-        </I18nProvider>
+        </TestWrapper>
       )
 
-      // Change via first selector
-      fireEvent.change(screen.getByTestId('selector-1-select'), { target: { value: 'es' } })
+      // Change via first dropdown
+      fireEvent.click(screen.getByTestId('dropdown-1-trigger'))
+      fireEvent.click(within(screen.getByTestId('dropdown-1-panel')).getByText(/espa/i))
 
-      // All selectors update
-      expect(screen.getByTestId('selector-1-select')).toHaveValue('es')
-      expect(screen.getByTestId('selector-2-select')).toHaveValue('es')
+      // Advance timers for announcer debounce
+      act(() => {
+        jest.advanceTimersByTime(100)
+      })
+
+      // All dropdowns show Spanish in aria-label
+      expect(screen.getByTestId('dropdown-1-trigger')).toHaveAttribute(
+        'aria-label',
+        expect.stringMatching(/espa/i)
+      )
+      expect(screen.getByTestId('dropdown-2-trigger')).toHaveAttribute(
+        'aria-label',
+        expect.stringMatching(/espa/i)
+      )
 
       // All greetings update
       expect(screen.getByTestId('greeting-1-title')).toHaveTextContent('Hola')

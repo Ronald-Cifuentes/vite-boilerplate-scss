@@ -1,0 +1,59 @@
+// ==========================================================================
+// RESET - CSS Reset (Outputs CSS)
+// ==========================================================================
+// Minimal reset for consistent cross-browser styling.
+// ==========================================================================
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  // Use font from theme
+  font-family: var(--font-family-base);
+  // Smooth scrolling unless user prefers reduced motion
+  scroll-behavior: smooth;
+
+  @media (prefers-reduced-motion: reduce) {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  background-color: var(--color-surface-base);
+  color: var(--color-text-primary);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+// Remove list styles on ul, ol with class
+ul[class],
+ol[class] {
+  list-style: none;
+}
+
+// Remove underlines on anchor tags with class
+a[class] {
+  text-decoration: none;
+}

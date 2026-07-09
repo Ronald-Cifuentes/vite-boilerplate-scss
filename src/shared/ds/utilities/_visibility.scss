@@ -1,0 +1,27 @@
+// ==========================================================================
+// UTILITIES VISIBILITY - Visibility Utilities (Outputs CSS)
+// ==========================================================================
+// Single-purpose utility classes. !important allowed in utilities only.
+// ==========================================================================
+
+@use '../tools/accessibility' as a11y;
+
+// Screen reader only
+.u-sr-only {
+  @include a11y.sr-only;
+}
+
+// Hidden (display none)
+.u-hidden {
+  display: none !important;
+}
+
+// Visible
+.u-visible {
+  visibility: visible !important;
+}
+
+// Invisible (takes space but hidden)
+.u-invisible {
+  visibility: hidden !important;
+}

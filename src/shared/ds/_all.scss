@@ -1,0 +1,31 @@
+// ==========================================================================
+// DESIGN SYSTEM - Master Import
+// ==========================================================================
+// Import this file once in main.scss. Layers are imported in ITCSS order:
+// Settings -> Tools -> Themes -> Generic -> Elements -> Objects -> Components -> Utilities
+//
+// Settings and Tools produce NO CSS output (variables and mixins only).
+// Themes MUST come before Generic so CSS custom properties are defined.
+// ==========================================================================
+
+// Layer 0: Settings (no output)
+// Layer 1: Tools (no output)
+// (Settings and Tools are imported via @use within other layers)
+
+// Themes - CSS custom property definitions (must be first CSS output)
+@use 'themes';
+
+// Layer 2: Generic - Resets
+@use 'generic';
+
+// Layer 3: Elements - Base HTML elements
+@use 'elements';
+
+// Layer 4: Objects - Layout patterns
+@use 'objects';
+
+// Layer 5: Components - UI components
+@use 'components';
+
+// Layer 6: Utilities - Single-purpose helpers
+@use 'utilities';

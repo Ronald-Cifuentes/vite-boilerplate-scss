@@ -1,0 +1,41 @@
+// ==========================================================================
+// OBJECTS STACK - Vertical Rhythm (Outputs CSS)
+// ==========================================================================
+
+@use '../settings/tokens' as t;
+
+.o-stack {
+  display: flex;
+  flex-direction: column;
+  gap: t.$space-4;
+}
+
+// Gap variants
+.o-stack--gap-xs {
+  gap: t.$space-1;
+}
+
+.o-stack--gap-sm {
+  gap: t.$space-2;
+}
+
+.o-stack--gap-md {
+  gap: t.$space-4;
+}
+
+.o-stack--gap-lg {
+  gap: t.$space-6;
+}
+
+.o-stack--gap-xl {
+  gap: t.$space-8;
+}
+
+// Alignment
+.o-stack--center {
+  align-items: center;
+}
+
+.o-stack--stretch {
+  align-items: stretch;
+}

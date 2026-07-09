@@ -1,0 +1,53 @@
+// ==========================================================================
+// DARK THEME - Dark Mode CSS Custom Properties
+// ==========================================================================
+
+@use '../settings/palette' as p;
+@use '../settings/tokens' as t;
+
+[data-theme='dark'] {
+  // Surface colors (backgrounds)
+  --color-surface-base: #{p.$palette-gray-900};
+  --color-surface-raised: #{p.$palette-gray-800};
+  --color-surface-overlay: #{p.$palette-gray-700};
+
+  // Text colors
+  --color-text-primary: #{p.$palette-gray-50};
+  --color-text-secondary: #{p.$palette-gray-300};
+  --color-text-muted: #{p.$palette-gray-500};
+  --color-text-inverse: #{p.$palette-gray-900};
+
+  // Interactive colors
+  --color-interactive-primary: #{p.$palette-blue-500};
+  --color-interactive-primary-hover: #{p.$palette-blue-400};
+  --color-interactive-primary-active: #{p.$palette-blue-300};
+  --color-interactive-secondary: #{p.$palette-gray-700};
+  --color-interactive-secondary-hover: #{p.$palette-gray-600};
+
+  // Feedback colors
+  --color-feedback-success: #{p.$palette-green-400};
+  --color-feedback-warning: #{p.$palette-amber-400};
+  --color-feedback-error: #{p.$palette-red-400};
+  --color-feedback-info: #{p.$palette-blue-400};
+
+  // Border colors
+  --color-border-default: #{p.$palette-gray-700};
+  --color-border-strong: #{p.$palette-gray-500};
+  --color-border-focus: #{p.$palette-blue-400};
+
+  // Shadows (deeper in dark mode)
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+
+  // Typography
+  --font-family-base: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  --font-family-mono: 'Fira Code', Consolas, 'Courier New', monospace;
+
+  // Transitions
+  --transition-fast: #{t.$transition-duration-fast} #{t.$transition-timing-default};
+  --transition-normal: #{t.$transition-duration-normal} #{t.$transition-timing-default};
+
+  // Browser hint for native form controls
+  color-scheme: dark;
+}

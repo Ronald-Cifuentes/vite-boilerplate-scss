@@ -1,0 +1,72 @@
+@use '../../ds/settings/tokens' as t;
+@use '../../ds/tools/accessibility' as a11y;
+@use '../../ds/tools/animation' as anim;
+
+.iconButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: t.$radius-md;
+  cursor: pointer;
+  @include a11y.focus-visible-ring;
+  @include a11y.touch-target;
+  @include anim.transition(background-color, color, transform);
+  @include anim.press-animation;
+
+  // Size variants
+  &--sm {
+    width: t.$touch-target-min;
+    height: t.$touch-target-min;
+    font-size: 1.125rem;
+  }
+
+  &--md {
+    width: t.$touch-target-min;
+    height: t.$touch-target-min;
+    font-size: 1.25rem;
+  }
+
+  &--lg {
+    width: 56px;
+    height: 56px;
+    font-size: 1.5rem;
+  }
+
+  // Variant styles
+  &--primary {
+    background-color: var(--color-interactive-primary);
+    color: var(--color-text-inverse);
+
+    &:hover:not(:disabled) {
+      background-color: var(--color-interactive-primary-hover);
+    }
+
+    &:active:not(:disabled) {
+      background-color: var(--color-interactive-primary-active);
+    }
+  }
+
+  &--secondary {
+    background-color: var(--color-interactive-secondary);
+    color: var(--color-text-primary);
+
+    &:hover:not(:disabled) {
+      background-color: var(--color-interactive-secondary-hover);
+    }
+  }
+
+  &--ghost {
+    background-color: transparent;
+    color: var(--color-text-primary);
+
+    &:hover:not(:disabled) {
+      background-color: var(--color-interactive-secondary);
+    }
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}

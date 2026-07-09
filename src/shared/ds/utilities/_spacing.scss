@@ -1,0 +1,117 @@
+// ==========================================================================
+// UTILITIES SPACING - Spacing Utilities (Outputs CSS)
+// ==========================================================================
+// Single-purpose utility classes. !important allowed in utilities only.
+// ==========================================================================
+
+@use '../settings/tokens' as t;
+
+// Margin utilities
+.u-m-0 {
+  margin: t.$space-0 !important;
+}
+.u-m-1 {
+  margin: t.$space-1 !important;
+}
+.u-m-2 {
+  margin: t.$space-2 !important;
+}
+.u-m-3 {
+  margin: t.$space-3 !important;
+}
+.u-m-4 {
+  margin: t.$space-4 !important;
+}
+
+.u-mt-0 {
+  margin-top: t.$space-0 !important;
+}
+.u-mt-1 {
+  margin-top: t.$space-1 !important;
+}
+.u-mt-2 {
+  margin-top: t.$space-2 !important;
+}
+.u-mt-3 {
+  margin-top: t.$space-3 !important;
+}
+.u-mt-4 {
+  margin-top: t.$space-4 !important;
+}
+.u-mt-5 {
+  margin-top: t.$space-5 !important;
+}
+.u-mt-6 {
+  margin-top: t.$space-6 !important;
+}
+
+.u-mb-0 {
+  margin-bottom: t.$space-0 !important;
+}
+.u-mb-1 {
+  margin-bottom: t.$space-1 !important;
+}
+.u-mb-2 {
+  margin-bottom: t.$space-2 !important;
+}
+.u-mb-3 {
+  margin-bottom: t.$space-3 !important;
+}
+.u-mb-4 {
+  margin-bottom: t.$space-4 !important;
+}
+
+.u-ml-0 {
+  margin-left: t.$space-0 !important;
+}
+.u-ml-auto {
+  margin-left: auto !important;
+}
+.u-mr-0 {
+  margin-right: t.$space-0 !important;
+}
+.u-mr-auto {
+  margin-right: auto !important;
+}
+.u-mx-auto {
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+// Padding utilities
+.u-p-0 {
+  padding: t.$space-0 !important;
+}
+.u-p-1 {
+  padding: t.$space-1 !important;
+}
+.u-p-2 {
+  padding: t.$space-2 !important;
+}
+.u-p-3 {
+  padding: t.$space-3 !important;
+}
+.u-p-4 {
+  padding: t.$space-4 !important;
+}
+
+.u-pt-0 {
+  padding-top: t.$space-0 !important;
+}
+.u-pt-4 {
+  padding-top: t.$space-4 !important;
+}
+.u-pb-0 {
+  padding-bottom: t.$space-0 !important;
+}
+.u-pb-4 {
+  padding-bottom: t.$space-4 !important;
+}
+.u-px-4 {
+  padding-left: t.$space-4 !important;
+  padding-right: t.$space-4 !important;
+}
+.u-py-4 {
+  padding-top: t.$space-4 !important;
+  padding-bottom: t.$space-4 !important;
+}

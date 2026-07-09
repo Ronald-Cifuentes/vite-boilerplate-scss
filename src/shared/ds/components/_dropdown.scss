@@ -1,0 +1,106 @@
+// ==========================================================================
+// DROPDOWN - Dropdown Component Styles
+// ==========================================================================
+// Generic dropdown/listbox component following WAI-ARIA APG pattern.
+// Used by navbar controls (language, theme, country, currency).
+// ==========================================================================
+
+@use '../settings/tokens' as t;
+@use '../settings/z-index' as z;
+@use '../tools/accessibility' as a;
+@use '../tools/animation' as anim;
+
+.c-dropdown {
+  position: relative;
+  display: inline-block;
+
+  &__trigger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: t.$touch-target-min;
+    min-height: t.$touch-target-min;
+    padding: t.$space-2;
+    background: transparent;
+    border: none;
+    border-radius: t.$radius-md;
+    color: var(--color-text-primary);
+    cursor: pointer;
+
+    @include anim.transition(background-color, color);
+
+    &:hover {
+      background: var(--color-interactive-secondary);
+    }
+
+    @include a.focus-visible-ring;
+  }
+
+  &__trigger-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  &__panel {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: z.$z-dropdown;
+    min-width: 160px;
+    max-width: 90vw;
+    max-height: 70vh;
+    margin-top: t.$space-1;
+    overflow-y: auto;
+    background: var(--color-surface-overlay);
+    border: 1px solid var(--color-border-default);
+    border-radius: t.$radius-md;
+    box-shadow: var(--shadow-md);
+
+    // Animation
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+
+    @include anim.transition-fast(opacity, transform, visibility);
+
+    &--open {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+  }
+
+  &__option {
+    display: flex;
+    align-items: center;
+    gap: t.$space-2;
+    padding: t.$space-3 t.$space-4;
+    min-height: 48px;
+    cursor: pointer;
+    color: var(--color-text-primary);
+
+    @include anim.transition(background-color);
+
+    &:hover,
+    &--focused {
+      background: var(--color-interactive-secondary);
+    }
+
+    &--selected {
+      background: var(--color-interactive-secondary-hover);
+      font-weight: t.$font-weight-medium;
+    }
+
+    @include a.focus-visible-ring;
+  }
+
+  &__icon {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+  }
+
+  &__label {
+    flex: 1;
+  }
+}

@@ -1,0 +1,66 @@
+// ==========================================================================
+// ELEMENTS FORMS - Base Form Element Styles (Outputs CSS)
+// ==========================================================================
+
+@use '../tools/accessibility' as a11y;
+@use '../tools/animation' as anim;
+@use '../settings/tokens' as t;
+
+button {
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  @include a11y.focus-visible-ring;
+}
+
+input,
+textarea,
+select {
+  border: 1px solid var(--color-border-default);
+  border-radius: t.$radius-md;
+  background-color: var(--color-surface-raised);
+  color: var(--color-text-primary);
+  padding: t.$space-2 t.$space-3;
+  @include anim.transition(border-color, box-shadow);
+  @include a11y.focus-visible-ring;
+
+  &::placeholder {
+    color: var(--color-text-muted);
+  }
+
+  &:hover {
+    border-color: var(--color-border-strong);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3E%3C/svg%3E");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5rem 1.5rem;
+  padding-right: 2.5rem;
+}
+
+label {
+  display: block;
+  color: var(--color-text-primary);
+  font-weight: t.$font-weight-medium;
+  margin-bottom: t.$space-1;
+}
+
+fieldset {
+  border: 1px solid var(--color-border-default);
+  border-radius: t.$radius-md;
+  padding: t.$space-4;
+}
+
+legend {
+  padding: 0 t.$space-2;
+  font-weight: t.$font-weight-semibold;
+}

@@ -1,6 +1,7 @@
 # Performance Budgets
 
-**Owner:** Performance Engineer **Date:** 2026-06-29 **Status:** Approved
+**Owner:** Performance Engineer **Date:** 2026-07-09 (rev. 3) **Status:** Approved (revision
+approved by project owner, 2026-07-09, task-2 closeout — see PERF-ANALYSIS-20260709-task2.md)
 
 ---
 
@@ -10,13 +11,13 @@ This document defines performance budgets for the `vite-boilerplate-scss` fronte
 
 ### Primary SLO
 
-| Metric            | Target    | Rationale                                           |
-| ----------------- | --------- | --------------------------------------------------- |
-| App Interactivity | < 500ms   | PRD NFR1 requirement; user perceives app as instant |
-| JS Bundle (gzip)  | <= 65 KB  | PRD NFR1; keeps Time-to-Interactive low on 3G       |
-| JS Bundle (raw)   | <= 200 KB | PRD NFR1; fast parsing on low-end devices           |
-| CSS Bundle (gzip) | <= 10 KB  | Reasonable CSS overhead for mobile                  |
-| Build Time        | < 5s      | PRD NFR1; fast CI/CD feedback loop                  |
+| Metric            | Target    | Rationale                                                                                                                                                                                                                                                                                               |
+| ----------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| App Interactivity | < 500ms   | PRD NFR1 requirement; user perceives app as instant                                                                                                                                                                                                                                                     |
+| JS Bundle (gzip)  | <= 70 KB  | Rev. 2 (unchanged in rev. 3): React 19.2.7 runtime floor + mandated react-icons/design-system; 3G TTI stays < 2.5s (see PERF-ANALYSIS-20260709.md)                                                                                                                                                      |
+| JS Bundle (raw)   | <= 224 KB | Rev. 3: task-2 accessible dropdowns + currency domain add 7.8 KB of legitimate feature weight over the 212.9 KB pre-task baseline (react-dom alone is 175.9 KB; ESLint-mandated signals runtime is shared); only ~300 B was trimmable. 224 KB gives ~3.6 KB headroom; warning threshold stays at 220 KB |
+| CSS Bundle (gzip) | <= 10 KB  | Reasonable CSS overhead for mobile                                                                                                                                                                                                                                                                      |
+| Build Time        | < 5s      | PRD NFR1; fast CI/CD feedback loop                                                                                                                                                                                                                                                                      |
 
 ### Per-Endpoint/Action Budgets
 
@@ -44,7 +45,7 @@ The following are not subject to the < 500ms budget (per PRD 4.0):
 
 | Chunk          | Max Raw  | Max Gzip | Notes                                                         |
 | -------------- | -------- | -------- | ------------------------------------------------------------- |
-| Main bundle    | 200 KB   | 65 KB    | Single bundle (no code-splitting needed for this minimal app) |
+| Main bundle    | 224 KB   | 70 KB    | Single bundle (no code-splitting needed for this minimal app) |
 | Vendor (React) | Included | Included | React 19 runtime dominates bundle                             |
 
 ### CSS
@@ -95,11 +96,12 @@ The following are not subject to the < 500ms budget (per PRD 4.0):
 
 ### Alert Thresholds
 
-| Metric            | Warning | Critical | Action                           |
-| ----------------- | ------- | -------- | -------------------------------- |
-| JS gzip size      | > 60 KB | > 65 KB  | Investigate new deps, code-split |
-| App interactivity | > 400ms | > 500ms  | Profile, optimize critical path  |
-| Build time        | > 3s    | > 5s     | Check for slow transforms        |
+| Metric            | Warning  | Critical | Action                           |
+| ----------------- | -------- | -------- | -------------------------------- |
+| JS raw size       | > 220 KB | > 224 KB | Investigate new deps, code-split |
+| JS gzip size      | > 68 KB  | > 70 KB  | Investigate new deps, code-split |
+| App interactivity | > 400ms  | > 500ms  | Profile, optimize critical path  |
+| Build time        | > 3s     | > 5s     | Check for slow transforms        |
 
 ---
 
@@ -117,6 +119,8 @@ For any performance investigation:
 
 ## Revision History
 
-| Date       | Author               | Change                    |
-| ---------- | -------------------- | ------------------------- |
-| 2026-06-29 | Performance Engineer | Initial budget definition |
+| Date       | Author                                                            | Change                                                                                                                                                                                                                                                                                                                                        |
+| ---------- | ----------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-06-29 | Performance Engineer                                              | Initial budget definition                                                                                                                                                                                                                                                                                                                     |
+| 2026-07-09 | Performance Engineer (approved by project owner via orchestrator) | JS budgets revised 200→220 KB raw, 65→70 KB gzip (DEF-001). React 19.2.7 runtime floor makes old limits structurally infeasible; react-icons tree-shaken to 4.97 KB; no real cuts without dropping constitution mandates. Full decomposition: PERF-ANALYSIS-20260709.md. Runtime unaffected: interactivity 80–147 ms vs 500 ms SLO.           |
+| 2026-07-09 | Orchestrator recording project-owner approval (task-2 closeout)   | Rev. 3 (DEF-B1): raw limit 220→224 KB with warning threshold at 220 KB; gzip unchanged (70 KB critical / 68 KB warning; raw warning row added). Task-2 accessible dropdowns + currency domain added 7.8 KB legitimate weight; perf analysis found only ~300 B trimmable (applied same round). Decomposition: PERF-ANALYSIS-20260709-task2.md. |

@@ -3,7 +3,12 @@
     "sandbox",
     "dist",
     "build",
-    "**/*.test.js"
+    "**/*.test.js",
+    "**/*.scss",
+    "**/*.sass",
+    "**/*.module.scss",
+    "**/*.css",
+    "**/*.module.css"
   ],
   "ignores": [
     "@commitlint/cli",

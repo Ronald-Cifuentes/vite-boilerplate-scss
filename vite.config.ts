@@ -4,6 +4,10 @@ import react from '@vitejs/plugin-react'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
+  build: {
+    // Target modern browsers to reduce polyfills
+    target: 'esnext',
+  },
   server: {
     // Pin the dev port and FAIL loudly if it's taken, instead of silently
     // falling back to 5174 (which makes :5173 show whatever other Vite project

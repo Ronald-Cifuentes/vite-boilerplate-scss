@@ -1,0 +1,27 @@
+@use '../../../../shared/ds/settings/tokens' as t;
+@use '../../../../shared/ds/tools/responsive' as r;
+@use '../../../../shared/ds/tools/animation' as anim;
+
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: t.$space-3 t.$space-4;
+  background-color: var(--color-surface-raised);
+  border-bottom: 1px solid var(--color-border-default);
+  @include anim.theme-transition;
+
+  @include r.media-md {
+    padding: t.$space-3 t.$space-6;
+  }
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: t.$space-2;
+
+  @include r.media-md {
+    gap: t.$space-3;
+  }
+}

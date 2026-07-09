@@ -1,0 +1,62 @@
+// ==========================================================================
+// PALETTE - Raw Color Values (NO CSS OUTPUT)
+// ==========================================================================
+// Primitive colors used only by theme files to define semantic tokens.
+// NEVER use these directly in components.
+// ==========================================================================
+
+// Gray Scale
+$palette-white: #ffffff;
+$palette-black: #000000;
+$palette-gray-50: #f9fafb;
+$palette-gray-100: #f3f4f6;
+$palette-gray-200: #e5e7eb;
+$palette-gray-300: #d1d5db;
+$palette-gray-400: #9ca3af;
+$palette-gray-500: #6b7280;
+$palette-gray-600: #4b5563;
+$palette-gray-700: #374151;
+$palette-gray-800: #1f2937;
+$palette-gray-900: #111827;
+$palette-gray-950: #030712;
+
+// Blue Scale (Primary)
+$palette-blue-50: #eff6ff;
+$palette-blue-100: #dbeafe;
+$palette-blue-200: #bfdbfe;
+$palette-blue-300: #93c5fd;
+$palette-blue-400: #60a5fa;
+$palette-blue-500: #3b82f6;
+$palette-blue-600: #2563eb;
+$palette-blue-700: #1d4ed8;
+$palette-blue-800: #1e40af;
+$palette-blue-900: #1e3a8a;
+
+// Green Scale (Success)
+$palette-green-50: #f0fdf4;
+$palette-green-100: #dcfce7;
+$palette-green-200: #bbf7d0;
+$palette-green-300: #86efac;
+$palette-green-400: #4ade80;
+$palette-green-500: #22c55e;
+$palette-green-600: #16a34a;
+$palette-green-700: #15803d;
+
+// Amber Scale (Warning)
+$palette-amber-50: #fffbeb;
+$palette-amber-100: #fef3c7;
+$palette-amber-200: #fde68a;
+$palette-amber-300: #fcd34d;
+$palette-amber-400: #fbbf24;
+$palette-amber-500: #f59e0b;
+$palette-amber-600: #d97706;
+
+// Red Scale (Error)
+$palette-red-50: #fef2f2;
+$palette-red-100: #fee2e2;
+$palette-red-200: #fecaca;
+$palette-red-300: #fca5a5;
+$palette-red-400: #f87171;
+$palette-red-500: #ef4444;
+$palette-red-600: #dc2626;
+$palette-red-700: #b91c1c;

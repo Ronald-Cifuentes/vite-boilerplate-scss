@@ -1,0 +1,69 @@
+// ==========================================================================
+// TYPOGRAPHY - Font Mixins (NO CSS OUTPUT)
+// ==========================================================================
+// Typography utility mixins.
+// ==========================================================================
+
+@use '../settings/tokens' as t;
+
+@mixin text-xs {
+  font-size: t.$font-size-xs;
+  line-height: t.$line-height-normal;
+}
+
+@mixin text-sm {
+  font-size: t.$font-size-sm;
+  line-height: t.$line-height-normal;
+}
+
+@mixin text-base {
+  font-size: t.$font-size-base;
+  line-height: t.$line-height-normal;
+}
+
+@mixin text-lg {
+  font-size: t.$font-size-lg;
+  line-height: t.$line-height-normal;
+}
+
+@mixin text-xl {
+  font-size: t.$font-size-xl;
+  line-height: t.$line-height-tight;
+}
+
+@mixin text-2xl {
+  font-size: t.$font-size-2xl;
+  line-height: t.$line-height-tight;
+}
+
+@mixin text-3xl {
+  font-size: t.$font-size-3xl;
+  line-height: t.$line-height-tight;
+}
+
+@mixin text-4xl {
+  font-size: t.$font-size-4xl;
+  line-height: t.$line-height-tight;
+}
+
+@mixin font-normal {
+  font-weight: t.$font-weight-normal;
+}
+
+@mixin font-medium {
+  font-weight: t.$font-weight-medium;
+}
+
+@mixin font-semibold {
+  font-weight: t.$font-weight-semibold;
+}
+
+@mixin font-bold {
+  font-weight: t.$font-weight-bold;
+}
+
+@mixin truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

@@ -1,0 +1,5 @@
+@use '../../ds/tools/accessibility' as a11y;
+
+.announcer {
+  @include a11y.sr-only;
+}

@@ -1,8 +1,8 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Poppins', sans-serif;
-  scroll-behavior: smooth;
-  color-scheme: dark;
-}
+// ==========================================================================
+// MAIN STYLESHEET - Application Entry Point
+// ==========================================================================
+// Imports the design system. All styles flow from DS layers.
+// No hardcoded values allowed here.
+// ==========================================================================
+
+@use 'shared/ds/all';

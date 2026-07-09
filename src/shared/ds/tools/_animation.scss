@@ -1,0 +1,94 @@
+// ==========================================================================
+// ANIMATION - Animation/Transition Mixins (NO CSS OUTPUT)
+// ==========================================================================
+// Animation mixins that respect prefers-reduced-motion.
+// ==========================================================================
+
+@use 'sass:list';
+@use '../settings/tokens' as t;
+
+// Standard transition with reduced-motion support
+@mixin transition($properties...) {
+  @if list.length($properties) == 0 {
+    transition: all t.$transition-duration-normal t.$transition-timing-default;
+  } @else {
+    $value: ();
+    @each $property in $properties {
+      $value: list.append(
+        $value,
+        $property t.$transition-duration-normal t.$transition-timing-default,
+        comma
+      );
+    }
+    transition: $value;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
+// Fast transition
+@mixin transition-fast($properties...) {
+  @if list.length($properties) == 0 {
+    transition: all t.$transition-duration-fast t.$transition-timing-default;
+  } @else {
+    $value: ();
+    @each $property in $properties {
+      $value: list.append(
+        $value,
+        $property t.$transition-duration-fast t.$transition-timing-default,
+        comma
+      );
+    }
+    transition: $value;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
+// Theme transition - specifically for color/background transitions during theme change
+@mixin theme-transition {
+  transition:
+    background-color t.$transition-duration-normal t.$transition-timing-default,
+    color t.$transition-duration-normal t.$transition-timing-default,
+    border-color t.$transition-duration-normal t.$transition-timing-default,
+    box-shadow t.$transition-duration-normal t.$transition-timing-default;
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
+// Button press animation
+@mixin press-animation {
+  &:active {
+    transform: scale(0.96);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &:active {
+      transform: none;
+    }
+  }
+}
+
+// Spin animation (for loading states)
+@mixin spin {
+  animation: spin 1s linear infinite;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

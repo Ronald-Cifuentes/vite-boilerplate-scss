@@ -1,0 +1,154 @@
+{
+  "task": "TASK 3 (supersession #2, THEME CONTROL ONLY): replace ThemeDropdown with a tri-state icon CYCLE BUTTON — press cycles light → dark → system; icon swaps per mode; 'system' follows the OS preference (matchMedia) LIVE. Language, country, currency dropdowns unchanged. All task-2 cross-cutting requirements remain binding: icon-only control, nothing decorative, 100% mobile-first, i18n en+es.",
+  "startedAt": "20260709-1847",
+  "previousTask": "logs/state-20260709-task2-final.json",
+  "supersession": "User 2026-07-09 (verbatim): 'Dark mode cannot be a dropdown menu because that would confuse or annoy the user; it's better if it's a button that changes as it's pressed. It will have three modes that swap the icon: light mode, dark mode, and system (which will use the one the user has for their system).' Supersedes CONTRACTS §7.2 (ThemeDropdown) for the theme control ONLY.",
+  "taskClass": "standard",
+  "scope": "incremental",
+  "baseline": "commit 3589fe4 + 14 uncommitted task-2 final-round files; baseline gates verified 1842-1845",
+  "changedDomains": [
+    "frontend",
+    "architecture",
+    "qa",
+    "security (index.html FOUC script modified — micro-triaged)"
+  ],
+  "requiredGates": {
+    "lint_clean": { "status": true, "evidence": "orchestrator: pnpm lint exit 0 (it3)" },
+    "typecheck_clean": {
+      "status": true,
+      "evidence": "orchestrator: pnpm exec tsc --noEmit exit 0 (it3)"
+    },
+    "build_ok": { "status": true, "evidence": "orchestrator: pnpm build exit 0 (it3)" },
+    "affected_tests_pass": {
+      "status": true,
+      "evidence": "orchestrator: jest 39 suites / 490 tests pass"
+    },
+    "coverage_100": {
+      "status": true,
+      "evidence": "orchestrator: 100% — 629/629, 140/140, 133/133, 598/598"
+    },
+    "e2e_affected_pass": {
+      "status": true,
+      "evidence": "orchestrator: playwright exit 0, 75/75 — tri-state cycle, LIVE OS-follow both directions without reload, FOUC matrix, default-system, back-compat, remaining-3-dropdown keyboard suite intact"
+    },
+    "arch_tests_pass": {
+      "status": true,
+      "evidence": "arch + design-system suites green inside jest run"
+    },
+    "a11y_responsive_ok": {
+      "status": true,
+      "evidence": "no aria-haspopup (accessibility.spec.ts:175), dynamic localized aria-label (:158), Enter/Space (:182), icon-only (navbar-controls:143), ≥44px (:154); viewports 375/768/1440; QA cycle-1 verified"
+    },
+    "mobile_first_enforced": {
+      "status": true,
+      "evidence": "grep 0 max-width @media; arch test green"
+    },
+    "nothing_decorative": {
+      "status": true,
+      "evidence": "QA cycle-1 sweep: button cycles+announces+persists; no dead affordances"
+    },
+    "no_hardcoded": {
+      "status": true,
+      "evidence": "i18n keys en+es for all 3 modes; arch tests; grep clean"
+    },
+    "no_secrets": { "status": true, "evidence": "grep secret patterns: 0" },
+    "no_todo_fixme": { "status": true, "evidence": "grep TODO|FIXME|HACK: 0" },
+    "bundle_within_budgets_rev3": {
+      "status": true,
+      "evidence": "221,845 raw ≤ 224,000; 69,411 gzip ≤ 70,000. Growth +1,246/+472 vs task-2 final, honestly flagged by FE (architect estimated -100..-200 — miss documented). Headroom now 2,155 raw / 589 gzip"
+    },
+    "system_mode_correct": {
+      "status": true,
+      "evidence": "e2e theme-persistence.spec.ts:110/130 live OS-follow without reload (both directions), :145 explicit ignores OS, :39/227 system persists + default, :211 FOUC resolves stored 'system'; ThemeProvider.tsx:64-74 listener with cleanup"
+    }
+  },
+  "harnessNotes": {
+    "e2e_install": "cd e2e && pnpm install --ignore-workspace (root pnpm-workspace.yaml has no packages: field)",
+    "jest_coverage": "use pnpm exec jest --coverage (pnpm test -- --coverage passes --coverage as a test pattern)",
+    "e2e_stale_server": "ALWAYS kill anything on :4173 before e2e (lsof -ti:4173 | xargs kill -9)",
+    "no_destructive_git": "NEVER git clean/stash/reset/checkout-- — uncommitted signed-off work lives in the tree until the user commits",
+    "formatter_hook": "PostToolUse hook reformats after Write/Edit — normal",
+    "playwright_output": "RTK proxy truncates/swallows playwright stdout AND redirects — wrap in sh -c '... > file' and read the file, or rely on exit code"
+  },
+  "profiles": {
+    "orchestrator": {
+      "status": "signed_off",
+      "attempts": 1,
+      "log": "logs/20260709-1936-Orchestrator_Master.md"
+    },
+    "architect": {
+      "status": "passed",
+      "attempts": 1,
+      "log": "logs/20260709-1858-Architect.md",
+      "note": "ADR-0009, CONTRACTS v3.1.0, 47 THEME3 rows; icons existence-verified"
+    },
+    "backend-engineer": {
+      "status": "not_applicable",
+      "attempts": 0,
+      "log": "logs/20260709-1935-Backend_Engineer.md"
+    },
+    "frontend-engineer": {
+      "status": "passed",
+      "attempts": 1,
+      "log": "logs/20260709-1917-Frontend_Engineer.md",
+      "note": "single-pass implementation; bundle growth honestly flagged (task-2 anti-pattern brief effective)"
+    },
+    "qa-engineer": {
+      "status": "passed_cycle1",
+      "attempts": 1,
+      "log": "logs/20260709-1931-QA_Engineer.md",
+      "report": "docs/qa/QA-REPORT-20260709-task3-cycle1.md",
+      "note": "ZERO defects (first clean first-cycle QA in project); diff-review: no prior coverage weakened; 47/47 THEME3 rows; project 183/0/11"
+    },
+    "security-auditor": {
+      "status": "passed",
+      "attempts": 1,
+      "log": "logs/20260709-1933-Security_Auditor.md",
+      "note": "micro-triage FOUC script: sink-free, SEC-005 REDUCED (new allowlist); deps untouched"
+    },
+    "performance-engineer": {
+      "status": "passed_gate_check",
+      "attempts": 1,
+      "log": "logs/20260709-1935-Performance_Engineer.md",
+      "note": "gate green under rev.3; headroom 2,155 raw / 589 gzip — next feature likely needs code-splitting or owner decision"
+    },
+    "devops-engineer": {
+      "status": "not_applicable",
+      "attempts": 0,
+      "log": "logs/20260709-1935-DevOps_Engineer.md"
+    }
+  },
+  "iteration": 4,
+  "maxIterations": 8,
+  "maxAttempts": 3,
+  "noProgressLimit": 3,
+  "noProgressStreak": 0,
+  "openFindings": [],
+  "incidentsCarriedOver": [
+    "INC-001 (task 1): perf agent destructive git clean — prevention rule in harnessNotes",
+    "PATTERN (task 2): FE gate-glossing — countermeasure (explicit anti-pattern brief + independent re-verify) applied in task 3 and WORKED (FE self-flagged bundle growth)"
+  ],
+  "history": [
+    {
+      "iteration": 1,
+      "ts": "20260709-1847",
+      "action": "task-3 intake: supersession #2 recorded; baseline green from task-2 sign-off; architect dispatched"
+    },
+    {
+      "iteration": 2,
+      "ts": "20260709-1900",
+      "action": "architect passed (ADR-0009 18.5K, CONTRACTS v3.1.0, 47 rows, icons verified); FE dispatched with task-2 anti-pattern brief"
+    },
+    {
+      "iteration": 3,
+      "ts": "20260709-1930",
+      "action": "FE attempt 1 passed all gates on orchestrator re-verify (jest 490 100%, e2e 75/75, bundle 221,845/69,411 within rev.3, growth honestly flagged); QA cycle 1 dispatched + security micro-triage on modified FOUC script"
+    },
+    {
+      "iteration": 4,
+      "ts": "20260709-1936",
+      "action": "QA cycle 1 PASSED zero defects (diff-review: exactly 2 theme listbox tests removed with button equivalents added; other dropdowns untouched); security micro-triage PASSED with SEC-005 REDUCED; all SUCCESS conditions met; not_applicable + perf gate-check logs written; FINAL SIGN-OFF ✅"
+    }
+  ],
+  "finalStatus": "SUCCESS — task 3 signed off 20260709-1936. Single-pass delivery: 0 QA defects, 0 fix rounds. All gates green; traceability THEME3 47/47; delivery report docs/DELIVERY-REPORT-20260709-task3.md."
+}

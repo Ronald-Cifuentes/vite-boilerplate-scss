@@ -12,8 +12,8 @@ test.describe('Language Selection Journey', () => {
   }) => {
     await page.goto('/')
 
-    await expect(page.getByTestId('greeting-title')).toHaveText('Hello')
-    await expect(page.getByTestId('greeting-subtitle')).toHaveText('Welcome to the application')
+    await expect(page.getByTestId('app-greeting-title')).toHaveText('Hello')
+    await expect(page.getByTestId('app-greeting-subtitle')).toHaveText('Welcome to the application')
     await expect(page.locator('html')).toHaveAttribute('lang', 'en')
   })
 
@@ -22,14 +22,16 @@ test.describe('Language Selection Journey', () => {
   }) => {
     // Given
     await page.goto('/')
-    await expect(page.getByTestId('greeting-title')).toHaveText('Hello')
+    await expect(page.getByTestId('app-greeting-title')).toHaveText('Hello')
 
-    // When
-    await page.getByRole('combobox').selectOption('es')
+    // When - open language dropdown and select Spanish
+    const langTrigger = page.getByTestId('app-navbar-language-trigger')
+    await langTrigger.click()
+    await page.getByTestId('app-navbar-language-option-es').click()
 
     // Then
-    await expect(page.getByTestId('greeting-title')).toHaveText('Hola')
-    await expect(page.getByTestId('greeting-subtitle')).toHaveText('Bienvenido a la aplicación')
+    await expect(page.getByTestId('app-greeting-title')).toHaveText('Hola')
+    await expect(page.getByTestId('app-greeting-subtitle')).toHaveText('Bienvenido a la aplicacion')
     await expect(page.locator('html')).toHaveAttribute('lang', 'es')
   })
 
@@ -37,17 +39,21 @@ test.describe('Language Selection Journey', () => {
     page,
   }) => {
     await page.goto('/')
+    const langTrigger = page.getByTestId('app-navbar-language-trigger')
 
     // Switch to Spanish
-    await page.getByRole('combobox').selectOption('es')
-    await expect(page.getByTestId('greeting-title')).toHaveText('Hola')
+    await langTrigger.click()
+    await page.getByTestId('app-navbar-language-option-es').click()
+    await expect(page.getByTestId('app-greeting-title')).toHaveText('Hola')
 
     // Switch back to English
-    await page.getByRole('combobox').selectOption('en')
-    await expect(page.getByTestId('greeting-title')).toHaveText('Hello')
+    await langTrigger.click()
+    await page.getByTestId('app-navbar-language-option-en').click()
+    await expect(page.getByTestId('app-greeting-title')).toHaveText('Hello')
 
     // Switch to Spanish again
-    await page.getByRole('combobox').selectOption('es')
-    await expect(page.getByTestId('greeting-title')).toHaveText('Hola')
+    await langTrigger.click()
+    await page.getByTestId('app-navbar-language-option-es').click()
+    await expect(page.getByTestId('app-greeting-title')).toHaveText('Hola')
   })
 })

@@ -5,6 +5,27 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vite + React + TS</title>
+    <script>
+      // FOUC prevention - runs synchronously before paint
+      // Storage key must match THEME_STORAGE_KEY in src/theme/config/themes.ts
+      ;(function () {
+        var STORAGE_KEY = 'app-theme'
+        var stored = null
+        try {
+          stored = localStorage.getItem(STORAGE_KEY)
+        } catch (e) {}
+
+        var theme
+        if (stored === 'light' || stored === 'dark') {
+          // Explicit user preference
+          theme = stored
+        } else {
+          // 'system' or absent/invalid -> resolve from OS
+          theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+        }
+        document.documentElement.setAttribute('data-theme', theme)
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -1,0 +1,89 @@
+// ==========================================================================
+// ELEMENTS TYPOGRAPHY - Base HTML Element Styles (Outputs CSS)
+// ==========================================================================
+
+@use '../tools/typography' as typo;
+@use '../tools/animation' as anim;
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  @include typo.font-semibold;
+  color: var(--color-text-primary);
+  @include anim.theme-transition;
+}
+
+h1 {
+  @include typo.text-4xl;
+}
+
+h2 {
+  @include typo.text-3xl;
+}
+
+h3 {
+  @include typo.text-2xl;
+}
+
+h4 {
+  @include typo.text-xl;
+}
+
+h5 {
+  @include typo.text-lg;
+}
+
+h6 {
+  @include typo.text-base;
+}
+
+p {
+  @include typo.text-base;
+  color: var(--color-text-primary);
+  @include anim.theme-transition;
+}
+
+small {
+  @include typo.text-sm;
+  color: var(--color-text-secondary);
+}
+
+strong {
+  @include typo.font-semibold;
+}
+
+a {
+  color: var(--color-interactive-primary);
+  text-decoration: underline;
+  @include anim.transition(color);
+
+  &:hover {
+    color: var(--color-interactive-primary-hover);
+  }
+
+  &:active {
+    color: var(--color-interactive-primary-active);
+  }
+}
+
+code,
+pre {
+  font-family: var(--font-family-mono);
+  @include typo.text-sm;
+}
+
+code {
+  background-color: var(--color-surface-raised);
+  padding: 0.125em 0.25em;
+  border-radius: 0.25rem;
+}
+
+pre {
+  background-color: var(--color-surface-raised);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+}

@@ -1,0 +1,51 @@
+// ==========================================================================
+// COMPONENT LINK - Link Styles (Outputs CSS)
+// ==========================================================================
+
+@use '../tools/accessibility' as a11y;
+@use '../tools/animation' as anim;
+
+.c-link {
+  color: var(--color-interactive-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  @include anim.transition(color);
+  @include a11y.focus-visible-ring;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--color-interactive-primary-hover);
+  }
+
+  &:active {
+    color: var(--color-interactive-primary-active);
+  }
+
+  // Nav variant - no underline by default
+  &--nav {
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  // Subtle variant
+  &--subtle {
+    color: var(--color-text-secondary);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--color-text-primary);
+      text-decoration: underline;
+    }
+  }
+
+  // External link indicator (optional visual cue)
+  &--external {
+    &::after {
+      content: ' \2197'; // ↗ arrow
+      font-size: 0.75em;
+    }
+  }
+}

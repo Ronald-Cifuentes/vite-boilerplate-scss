@@ -1,0 +1,51 @@
+// ==========================================================================
+// OBJECTS CLUSTER - Horizontal Grouping (Outputs CSS)
+// ==========================================================================
+
+@use '../settings/tokens' as t;
+
+.o-cluster {
+  display: flex;
+  flex-wrap: wrap;
+  gap: t.$space-4;
+  align-items: center;
+}
+
+// Gap variants
+.o-cluster--gap-xs {
+  gap: t.$space-1;
+}
+
+.o-cluster--gap-sm {
+  gap: t.$space-2;
+}
+
+.o-cluster--gap-md {
+  gap: t.$space-4;
+}
+
+.o-cluster--gap-lg {
+  gap: t.$space-6;
+}
+
+// Justification
+.o-cluster--start {
+  justify-content: flex-start;
+}
+
+.o-cluster--center {
+  justify-content: center;
+}
+
+.o-cluster--end {
+  justify-content: flex-end;
+}
+
+.o-cluster--between {
+  justify-content: space-between;
+}
+
+// No wrap variant
+.o-cluster--nowrap {
+  flex-wrap: nowrap;
+}

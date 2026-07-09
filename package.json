@@ -28,6 +28,7 @@
     "@preact/signals-react": "3.10.2",
     "react": "19.2.7",
     "react-dom": "19.2.7",
+    "react-icons": "^5.7.0",
     "typescript": "6.0.3",
     "vite": "8.1.0"
   },
@@ -36,6 +37,7 @@
     "@testing-library/dom": "10.4.1",
     "@testing-library/jest-dom": "6.9.1",
     "@testing-library/react": "16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@types/jest": "30.0.0",
     "@types/react": "19.2.17",
     "@types/react-dom": "19.2.3",

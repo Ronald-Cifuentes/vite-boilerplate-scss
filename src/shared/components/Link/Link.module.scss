@@ -1,0 +1,41 @@
+@use '../../ds/tools/accessibility' as a11y;
+@use '../../ds/tools/animation' as anim;
+
+.link {
+  color: var(--color-interactive-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+  @include anim.transition(color);
+  @include a11y.focus-visible-ring;
+
+  &:hover {
+    color: var(--color-interactive-primary-hover);
+  }
+
+  &:active {
+    color: var(--color-interactive-primary-active);
+  }
+
+  &--default {
+    // Default styles already applied
+  }
+
+  &--nav {
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &--subtle {
+    color: var(--color-text-secondary);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--color-text-primary);
+      text-decoration: underline;
+    }
+  }
+}
