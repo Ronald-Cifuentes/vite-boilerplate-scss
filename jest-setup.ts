@@ -1,6 +1,10 @@
 import '@testing-library/jest-dom'
 import '@testing-library/jest-dom/jest-globals'
 
+// Mock Element.scrollIntoView for tests (needed by mobile menu focus handling)
+// CONTRACTS §17: scrollIntoView called on focus for keyboard navigation
+Element.prototype.scrollIntoView = jest.fn()
+
 // Mock window.matchMedia for tests that need it
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
@@ -29,3 +33,15 @@ window.requestAnimationFrame = (callback: FrameRequestCallback): number => {
 window.cancelAnimationFrame = (): void => {
   // No-op in tests since RAF runs synchronously
 }
+
+// Mock ResizeObserver for tests (needed by useDropdownPosition)
+class MockResizeObserver {
+  callback: ResizeObserverCallback
+  constructor(callback: ResizeObserverCallback) {
+    this.callback = callback
+  }
+  observe(): void {}
+  unobserve(): void {}
+  disconnect(): void {}
+}
+window.ResizeObserver = MockResizeObserver as unknown as typeof ResizeObserver

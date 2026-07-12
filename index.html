@@ -5,6 +5,21 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vite + React + TS</title>
+    <!-- Preload mobile menu fonts (ADR-0012) -->
+    <link
+      rel="preload"
+      href="/fonts/rubik-mono-one-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/roboto-mono-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
     <script>
       // FOUC prevention - runs synchronously before paint
       // Storage key must match THEME_STORAGE_KEY in src/theme/config/themes.ts

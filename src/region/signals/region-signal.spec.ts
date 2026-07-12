@@ -38,7 +38,7 @@ describe('Region Signal', () => {
   })
 
   describe('cycleRegion', () => {
-    it('cycles through all regions in order', () => {
+    it('cycles through all 7 regions in order (US, ES, GB, MX, CO, CN, JP)', () => {
       expect(regionSignal.value).toBe('US')
 
       cycleRegion()
@@ -49,6 +49,15 @@ describe('Region Signal', () => {
 
       cycleRegion()
       expect(regionSignal.value).toBe('MX')
+
+      cycleRegion()
+      expect(regionSignal.value).toBe('CO')
+
+      cycleRegion()
+      expect(regionSignal.value).toBe('CN')
+
+      cycleRegion()
+      expect(regionSignal.value).toBe('JP')
 
       cycleRegion()
       expect(regionSignal.value).toBe('US') // Wraps around

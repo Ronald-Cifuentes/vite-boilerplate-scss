@@ -49,10 +49,13 @@ export function formatCurrency(value: number): string {
   const currency = currencySignal.value
   // Use appropriate locale for currency formatting
   const localeMap: Record<SupportedCurrency, string> = {
+    COP: 'es-CO',
     USD: 'en-US',
     EUR: 'es-ES',
     GBP: 'en-GB',
     MXN: 'es-MX',
+    CNY: 'zh-CN',
+    JPY: 'ja-JP',
   }
   return new Intl.NumberFormat(localeMap[currency], {
     style: 'currency',

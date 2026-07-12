@@ -80,6 +80,8 @@ describe('Architecture Rules', () => {
     it('isSupportedLocale type guard works correctly', () => {
       expect(isSupportedLocale('en')).toBe(true)
       expect(isSupportedLocale('es')).toBe(true)
+      expect(isSupportedLocale('zh')).toBe(true)
+      expect(isSupportedLocale('ja')).toBe(true)
       expect(isSupportedLocale('fr')).toBe(false)
       expect(isSupportedLocale('')).toBe(false)
     })
@@ -96,6 +98,9 @@ describe('Architecture Rules', () => {
       expect(isValidRegion('ES')).toBe(true)
       expect(isValidRegion('GB')).toBe(true)
       expect(isValidRegion('MX')).toBe(true)
+      expect(isValidRegion('CO')).toBe(true)
+      expect(isValidRegion('CN')).toBe(true)
+      expect(isValidRegion('JP')).toBe(true)
       expect(isValidRegion('FR')).toBe(false)
       expect(isValidRegion('')).toBe(false)
     })
@@ -108,6 +113,14 @@ describe('Architecture Rules', () => {
       expect(LOCALE_METADATA.es.code).toBe('es')
       expect(LOCALE_METADATA.es.nativeName).toBeDefined()
       expect(LOCALE_METADATA.es.direction).toBe('ltr')
+
+      expect(LOCALE_METADATA.zh.code).toBe('zh')
+      expect(LOCALE_METADATA.zh.nativeName).toBe('中文')
+      expect(LOCALE_METADATA.zh.direction).toBe('ltr')
+
+      expect(LOCALE_METADATA.ja.code).toBe('ja')
+      expect(LOCALE_METADATA.ja.nativeName).toBe('日本語')
+      expect(LOCALE_METADATA.ja.direction).toBe('ltr')
     })
 
     it('REGION_METADATA has correct structure', () => {
@@ -118,6 +131,14 @@ describe('Architecture Rules', () => {
       expect(REGION_METADATA.ES.code).toBe('ES')
       expect(REGION_METADATA.ES.currency).toBe('EUR')
       expect(REGION_METADATA.ES.dateLocale).toBe('es-ES')
+
+      expect(REGION_METADATA.CN.code).toBe('CN')
+      expect(REGION_METADATA.CN.currency).toBe('CNY')
+      expect(REGION_METADATA.CN.dateLocale).toBe('zh-CN')
+
+      expect(REGION_METADATA.JP.code).toBe('JP')
+      expect(REGION_METADATA.JP.currency).toBe('JPY')
+      expect(REGION_METADATA.JP.dateLocale).toBe('ja-JP')
     })
   })
 

@@ -4,6 +4,10 @@ import react from '@vitejs/plugin-react'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
+  define: {
+    // Inject Banxico token at build time (SEC-006: read-only public data token)
+    'globalThis.__VITE_BANXICO_TOKEN__': JSON.stringify(process.env.VITE_BANXICO_TOKEN),
+  },
   build: {
     // Target modern browsers to reduce polyfills
     target: 'esnext',

@@ -14,6 +14,15 @@ export const en: TranslationDictionary = {
     label: 'Language',
     changeLanguage: 'Change language',
   },
+  mobileMenu: {
+    openMenu: 'Open menu',
+    closeMenu: 'Close menu',
+    menuLabel: 'Main menu',
+    language: 'Language',
+    country: 'Country',
+    currency: 'Currency',
+    theme: 'Theme',
+  },
   navbar: {
     language: 'Language',
     theme: 'Theme',
@@ -32,10 +41,19 @@ export const en: TranslationDictionary = {
     themeModeSystem: 'System theme',
   },
   currency: {
+    cop: 'Colombian Peso',
     usd: 'US Dollar',
     eur: 'Euro',
     gbp: 'British Pound',
     mxn: 'Mexican Peso',
+    cny: 'Chinese Yuan',
+    jpy: 'Japanese Yen',
+  },
+  rates: {
+    loading: 'Loading rates...',
+    stale: 'Rates from {age} ago',
+    unavailable: 'Rates unavailable',
+    partial: 'Some rates unavailable',
   },
   a11y: {
     languageSelectorDescription: 'Select your preferred language',
@@ -45,5 +63,6 @@ export const en: TranslationDictionary = {
     countryChangedTo: 'Country changed to',
     currencyChangedTo: 'Currency changed to',
     skipToContent: 'Skip to content',
+    locationDetected: 'Location detected',
   },
 }

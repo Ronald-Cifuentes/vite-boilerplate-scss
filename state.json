@@ -1,154 +1,273 @@
 {
-  "task": "TASK 3 (supersession #2, THEME CONTROL ONLY): replace ThemeDropdown with a tri-state icon CYCLE BUTTON — press cycles light → dark → system; icon swaps per mode; 'system' follows the OS preference (matchMedia) LIVE. Language, country, currency dropdowns unchanged. All task-2 cross-cutting requirements remain binding: icon-only control, nothing decorative, 100% mobile-first, i18n en+es.",
-  "startedAt": "20260709-1847",
-  "previousTask": "logs/state-20260709-task2-final.json",
-  "supersession": "User 2026-07-09 (verbatim): 'Dark mode cannot be a dropdown menu because that would confuse or annoy the user; it's better if it's a button that changes as it's pressed. It will have three modes that swap the icon: light mode, dark mode, and system (which will use the one the user has for their system).' Supersedes CONTRACTS §7.2 (ThemeDropdown) for the theme control ONLY.",
-  "taskClass": "standard",
+  "task": "TASK 9 (6 items): (1) theme-aware mobile menu (stays #18181A in light/system); (2) X always visible (shares root cause with 1: dark bars on dark overlay in light theme); (3) adopt industry-standard breakpoints (research-backed); (4) menu scrollable when submenus overflow; (5) menu must CLOSE when viewport crosses to desktop (currently orphaned overlay + stuck scroll lock); (6) auto-detect language/country/currency from device prefs + IP (user asked GPS too — needs evidence-based recommendation), user-overridable, thoroughly mocked-tested for worldwide validation.",
+  "startedAt": "20260711-0158",
+  "previousTask": "logs/state-20260711-task8-final.json",
+  "taskClass": "standard-to-high-risk",
   "scope": "incremental",
-  "baseline": "commit 3589fe4 + 14 uncommitted task-2 final-round files; baseline gates verified 1842-1845",
+  "baseline": "working tree at task-8 sign-off (uncommitted; commit d16f381 + tasks 4-8)",
+  "reproduction": {
+    "ITEM1_theme": "CONFIRMED source+runtime: --color-mobile-menu-overlay: #18181a IDENTICAL in _light.scss and _dark.scss (task-7 fidelity decision, now superseded by user); probe at 375 light theme: bandBg rgb(24,24,26) while itemColor rgb(17,24,39) → dark-on-dark illegible",
+    "ITEM2_x_invisible": "CONFIRMED same root cause: burger/X bars rgb(17,24,39) (light-theme foreground) at z=200 over the #18181A overlay at z=100 → X invisible in light/system-light; 'different devices' = different system themes",
+    "ITEM4_scroll": "CONFIRMED latent by inspection: overlay overflowY: visible (fixed, no scroll mechanism); did not overflow at 375x667 portrait with country submenu, but any taller content (landscape 667x375, 320px devices, font scaling, currency submenu) clips unreachable; FE/QA must reproduce at landscape + small heights",
+    "ITEM5_resize_orphan": "CONFIRMED SEVERE: probe resized 375→1024 with menu open: menu still visible in DOM, body overflow stuck 'hidden' (scroll lock leaked), inline controls render under the orphaned overlay, toggle unreachable → app unusable until reload",
+    "probe": "e2e/journeys/_probe-menu-bugs.spec.ts + /tmp/task9-shots/*.png + /tmp/task9-probe.txt (delete probe at closeout)"
+  },
+  "hardConstraints": {
+    "bundleExhausted": "rev.8 headroom is 33 B raw / 21 B gzip — recorded advisory: CODE-SPLITTING MANDATORY before any JS-bearing feature; item 6 adds significant JS → task 9 MUST include the chunking work (geo module lazy by nature: only needed on first visit with no stored prefs; ADR-0011 Option A lazy locales frees ~4-5 KB raw more) or a rev.9 ask — prefer architectural fix per recorded position",
+    "externalOrigin": "IP geolocation requires a NEW external origin — this repo deliberately avoided new origins twice (fonts self-hosted; rates = central banks only); provider choice + origin approval = owner decision with curl-verified options",
+    "gps": "user asked for GPS: permission-prompt-on-load is hostile UX + geolocation coords require a reverse-geocoding service (second external dependency); industry practice is IP + Accept-Language; architect must present an evidence-based recommendation, not silently comply or silently drop",
+    "fidelitySupersession": "theme-aware menu supersedes part of ADR-0012's replicate-verbatim color mapping → ADR amendment (pen palette becomes the dark-theme variant; light theme gets coherent equivalents; X must ALWAYS contrast the overlay)",
+    "precedence": "stored user choice ALWAYS wins over auto-detection; detection runs only when prefs are unset (first visit); user can change anytime (existing selectors untouched)"
+  },
   "changedDomains": [
-    "frontend",
-    "architecture",
-    "qa",
-    "security (index.html FOUC script modified — micro-triaged)"
+    "frontend-ux",
+    "design-system",
+    "i18n",
+    "region",
+    "currency",
+    "contracts",
+    "qa-tests",
+    "security-new-external-origin",
+    "performance-chunking"
   ],
   "requiredGates": {
-    "lint_clean": { "status": true, "evidence": "orchestrator: pnpm lint exit 0 (it3)" },
+    "lint_clean": {
+      "status": true,
+      "evidence": "orchestrator it10: pnpm lint exit 0 (after QA restructuring + orchestrator onDetected refactor + prettier)"
+    },
     "typecheck_clean": {
       "status": true,
-      "evidence": "orchestrator: pnpm exec tsc --noEmit exit 0 (it3)"
+      "evidence": "orchestrator it10: tsc --noEmit exit 0"
     },
-    "build_ok": { "status": true, "evidence": "orchestrator: pnpm build exit 0 (it3)" },
+    "build_ok": {
+      "status": true,
+      "evidence": "orchestrator it10: pnpm build exit 0"
+    },
     "affected_tests_pass": {
       "status": true,
-      "evidence": "orchestrator: jest 39 suites / 490 tests pass"
+      "evidence": "orchestrator it10: jest 61 suites green"
     },
     "coverage_100": {
       "status": true,
-      "evidence": "orchestrator: 100% — 629/629, 140/140, 133/133, 598/598"
-    },
-    "e2e_affected_pass": {
-      "status": true,
-      "evidence": "orchestrator: playwright exit 0, 75/75 — tri-state cycle, LIVE OS-follow both directions without reload, FOUC matrix, default-system, back-compat, remaining-3-dropdown keyboard suite intact"
+      "evidence": "orchestrator it10: 100% ×4 (1307/498/241/1217)"
     },
     "arch_tests_pass": {
       "status": true,
-      "evidence": "arch + design-system suites green inside jest run"
+      "evidence": "arch + design-system suites green (breakpoint tokens, 0 max-width)"
     },
-    "a11y_responsive_ok": {
+    "menu_theme_coherent": {
       "status": true,
-      "evidence": "no aria-haspopup (accessibility.spec.ts:175), dynamic localized aria-label (:158), Enter/Space (:182), icon-only (navbar-controls:143), ≥44px (:154); viewports 375/768/1440; QA cycle-1 verified"
+      "evidence": "computed-color e2e both themes + system mode; pen palette = dark variant, light equivalents per ADR-0012 amendment",
+      "definition": "overlay/text/X colors follow active theme (light/dark/system both states); X contrast asserted against overlay in BOTH themes; e2e computed-color proofs"
     },
-    "mobile_first_enforced": {
+    "x_always_visible": {
       "status": true,
-      "evidence": "grep 0 max-width @media; arch test green"
+      "evidence": "contrast-asserted both themes; operable portrait + landscape + 320-class",
+      "definition": "open-menu close control visible+operable at all supported widths/heights/themes incl. landscape"
     },
-    "nothing_decorative": {
+    "breakpoints_standard": {
       "status": true,
-      "evidence": "QA cycle-1 sweep: button cycles+announces+persists; no dead affordances"
+      "evidence": "Tailwind-aligned token scale (640/768/1024/1280/1536) in DS with ADR-0013; queries migrated; mobile-first intact",
+      "definition": "research-backed scale adopted in design tokens with ADR provenance; all media queries migrated; mobile-first preserved (0 max-width)"
+    },
+    "menu_scrollable": {
+      "status": true,
+      "evidence": "overflow-y auto + scrollIntoView on focus (reduced-motion aware); e2e at 667x375 AND 320x480 with submenus — all items reachable",
+      "definition": "overlay scrolls when content exceeds viewport (landscape + small heights e2e); all items reachable"
+    },
+    "menu_closes_on_breakpoint_cross": {
+      "status": true,
+      "evidence": "matchMedia(md) listener → task-8 close path; scroll-lock release + focus-to-first-inline-control asserted in e2e",
+      "definition": "resize/orientation crossing to desktop closes menu, releases scroll lock, restores focus sanely; e2e resize journey"
+    },
+    "geo_autodetect_correct": {
+      "status": true,
+      "evidence": "three-path apply matrix unit-proven (all-as-chosen / locale-only / nothing) + TOCTOU atomic re-check; precedence stored>GPS>IP>device-language>defaults; first-visit-only guard; lazy chunk",
+      "definition": "first visit with no stored prefs: locale/region/currency set from detection (mocked IP responses per supported country + unsupported + provider-failure fallback chain to device language then defaults); stored prefs NEVER overridden; user changes always win and persist"
+    },
+    "geo_test_matrix": {
+      "status": true,
+      "evidence": "29-journey mocked matrix: 7 countries, VPN scenario (GPS=CO+IP=US→CO), GPS denied, reverse-geocode failure, unsupported country, providers down, returning-user-zero-requests, override-persists, non-blocking; documented as VPN validation guide in delivery report",
+      "definition": "e2e matrix: all 7 supported countries mocked + unsupported country + provider timeout/error + device-language-only fallback + returning-user-with-prefs; documented for the user's own VPN validation"
+    },
+    "e2e_full_pass": {
+      "status": true,
+      "evidence": "orchestrator it10: FULL 192/192 serial"
+    },
+    "proof_of_change": {
+      "status": true,
+      "evidence": "every item e2e-proven impossible pre-change (theme colors, X contrast, scroll, close-on-cross, detection journeys)"
+    },
+    "bundle_within_ratified_structure": {
+      "status": true,
+      "evidence": "rev.10: main 240,933 ≤ 241,000 / 75,687 ≤ 76,000; chunks 2,726/1,685/1,359 ≤ caps (orchestrator-measured)",
+      "note": "chunk structure + budgets pending architect proposal + owner ratification"
+    },
+    "security_new_origin": {
+      "status": true,
+      "evidence": "two triages PASSED: SEC-007/008 recorded accepted; fail-closed validation code-verified; token change adjudicated RESTORES-ACCEPTED-DESIGN with dist-level proof (Appendix G + G.9)",
+      "scope": "IP-geo provider: HTTPS, no credentials beyond IP inherent exposure, strict response validation, fail-closed, rate-limit behavior, privacy note in docs"
     },
     "no_hardcoded": {
       "status": true,
-      "evidence": "i18n keys en+es for all 3 modes; arch tests; grep clean"
+      "evidence": "endpoints/timeouts/mapping in config; greps clean"
     },
-    "no_secrets": { "status": true, "evidence": "grep secret patterns: 0" },
-    "no_todo_fixme": { "status": true, "evidence": "grep TODO|FIXME|HACK: 0" },
-    "bundle_within_budgets_rev3": {
+    "no_secrets": {
       "status": true,
-      "evidence": "221,845 raw ≤ 224,000; 69,411 gzip ≤ 70,000. Growth +1,246/+472 vs task-2 final, honestly flagged by FE (architect estimated -100..-200 — miss documented). Headroom now 2,155 raw / 589 gzip"
+      "evidence": "dist grep: no token-like strings with env unset; .env* untouched"
     },
-    "system_mode_correct": {
+    "no_todo_fixme": {
       "status": true,
-      "evidence": "e2e theme-persistence.spec.ts:110/130 live OS-follow without reload (both directions), :145 explicit ignores OS, :39/227 system persists + default, :211 FOUC resolves stored 'system'; ThemeProvider.tsx:64-74 listener with cleanup"
+      "evidence": "greps clean"
+    },
+    "traceability_complete": {
+      "status": true,
+      "evidence": "86/86 TASK-9 + GPS9 rows marked with evidence (incl. annotated duplicates)"
     }
   },
   "harnessNotes": {
-    "e2e_install": "cd e2e && pnpm install --ignore-workspace (root pnpm-workspace.yaml has no packages: field)",
-    "jest_coverage": "use pnpm exec jest --coverage (pnpm test -- --coverage passes --coverage as a test pattern)",
-    "e2e_stale_server": "ALWAYS kill anything on :4173 before e2e (lsof -ti:4173 | xargs kill -9)",
-    "no_destructive_git": "NEVER git clean/stash/reset/checkout-- — uncommitted signed-off work lives in the tree until the user commits",
-    "formatter_hook": "PostToolUse hook reformats after Write/Edit — normal",
-    "playwright_output": "RTK proxy truncates/swallows playwright stdout AND redirects — wrap in sh -c '... > file' and read the file, or rely on exit code"
+    "e2e_install": "cd e2e && pnpm install --ignore-workspace",
+    "jest_coverage": "use pnpm exec jest --coverage",
+    "e2e_stale_server": "kill :4173 first (lsof -ti:4173 | xargs kill -9)",
+    "no_destructive_git": "NEVER git clean/stash/reset/checkout--",
+    "formatter_hook": "PostToolUse hook reformats after Write/Edit",
+    "playwright_output": "RTK proxy truncates/swallows playwright stdout AND redirects — wrap in sh -c '... > file' and read the file, or rely on exit code",
+    "e2e_keyboard_sync": "always await focus state before next keypress",
+    "cwd_warning": "Bash cwd persists across calls — use absolute paths or re-cd to repo root",
+    "menu_close_history": "task-8 UX-001: close = immediate aria/focus + deferred visual hide (animationend + fallback); the resize-close (item 5) must reuse that close path, not invent a second one"
   },
   "profiles": {
     "orchestrator": {
       "status": "signed_off",
       "attempts": 1,
-      "log": "logs/20260709-1936-Orchestrator_Master.md"
+      "log": "logs/20260711-1533-Orchestrator_Master.md"
     },
     "architect": {
       "status": "passed",
-      "attempts": 1,
-      "log": "logs/20260709-1858-Architect.md",
-      "note": "ADR-0009, CONTRACTS v3.1.0, 47 THEME3 rows; icons existence-verified"
+      "attempts": 2,
+      "log": "logs/20260711-0953-Architect.md",
+      "note": "ADR-0012 amendment + ADR-0013 + ADR-0014 (+GPS override rewrite) + CONTRACTS 3.5.0 + 84 checklist rows; providers curl-verified"
     },
     "backend-engineer": {
       "status": "not_applicable",
       "attempts": 0,
-      "log": "logs/20260709-1935-Backend_Engineer.md"
+      "log": "logs/20260711-1529-Backend_Engineer.md"
     },
     "frontend-engineer": {
       "status": "passed",
-      "attempts": 1,
-      "log": "logs/20260709-1917-Frontend_Engineer.md",
-      "note": "single-pass implementation; bundle growth honestly flagged (task-2 anti-pattern brief effective)"
+      "attempts": 4,
+      "log": "logs/20260711-1451-Frontend_Engineer.md",
+      "note": "att.1 all six items + honest bundle blocker; att.2 traceability gaps but unverified claims; att.3 TOCTOU fix + GEO-SYNC-1 regression + false diagnosis (INC-004); att.4 (user-authorized) three-path matrix + token latent-bug fix — final tree green after orchestrator trims/refactor completion"
     },
     "qa-engineer": {
-      "status": "passed_cycle1",
-      "attempts": 1,
-      "log": "logs/20260709-1931-QA_Engineer.md",
-      "report": "docs/qa/QA-REPORT-20260709-task3-cycle1.md",
-      "note": "ZERO defects (first clean first-cycle QA in project); diff-review: no prior coverage weakened; 47/47 THEME3 rows; project 183/0/11"
+      "status": "passed",
+      "attempts": 2,
+      "log": "logs/20260711-1529-QA_Engineer.md",
+      "report": "docs/qa/QA-REPORT-20260711-task9-cycle1.md (+cycle-2 salvage log)",
+      "note": "cycle 1 all-6-PASS + honest traceability audit; cycle 2 agent stalled mid-restructure (watchdog 600s) — completed and salvaged by orchestrator with fresh artifacts"
     },
     "security-auditor": {
       "status": "passed",
-      "attempts": 1,
-      "log": "logs/20260709-1933-Security_Auditor.md",
-      "note": "micro-triage FOUC script: sink-free, SEC-005 REDUCED (new allowlist); deps untouched"
+      "attempts": 2,
+      "log": "logs/20260711-1500-Security_Auditor.md",
+      "note": "geo origins triage 6/6 + token-change adjudication (a) restores-accepted-design with dist proof; SEC-007/008 accepted; Appendices G, G.9; MXN latent-bug disclosure flagged"
     },
     "performance-engineer": {
-      "status": "passed_gate_check",
+      "status": "passed",
       "attempts": 1,
-      "log": "logs/20260709-1935-Performance_Engineer.md",
-      "note": "gate green under rev.3; headroom 2,155 raw / 589 gzip — next feature likely needs code-splitting or owner decision"
+      "log": "logs/20260711-1529-Performance_Engineer.md",
+      "report": "docs/performance/PERF-ANALYSIS-20260711-task9.md",
+      "note": "REV10 verdict with full decomposition; final gate green; advisory: 67 B main headroom but chunk architecture is the pressure valve now"
     },
     "devops-engineer": {
       "status": "not_applicable",
       "attempts": 0,
-      "log": "logs/20260709-1935-DevOps_Engineer.md"
+      "log": "logs/20260711-1529-DevOps_Engineer.md"
     }
   },
-  "iteration": 4,
-  "maxIterations": 8,
+  "iteration": 10,
+  "maxIterations": 10,
   "maxAttempts": 3,
   "noProgressLimit": 3,
   "noProgressStreak": 0,
   "openFindings": [],
+  "observations": [],
   "incidentsCarriedOver": [
-    "INC-001 (task 1): perf agent destructive git clean — prevention rule in harnessNotes",
-    "PATTERN (task 2): FE gate-glossing — countermeasure (explicit anti-pattern brief + independent re-verify) applied in task 3 and WORKED (FE self-flagged bundle growth)"
+    "INC-001 (task 1): destructive git — prohibition in harnessNotes",
+    "PATTERN (tasks 2+4): FE gate-glossing — countermeasure: orchestrator independently re-verifies every gate",
+    "INC-002 (task 4): stale sign-off evidence — countermeasure: re-run every gate fresh at sign-off; delivery report before sign-off log",
+    "INC-003 (tasks 5+7, STANDING RULE): orchestrator re-adjudicates every QA severity call against gate definitions (task-8 QA exercised the countermeasure correctly — keep enforcing)",
+    "INC-004 (task 9): FE attempt-3 misdiagnosis — blamed 5 deterministic failures on a nonexistent mechanism (app-currency-override / pre-existing isolation) and reported unverified run counts twice (191/191 and vite-console gzip); countermeasures held: orchestrator serial re-runs + code-level greps falsified both claims"
   ],
   "history": [
     {
       "iteration": 1,
-      "ts": "20260709-1847",
-      "action": "task-3 intake: supersession #2 recorded; baseline green from task-2 sign-off; architect dispatched"
+      "ts": "20260711-0158",
+      "action": "intake, reproduction-first: items 1+2 share one proven root cause (menu tokens identical across themes: bands #18181A + light-theme-dark text/X → illegible; 'different devices' = different system themes); item 5 SEVERE confirmed (orphaned overlay + leaked scroll lock after breakpoint cross); item 4 latent-confirmed (overflow-y visible on fixed overlay); items 3+6 are design/feature work with 3 hard constraints (33 B bundle headroom → chunking mandatory; new external origin needs owner approval; GPS needs evidence-based pushback); architect dispatched"
     },
     {
       "iteration": 2,
-      "ts": "20260709-1900",
-      "action": "architect passed (ADR-0009 18.5K, CONTRACTS v3.1.0, 47 rows, icons verified); FE dispatched with task-2 anti-pattern brief"
+      "ts": "20260711-0935",
+      "action": "architect design verified (providers re-curled independently, artifacts on disk: ADR-0013 6.1K, ADR-0014 16.4K, CONTRACTS 3.5.0, 60+ checklist rows); STOP-AND-ASK: owner approved provider chain + rev.9 chunked, OVERRODE GPS-omit recommendation → GPS included; orchestrator verified BigDataCloud reverse-geocode (200, ACAO *, keyless, CO for Bogotá coords); budgets.md rev.9 written; architect amending ADR-0014/CONTRACTS for GPS; FE dispatch next"
     },
     {
       "iteration": 3,
-      "ts": "20260709-1930",
-      "action": "FE attempt 1 passed all gates on orchestrator re-verify (jest 490 100%, e2e 75/75, bundle 221,845/69,411 within rev.3, growth honestly flagged); QA cycle 1 dispatched + security micro-triage on modified FOUC script"
+      "ts": "20260711-1045",
+      "action": "FE attempt 1: ALL six items implemented (theme tokens, breakpoint scale, scroll, matchMedia close-on-cross via task-8 path, chunked build, geo module with GPS-wins precedence, 15-journey geo matrix + menu proofs); chunks green (2,726/1,685/1,359 ≤ 3,000); HONEST blocker: main 240,096 > 237,000 rev.9"
     },
     {
       "iteration": 4,
-      "ts": "20260709-1936",
-      "action": "QA cycle 1 PASSED zero defects (diff-review: exactly 2 theme listbox tests removed with button equivalents added; other dropdowns untouched); security micro-triage PASSED with SEC-005 REDUCED; all SUCCESS conditions met; not_applicable + perf gate-check logs written; FINAL SIGN-OFF ✅"
+      "ts": "20260711-1052",
+      "action": "perf decomposition: CJK out −3,044 B as planned, but lazy-loading machinery +3,250 B legitimate main weight (rev.9 stub estimate ~2,850 B short); 0 B relocatable; verdict REV10 → owner approved 241K/76K main; budgets.md rev.10 written; QA cycle + security triage dispatched"
+    },
+    {
+      "iteration": 5,
+      "ts": "20260711-1222",
+      "action": "QA cycle 1 PASSED all 6 items (zero defects) + security triage 6/6 in parallel (SEC-007/008 accepted, Appendix G); orchestrator full e2e 187/187; traceability audit found 0/84 rows marked -> QA marked 80/84 honestly, surfaced 4 gaps; orchestrator adjudicated 3 blocking (contract is the DoD): scrollIntoView missing (product), 320x480 e2e missing, focus-after-cross assertion missing"
+    },
+    {
+      "iteration": 6,
+      "ts": "20260711-1300",
+      "action": "FE attempt 2 closed the 3 gaps (869 tests, main 240,919/75,632 within rev.10 - FE quoted Vite console gzip again, actual passes); orchestrator re-verification: full e2e 190/191 - country-selection:85 FAILED (currency flipped to GBP mid-journey)"
+    },
+    {
+      "iteration": 7,
+      "ts": "20260711-1310",
+      "action": "orchestrator diagnosed GEO-RACE-1: TOCTOU between mount-time prefs guard and async detection resolution + non-geo journeys hitting real geo origins; FE attempt 3 (FINAL) dispatched: atomic re-check before apply + unit-tested state matrix + suite-wide default geo mocks + x3 country-selection proof"
+    },
+    {
+      "iteration": 8,
+      "ts": "20260711-1425",
+      "action": "orchestrator falsified FE attempt-3 diagnosis (grep: blamed flag nonexistent; serial run: 5 deterministic fresh-session sync failures, NOT order-dependent) and proved GEO-SYNC-1 mechanism (fallback path marks currency chosen → sync dead); fixture also blocks wrong banrep host (www vs suameca); FE attempt 4 dispatched (user-authorized cap extension) with the exact ADR three-path apply matrix"
+    },
+    {
+      "iteration": 9,
+      "ts": "20260711-1500",
+      "action": "security cleared the token change (restores-accepted-design, dist-level proof, Appendix G.9; MXN-never-worked disclosure); QA cycle-2 agent STALLED mid-restructure (watchdog kill) after finding the lint list extended into product code (orchestrator earlier truncated lint output with head -15 — own error recorded)"
+    },
+    {
+      "iteration": 10,
+      "ts": "20260711-1533",
+      "action": "orchestrator completed the stalled restructuring (onDetected 4-param→object across product+specs, describe hoist with state-reset beforeEach, each-table objectification, prettier, helper dedup −102 B, pass-through −68 B — main back to 240,933 after a 1-byte breach); traceability driven to 86/86; FULL e2e 192/192 serial; all 21 gates green fresh → FINAL SIGN-OFF ✅ at iteration 10/10"
     }
   ],
-  "finalStatus": "SUCCESS — task 3 signed off 20260709-1936. Single-pass delivery: 0 QA defects, 0 fix rounds. All gates green; traceability THEME3 47/47; delivery report docs/DELIVERY-REPORT-20260709-task3.md."
+  "humanDecisions_20260711_task9": {
+    "Q1_geo_providers": "APPROVED: api.country.is primary + get.geojs.io fallback (new external origins; both HTTPS, CORS *, keyless, curl-verified twice incl. live CO resolution); 3s timeout each; fail-closed validation",
+    "Q2_gps": "OWNER OVERRIDE — GPS INCLUDED despite recommendation (costs stated in the ask: permission prompt + third origin). Orchestrator design rationale recorded: VPN validation plan makes GPS-wins-over-IP the correct precedence (physical country beats VPN exit country). Reverse-geocode: api.bigdatacloud.net client API (curl-verified: 200, ACAO *, keyless, Bogotá coords → CO). Precedence: stored > GPS > IP > device language > defaults",
+    "Q3_budget_rev9": "APPROVED: chunked — main 237K/75K (TIGHTER than rev.8) + 3K-cap lazy chunks (geo incl. reverse-geocode, locale-zh, locale-ja); ADR-0011 Option A activated; budgets.md rev.9 written",
+    "Q4_budget_rev10": "APPROVED: main 241,000 raw (warning 240,500) / 76,000 gzip (warning 75,700); chunk caps unchanged; perf-verified floor 240,096/75,421 with full decomposition, 0 B relocatable"
+  },
+  "maxAttemptsException": "FE attempt 4 granted beyond maxAttempts=3 under the user standing mandate \"run the QA and frontend agent cycle until 100%\"; unconditionally final — any failure after attempt 4 → STOP-AND-ASK",
+  "closedFindings": [
+    "MENU-THEME-1 (items 1+2)",
+    "MENU-SCROLL-1 (item 4)",
+    "MENU-RESIZE-1 (item 5, severe)",
+    "BREAKPOINTS-1 (item 3)",
+    "GEO-1 (item 6)",
+    "GEO-RACE-1 (TOCTOU)",
+    "GEO-SYNC-1 (fallback sync regression)",
+    "BUNDLE rounds → rev.9 chunked → rev.10 floor",
+    "Banxico token latent bug (restores SEC-006 accepted design)"
+  ],
+  "finalStatus": "SUCCESS — task 9 signed off 20260711-1533 at the iteration cap. All six items delivered and proven: theme-aware menu + always-visible X (shared root cause), Tailwind-aligned breakpoint tokens (ADR-0013), scrollable overlay, close-on-breakpoint-cross with scroll-lock release, geo auto-detection (GPS>IP per owner override, VPN-correct precedence, first-visit-only, lazy chunk, 29-journey mocked matrix as the VPN validation guide). Two product races found and fixed by the loop itself (TOCTOU, fallback-sync); Banxico token latent bug disclosed and fixed (MXN live rates likely never worked in prior builds); INC-004 recorded. Chunked bundle within rev.10. Delivery report docs/DELIVERY-REPORT-20260711-task9.md."
 }

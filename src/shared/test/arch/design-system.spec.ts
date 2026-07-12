@@ -134,6 +134,7 @@ describe('Design System Architecture Rules', () => {
       expect(isValidRegion('ES')).toBe(true)
       expect(isValidRegion('GB')).toBe(true)
       expect(isValidRegion('MX')).toBe(true)
+      expect(isValidRegion('CO')).toBe(true)
     })
 
     it('isValidRegion rejects invalid regions', () => {
@@ -160,18 +161,23 @@ describe('Design System Architecture Rules', () => {
       expect(SUPPORTED_PREFERENCES).toHaveLength(3)
     })
 
-    it('SUPPORTED_REGIONS includes all 4 regions', () => {
+    it('SUPPORTED_REGIONS includes all 7 regions', () => {
       expect(SUPPORTED_REGIONS).toContain('US')
       expect(SUPPORTED_REGIONS).toContain('ES')
       expect(SUPPORTED_REGIONS).toContain('GB')
       expect(SUPPORTED_REGIONS).toContain('MX')
-      expect(SUPPORTED_REGIONS).toHaveLength(4)
+      expect(SUPPORTED_REGIONS).toContain('CO')
+      expect(SUPPORTED_REGIONS).toContain('CN')
+      expect(SUPPORTED_REGIONS).toContain('JP')
+      expect(SUPPORTED_REGIONS).toHaveLength(7)
     })
 
-    it('SUPPORTED_LOCALES includes en and es', () => {
+    it('SUPPORTED_LOCALES includes all 4 locales', () => {
       expect(SUPPORTED_LOCALES).toContain('en')
       expect(SUPPORTED_LOCALES).toContain('es')
-      expect(SUPPORTED_LOCALES).toHaveLength(2)
+      expect(SUPPORTED_LOCALES).toContain('zh')
+      expect(SUPPORTED_LOCALES).toContain('ja')
+      expect(SUPPORTED_LOCALES).toHaveLength(4)
     })
   })
 

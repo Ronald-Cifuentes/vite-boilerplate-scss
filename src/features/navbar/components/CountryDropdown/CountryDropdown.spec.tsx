@@ -70,6 +70,7 @@ describe('CountryDropdown', () => {
     expect(screen.getByText('Spain')).toBeInTheDocument()
     expect(screen.getByText('United Kingdom')).toBeInTheDocument()
     expect(screen.getByText('Mexico')).toBeInTheDocument()
+    expect(screen.getByText('Colombia')).toBeInTheDocument()
   })
 
   it('should change region when option is selected', async () => {
@@ -193,11 +194,13 @@ describe('CountryDropdown', () => {
       const esOption = screen.getByTestId('country-dropdown-option-ES')
       const gbOption = screen.getByTestId('country-dropdown-option-GB')
       const mxOption = screen.getByTestId('country-dropdown-option-MX')
+      const coOption = screen.getByTestId('country-dropdown-option-CO')
 
       expect(usOption.querySelector('svg')).toBeInTheDocument()
       expect(esOption.querySelector('svg')).toBeInTheDocument()
       expect(gbOption.querySelector('svg')).toBeInTheDocument()
       expect(mxOption.querySelector('svg')).toBeInTheDocument()
+      expect(coOption.querySelector('svg')).toBeInTheDocument()
     })
   })
 })

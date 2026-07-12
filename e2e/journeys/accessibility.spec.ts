@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from '../helpers/fixtures'
 
 test.describe('Accessibility', () => {
   // Playwright provides a fresh, isolated browser context per test
@@ -17,9 +17,10 @@ test.describe('Accessibility', () => {
     await page.keyboard.press('Enter')
     await expect(langTrigger).toHaveAttribute('aria-expanded', 'true')
 
-    // Focus the Spanish option and press Enter
+    // Navigate to Spanish option using arrow keys (English is first, Spanish is second)
+    await page.keyboard.press('ArrowDown')
     const spanishOption = page.getByTestId('app-navbar-language-option-es')
-    await spanishOption.focus()
+    await expect(spanishOption).toBeFocused()
     await page.keyboard.press('Enter')
 
     // Verify interaction worked - HTML lang should change
@@ -111,9 +112,9 @@ test.describe('Accessibility', () => {
     const panel = page.getByTestId('app-navbar-language-panel')
     await expect(panel).toHaveAttribute('role', 'listbox')
 
-    // Verify options have option role
+    // Verify options have option role (4 locales: en, es, zh, ja)
     const options = panel.locator('[role="option"]')
-    await expect(options).toHaveCount(2) // en, es
+    await expect(options).toHaveCount(4)
   })
 
   test('All closed dropdown panels have aria-hidden="true" on page load (DEF-A11Y-1)', async ({

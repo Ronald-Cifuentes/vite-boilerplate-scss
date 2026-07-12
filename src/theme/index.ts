@@ -8,6 +8,8 @@ export {
   SUPPORTED_PREFERENCES,
   THEME_STORAGE_KEY,
   THEME_CONFIG,
+  PREFERENCE_ICONS,
+  PREFERENCE_LABEL_KEYS,
   isValidPreference,
   isValidTheme,
   getNextPreference,

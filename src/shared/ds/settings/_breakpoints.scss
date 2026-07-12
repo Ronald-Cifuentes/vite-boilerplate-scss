@@ -2,13 +2,14 @@
 // BREAKPOINTS - Responsive Breakpoint Definitions (NO CSS OUTPUT)
 // ==========================================================================
 // Mobile-first breakpoints. Use via mixins in tools layer.
+// Aligned with Tailwind CSS v3 defaults for industry consistency (ADR-0013).
 // ==========================================================================
 
-$breakpoint-sm: 375px; // Mobile
-$breakpoint-md: 768px; // Tablet
+$breakpoint-sm: 640px; // Large phones / small tablets (Tailwind-aligned)
+$breakpoint-md: 768px; // Tablet / hamburger->inline switch
 $breakpoint-lg: 1024px; // Desktop
 $breakpoint-xl: 1280px; // Large desktop
-$breakpoint-2xl: 1440px; // Extra large
+$breakpoint-2xl: 1536px; // Extra large / 4K scaled
 
 // Map for programmatic access
 $breakpoints: (
@@ -18,3 +19,6 @@ $breakpoints: (
   'xl': $breakpoint-xl,
   '2xl': $breakpoint-2xl,
 );
+
+// Semantic aliases for common use cases
+$breakpoint-mobile-menu-switch: $breakpoint-md; // 768px: hamburger <-> inline

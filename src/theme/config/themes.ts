@@ -1,3 +1,5 @@
+import { MdLightMode, MdDarkMode, MdSettingsBrightness } from 'react-icons/md'
+import type { IconType } from 'react-icons'
 import type { ThemePreference, ThemeMode, ThemeConfig } from '../types/Theme'
 
 export const THEME_STORAGE_KEY = 'app-theme' as const
@@ -7,6 +9,23 @@ export const SUPPORTED_PREFERENCES: readonly ThemePreference[] = [
   'dark',
   'system',
 ] as const
+
+/** Icons for each theme preference (tri-state cycle button) */
+export const PREFERENCE_ICONS: Record<ThemePreference, IconType> = {
+  light: MdLightMode,
+  dark: MdDarkMode,
+  system: MdSettingsBrightness,
+} as const
+
+/** Translation keys for each theme preference label */
+export const PREFERENCE_LABEL_KEYS: Record<
+  ThemePreference,
+  'navbar.themeModeLight' | 'navbar.themeModeDark' | 'navbar.themeModeSystem'
+> = {
+  light: 'navbar.themeModeLight',
+  dark: 'navbar.themeModeDark',
+  system: 'navbar.themeModeSystem',
+} as const
 
 export const THEME_CONFIG: ThemeConfig = {
   defaultPreference: DEFAULT_PREFERENCE,

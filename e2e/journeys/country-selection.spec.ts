@@ -1,11 +1,18 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from '../helpers/fixtures'
 
 test.describe('Country Selection Journey', () => {
   test.beforeEach(async ({ page }) => {
-    // Clear localStorage to start fresh
+    // Geo detection is blocked by the fixture (blockGeoDetection: auto).
+    // With geo blocked, detection fails and applies NOTHING (ADR-0014 path 3).
+    // This leaves currency sync fully functional.
+
+    // Navigate to app - geo will fail, app uses defaults
     await page.goto('/')
-    await page.evaluate(() => localStorage.clear())
-    await page.reload()
+    await page.waitForLoadState('networkidle')
+
+    // Verify we're starting with USD (default)
+    const priceValue = page.getByTestId('app-greeting-price-value')
+    await expect(priceValue).toContainText('USD')
   })
 
   test.describe('Given the user is on the home page', () => {
@@ -31,61 +38,77 @@ test.describe('Country Selection Journey', () => {
       expect(esDateText).not.toBe(usDateText)
     })
 
-    test('When selecting country, Then visible Intl-formatted currency changes', async ({
+    test('When selecting country (without explicit currency selection), Then currency syncs to region default', async ({
       page,
     }) => {
+      // Per CONTRACTS v3.2.0: Currency syncs to region default UNLESS user has explicitly
+      // selected a currency. Since this is a fresh session with no explicit currency selection,
+      // changing region SHOULD change the currency.
       const countryTrigger = page.getByTestId('app-navbar-country-trigger')
-      const priceDisplay = page.getByTestId('app-greeting-price')
+      const priceValue = page.getByTestId('app-greeting-price-value')
+      const dateDisplay = page.getByTestId('app-greeting-date')
 
-      // Capture initial price format (US: $1,234.56)
-      const usPriceText = await priceDisplay.textContent()
-      expect(usPriceText).toContain('$')
+      // Initial state should be USD (default region US -> default currency USD)
+      await expect(priceValue).toContainText('USD')
+
+      // Capture initial date format (US format)
+      const usDateText = await dateDisplay.textContent()
 
       // Open dropdown and select Spain (ES)
       await countryTrigger.click()
       await page.getByTestId('app-navbar-country-option-ES').click()
       await expect(countryTrigger).toHaveAccessibleName(/spain/i)
 
-      // Capture Spanish price format (EUR: 1.234,56 EUR or similar)
-      const esPriceText = await priceDisplay.textContent()
-      expect(esPriceText).toBeTruthy()
+      // Currency SHOULD sync to EUR (ES region's default currency)
+      await expect(priceValue).toContainText('EUR')
 
-      // The currency should change from USD ($) to EUR
-      expect(esPriceText).not.toBe(usPriceText)
-      // EUR uses different symbol/format
-      expect(esPriceText).toMatch(/EUR|€/)
+      // DATE should also change (region affects date formatting)
+      const esDateText = await dateDisplay.textContent()
+      expect(esDateText).not.toBe(usDateText)
     })
 
-    test('When selecting different countries, Then number formatting changes between regions', async ({
+    test('When selecting different countries, Then currency syncs and dates change', async ({
       page,
     }) => {
+      // Per CONTRACTS v3.2.0: Region changes sync currency (unless user explicitly selected one).
+      // Date formatting also varies by region.
       const countryTrigger = page.getByTestId('app-navbar-country-trigger')
-      const priceDisplay = page.getByTestId('app-greeting-price')
+      const priceValue = page.getByTestId('app-greeting-price-value')
+      const dateDisplay = page.getByTestId('app-greeting-date')
 
-      // Get US format (uses comma as thousand separator, period as decimal)
-      const usText = await priceDisplay.textContent()
+      // Initial state: US region, USD currency
+      await expect(priceValue).toContainText('USD')
+      const usDate = await dateDisplay.textContent()
 
-      // Select Spain
+      // Select Spain -> EUR
       await countryTrigger.click()
       await page.getByTestId('app-navbar-country-option-ES').click()
-      const esText = await priceDisplay.textContent()
+      await expect(priceValue).toContainText('EUR')
+      const esDate = await dateDisplay.textContent()
 
-      // Select UK
+      // Select UK -> GBP
       await countryTrigger.click()
       await page.getByTestId('app-navbar-country-option-GB').click()
-      const gbText = await priceDisplay.textContent()
+      await expect(priceValue).toContainText('GBP')
+      const gbDate = await dateDisplay.textContent()
 
-      // Select Mexico
+      // Select Mexico -> MXN
       await countryTrigger.click()
       await page.getByTestId('app-navbar-country-option-MX').click()
-      const mxText = await priceDisplay.textContent()
+      await expect(priceValue).toContainText('MXN')
+      const mxDate = await dateDisplay.textContent()
 
-      // All should be different due to currency/locale differences
-      const formats = [usText, esText, gbText, mxText]
-      const uniqueFormats = new Set(formats)
+      // Select Colombia -> COP
+      await countryTrigger.click()
+      await page.getByTestId('app-navbar-country-option-CO').click()
+      await expect(priceValue).toContainText('COP')
+      const coDate = await dateDisplay.textContent()
 
-      // At minimum US/ES should differ (USD vs EUR)
-      expect(usText).not.toBe(esText)
+      // DATE formatting should vary between regions (different Intl locales)
+      const dateFormats = [usDate, esDate, gbDate, mxDate, coDate]
+      const uniqueDateFormats = new Set(dateFormats)
+      // At minimum US/ES should have different date formats (MM/DD/YYYY vs DD/MM/YYYY)
+      expect(uniqueDateFormats.size).toBeGreaterThanOrEqual(2)
     })
   })
 
@@ -180,6 +203,210 @@ test.describe('Country Selection Journey', () => {
       const announcerText = await announcer.textContent()
       // Check for Spanish region change text (could be "Pais cambiado a" or similar)
       expect(announcerText).toMatch(/cambiado|region|pais|espana|spain/i)
+    })
+  })
+
+  test.describe('Given Colombia (CO) is a newly added region (task 5 proof)', () => {
+    test('CO option is visible in country dropdown', async ({ page }) => {
+      const countryTrigger = page.getByTestId('app-navbar-country-trigger')
+      await countryTrigger.click()
+      const coOption = page.getByTestId('app-navbar-country-option-CO')
+      await expect(coOption).toBeVisible()
+    })
+
+    test('Selecting CO triggers accessible name containing Colombia', async ({ page }) => {
+      const countryTrigger = page.getByTestId('app-navbar-country-trigger')
+      await countryTrigger.click()
+      await page.getByTestId('app-navbar-country-option-CO').click()
+      await expect(countryTrigger).toHaveAccessibleName(/colombia/i)
+    })
+
+    test('Selecting CO causes announcer to mention Colombia', async ({ page }) => {
+      const countryTrigger = page.getByTestId('app-navbar-country-trigger')
+      const announcer = page.getByTestId('app-navbar-country-announcer')
+      await countryTrigger.click()
+      await page.getByTestId('app-navbar-country-option-CO').click()
+      await expect(announcer).not.toBeEmpty()
+      const announcerText = await announcer.textContent()
+      expect(announcerText).toMatch(/colombia/i)
+    })
+
+    test('Selecting CO renders es-CO date format (DD/MM/YYYY)', async ({ page }) => {
+      const countryTrigger = page.getByTestId('app-navbar-country-trigger')
+      const dateDisplay = page.getByTestId('app-greeting-date')
+
+      // Capture US date format first (MM/DD/YYYY)
+      const usDateText = await dateDisplay.textContent()
+
+      // Select Colombia
+      await countryTrigger.click()
+      await page.getByTestId('app-navbar-country-option-CO').click()
+
+      // es-CO date format differs from en-US (DD/MM/YYYY vs MM/DD/YYYY)
+      const coDateText = await dateDisplay.textContent()
+      expect(coDateText).not.toBe(usDateText)
+    })
+
+    test('Fresh session: selecting CO syncs currency to COP (syncCurrencyToRegion)', async ({
+      page,
+    }) => {
+      // This test proves the CO region correctly syncs to COP currency when user has not
+      // explicitly overridden currency (fresh session with cleared localStorage).
+      const countryTrigger = page.getByTestId('app-navbar-country-trigger')
+      const priceValue = page.getByTestId('app-greeting-price-value')
+
+      // Verify initial currency is USD (default region US -> default currency USD)
+      await expect(priceValue).toContainText('USD')
+
+      // Select Colombia - since user hasn't explicitly selected currency, it should sync to COP
+      await countryTrigger.click()
+      await page.getByTestId('app-navbar-country-option-CO').click()
+
+      // Currency should now be COP (region CO -> COP via syncCurrencyToRegion)
+      await expect(priceValue).toContainText('COP')
+    })
+
+    test('Colombia persists after reload', async ({ page }) => {
+      const countryTrigger = page.getByTestId('app-navbar-country-trigger')
+
+      // Select Colombia
+      await countryTrigger.click()
+      await page.getByTestId('app-navbar-country-option-CO').click()
+      await expect(countryTrigger).toHaveAccessibleName(/colombia/i)
+
+      // Reload the page
+      await page.reload()
+
+      // Colombia should persist
+      await expect(page.getByTestId('app-navbar-country-trigger')).toHaveAccessibleName(/colombia/i)
+    })
+  })
+
+  test.describe('Given China (CN) is a newly added region (task 6 proof)', () => {
+    test('CN option is visible in country dropdown', async ({ page }) => {
+      const countryTrigger = page.getByTestId('app-navbar-country-trigger')
+      await countryTrigger.click()
+      const cnOption = page.getByTestId('app-navbar-country-option-CN')
+      await expect(cnOption).toBeVisible()
+    })
+
+    test('Selecting CN triggers accessible name containing China', async ({ page }) => {
+      const countryTrigger = page.getByTestId('app-navbar-country-trigger')
+      await countryTrigger.click()
+      await page.getByTestId('app-navbar-country-option-CN').click()
+      await expect(countryTrigger).toHaveAccessibleName(/china/i)
+    })
+
+    test('Selecting CN renders zh-CN date format', async ({ page }) => {
+      const countryTrigger = page.getByTestId('app-navbar-country-trigger')
+      const dateDisplay = page.getByTestId('app-greeting-date')
+
+      // Capture US date format first
+      const usDateText = await dateDisplay.textContent()
+
+      // Select China
+      await countryTrigger.click()
+      await page.getByTestId('app-navbar-country-option-CN').click()
+
+      // zh-CN date format differs from en-US
+      const cnDateText = await dateDisplay.textContent()
+      expect(cnDateText).not.toBe(usDateText)
+    })
+
+    test('Fresh session: selecting CN syncs currency to CNY (syncCurrencyToRegion)', async ({
+      page,
+    }) => {
+      const countryTrigger = page.getByTestId('app-navbar-country-trigger')
+      const priceValue = page.getByTestId('app-greeting-price-value')
+
+      // Verify initial currency is USD (default region US -> default currency USD)
+      await expect(priceValue).toContainText('USD')
+
+      // Select China - should sync to CNY
+      await countryTrigger.click()
+      await page.getByTestId('app-navbar-country-option-CN').click()
+
+      // Currency should now be CNY (region CN -> CNY via syncCurrencyToRegion)
+      await expect(priceValue).toContainText('CNY')
+    })
+
+    test('China persists after reload', async ({ page }) => {
+      const countryTrigger = page.getByTestId('app-navbar-country-trigger')
+
+      // Select China
+      await countryTrigger.click()
+      await page.getByTestId('app-navbar-country-option-CN').click()
+      await expect(countryTrigger).toHaveAccessibleName(/china/i)
+
+      // Reload
+      await page.reload()
+
+      // China should persist
+      await expect(page.getByTestId('app-navbar-country-trigger')).toHaveAccessibleName(/china/i)
+    })
+  })
+
+  test.describe('Given Japan (JP) is a newly added region (task 6 proof)', () => {
+    test('JP option is visible in country dropdown', async ({ page }) => {
+      const countryTrigger = page.getByTestId('app-navbar-country-trigger')
+      await countryTrigger.click()
+      const jpOption = page.getByTestId('app-navbar-country-option-JP')
+      await expect(jpOption).toBeVisible()
+    })
+
+    test('Selecting JP triggers accessible name containing Japan', async ({ page }) => {
+      const countryTrigger = page.getByTestId('app-navbar-country-trigger')
+      await countryTrigger.click()
+      await page.getByTestId('app-navbar-country-option-JP').click()
+      await expect(countryTrigger).toHaveAccessibleName(/japan/i)
+    })
+
+    test('Selecting JP renders ja-JP date format', async ({ page }) => {
+      const countryTrigger = page.getByTestId('app-navbar-country-trigger')
+      const dateDisplay = page.getByTestId('app-greeting-date')
+
+      // Capture US date format first
+      const usDateText = await dateDisplay.textContent()
+
+      // Select Japan
+      await countryTrigger.click()
+      await page.getByTestId('app-navbar-country-option-JP').click()
+
+      // ja-JP date format differs from en-US
+      const jpDateText = await dateDisplay.textContent()
+      expect(jpDateText).not.toBe(usDateText)
+    })
+
+    test('Fresh session: selecting JP syncs currency to JPY (syncCurrencyToRegion)', async ({
+      page,
+    }) => {
+      const countryTrigger = page.getByTestId('app-navbar-country-trigger')
+      const priceValue = page.getByTestId('app-greeting-price-value')
+
+      // Verify initial currency is USD (default region US -> default currency USD)
+      await expect(priceValue).toContainText('USD')
+
+      // Select Japan - should sync to JPY
+      await countryTrigger.click()
+      await page.getByTestId('app-navbar-country-option-JP').click()
+
+      // Currency should now be JPY (region JP -> JPY via syncCurrencyToRegion)
+      await expect(priceValue).toContainText('JPY')
+    })
+
+    test('Japan persists after reload', async ({ page }) => {
+      const countryTrigger = page.getByTestId('app-navbar-country-trigger')
+
+      // Select Japan
+      await countryTrigger.click()
+      await page.getByTestId('app-navbar-country-option-JP').click()
+      await expect(countryTrigger).toHaveAccessibleName(/japan/i)
+
+      // Reload
+      await page.reload()
+
+      // Japan should persist
+      await expect(page.getByTestId('app-navbar-country-trigger')).toHaveAccessibleName(/japan/i)
     })
   })
 })

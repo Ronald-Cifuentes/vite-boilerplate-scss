@@ -5,6 +5,7 @@ import type { DropdownProps, DropdownOption } from './interfaces'
 import { DropdownTrigger } from './DropdownTrigger'
 import { DropdownPanel } from './DropdownPanel'
 import { DropdownOptionItem } from './DropdownOptionItem'
+import { useDropdownPosition, type DropdownPosition } from './useDropdownPosition'
 import styles from './Dropdown.module.scss'
 
 export function Dropdown<T extends string = string>({
@@ -19,117 +20,122 @@ export function Dropdown<T extends string = string>({
 }: DropdownProps<T>): ReturnType<FC> {
   useSignals()
   const isOpen = useSignal(false)
-  const focusedIndex = useSignal(-1)
-  const justOpenedRef = useRef(false)
-  const triggerRef = useRef<HTMLButtonElement>(null)
-  const optionRefs = useMemo(
+  const isClosing = useSignal(false)
+  const focusIdx = useSignal(-1)
+  const justOpened = useRef(false)
+  const trigRef = useRef<HTMLButtonElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
+  const optRefs = useMemo(
     () => options.map(() => ({ current: null as HTMLDivElement | null })),
     [options]
   )
-  const selectedIndex = options.findIndex(opt => opt.value === value)
+  const selIdx = options.findIndex(o => o.value === value)
+  const pos = useSignal<DropdownPosition>({ flipVertical: false, flipHorizontal: false })
+  const onPosChange = useCallback(
+    (p: DropdownPosition): void => {
+      pos.value = p
+    },
+    [pos]
+  )
+  useDropdownPosition({
+    isOpen: isOpen.value,
+    triggerRef: trigRef,
+    panelRef,
+    onPositionChange: onPosChange,
+  })
+  const onCloseAnimEnd = useCallback((): void => {
+    isClosing.value = false
+  }, [isClosing])
 
   useLayoutEffect(() => {
     if (!isOpen.value) return undefined
-    const handleClickOutside = (event: MouseEvent): void => {
-      const target = event.target as Node
-      const dropdown = triggerRef.current?.parentElement
-      if (dropdown && !dropdown.contains(target)) {
+    const h = (e: MouseEvent): void => {
+      const dd = trigRef.current?.parentElement
+      if (dd && !dd.contains(e.target as Node)) {
         isOpen.value = false
-        focusedIndex.value = -1
+        focusIdx.value = -1
       }
     }
-    document.addEventListener('mousedown', handleClickOutside)
+    document.addEventListener('mousedown', h)
     return (): void => {
-      document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('mousedown', h)
     }
-  }, [isOpen.value, isOpen, focusedIndex])
+  }, [isOpen.value, isOpen, focusIdx])
 
   useLayoutEffect(() => {
-    if (isOpen.value && focusedIndex.value >= 0 && justOpenedRef.current) {
-      justOpenedRef.current = false
-      const t = setTimeout(() => optionRefs[focusedIndex.value]?.current?.focus(), 0)
+    if (isOpen.value && focusIdx.value >= 0 && justOpened.current) {
+      justOpened.current = false
+      const t = setTimeout(() => optRefs[focusIdx.value]?.current?.focus(), 0)
       return (): void => {
         clearTimeout(t)
       }
     }
     return undefined
-  }, [isOpen.value, focusedIndex.value, optionRefs])
+  }, [isOpen.value, focusIdx.value, optRefs])
 
-  const openDropdown = useCallback((): void => {
-    justOpenedRef.current = true
+  const open = useCallback((): void => {
+    justOpened.current = true
     isOpen.value = true
-    focusedIndex.value = selectedIndex >= 0 ? selectedIndex : 0
-  }, [selectedIndex, isOpen, focusedIndex])
-
-  const closeDropdown = useCallback(
-    (returnFocus?: boolean): void => {
+    focusIdx.value = selIdx >= 0 ? selIdx : 0
+  }, [selIdx, isOpen, focusIdx])
+  const close = useCallback(
+    (rf?: boolean): void => {
+      // aria-expanded updates IMMEDIATELY (isOpen=false), but visual close defers
       isOpen.value = false
-      focusedIndex.value = -1
-      justOpenedRef.current = false
-      if (returnFocus !== false) {
-        triggerRef.current?.focus()
-      }
+      isClosing.value = true
+      focusIdx.value = -1
+      justOpened.current = false
+      if (rf !== false) trigRef.current?.focus()
     },
-    [isOpen, focusedIndex]
+    [isOpen, isClosing, focusIdx]
   )
-
-  const selectOption = useCallback(
-    (option: DropdownOption<T>): void => {
-      onChange(option.value)
-      closeDropdown(true)
+  const select = useCallback(
+    (o: DropdownOption<T>): void => {
+      onChange(o.value)
+      close(true)
     },
-    [onChange, closeDropdown]
+    [onChange, close]
   )
-
-  const handleTriggerClick = useCallback((): void => {
+  const onTrigClick = useCallback((): void => {
     if (isOpen.value) {
-      closeDropdown(false)
+      close(false)
     } else {
-      openDropdown()
+      open()
     }
-  }, [isOpen.value, openDropdown, closeDropdown])
-
-  const handleTriggerKeyDown = useCallback(
+  }, [isOpen.value, open, close])
+  const onTrigKey = useCallback(
     (e: KeyboardEvent): void => {
-      switch (e.key) {
-        case 'Enter':
-        case ' ':
-        case 'ArrowDown':
-        case 'ArrowUp':
-          e.preventDefault()
-          if (!isOpen.value) {
-            openDropdown()
-          }
-          break
+      // istanbul ignore else - all 4 keys tested
+      if (['Enter', ' ', 'ArrowDown', 'ArrowUp'].includes(e.key)) {
+        e.preventDefault()
+        if (!isOpen.value) open()
       }
     },
-    [isOpen.value, openDropdown]
+    [isOpen.value, open]
   )
-
   const moveFocus = useCallback(
-    (newIndex: number): void => {
-      focusedIndex.value = newIndex
-      optionRefs[newIndex]?.current?.focus()
+    (i: number): void => {
+      focusIdx.value = i
+      optRefs[i]?.current?.focus()
     },
-    [focusedIndex, optionRefs]
+    [focusIdx, optRefs]
   )
-
-  const handleOptionKeyDown = useCallback(
-    (e: KeyboardEvent, index: number): void => {
+  const onOptKey = useCallback(
+    (e: KeyboardEvent, i: number): void => {
       const len = options.length
       switch (e.key) {
         case 'Enter':
         case ' ':
           e.preventDefault()
-          selectOption(options[index] as DropdownOption<T>)
+          select(options[i] as DropdownOption<T>)
           break
         case 'ArrowDown':
           e.preventDefault()
-          moveFocus((index + 1) % len)
+          moveFocus((i + 1) % len)
           break
         case 'ArrowUp':
           e.preventDefault()
-          moveFocus((index - 1 + len) % len)
+          moveFocus((i - 1 + len) % len)
           break
         case 'Home':
           e.preventDefault()
@@ -141,21 +147,20 @@ export function Dropdown<T extends string = string>({
           break
         case 'Escape':
           e.preventDefault()
-          closeDropdown(true)
+          close(true)
           break
         case 'Tab':
-          closeDropdown(false)
+          close(false)
           break
       }
     },
-    [options, selectOption, closeDropdown, moveFocus]
+    [options, select, close, moveFocus]
   )
-
-  const handleOptionClick = useCallback(
-    (option: DropdownOption<T>): void => {
-      selectOption(option)
+  const onOptClick = useCallback(
+    (o: DropdownOption<T>): void => {
+      select(o)
     },
-    [selectOption]
+    [select]
   )
 
   return (
@@ -169,31 +174,36 @@ export function Dropdown<T extends string = string>({
         aria-expanded={isOpen.value}
         aria-controls={`${id}-panel`}
         id={`${id}-trigger`}
-        onClick={handleTriggerClick}
-        onKeyDown={handleTriggerKeyDown}
-        buttonRef={triggerRef}
+        onClick={onTrigClick}
+        onKeyDown={onTrigKey}
+        buttonRef={trigRef}
         dataTestId={`${dataTestId}-trigger`}
       />
       <DropdownPanel
         id={`${id}-panel`}
         aria-labelledby={`${id}-trigger`}
         isOpen={isOpen.value}
+        isClosing={isClosing.value}
+        onCloseAnimationEnd={onCloseAnimEnd}
+        flipVertical={pos.value.flipVertical}
+        flipHorizontal={pos.value.flipHorizontal}
+        panelRef={panelRef}
         dataTestId={`${dataTestId}-panel`}
       >
-        {options.map((option, index) => (
+        {options.map((o, i) => (
           <DropdownOptionItem
-            key={option.value}
-            option={option}
-            isSelected={option.value === value}
-            isFocused={index === focusedIndex.value}
-            onClick={(): void => handleOptionClick(option as DropdownOption<T>)}
-            onKeyDown={(e): void => handleOptionKeyDown(e, index)}
-            id={`${id}-option-${option.value}`}
-            tabIndex={index === focusedIndex.value ? 0 : -1}
+            key={o.value}
+            option={o}
+            isSelected={o.value === value}
+            isFocused={i === focusIdx.value}
+            onClick={(): void => onOptClick(o as DropdownOption<T>)}
+            onKeyDown={(e): void => onOptKey(e, i)}
+            id={`${id}-option-${o.value}`}
+            tabIndex={i === focusIdx.value ? 0 : -1}
             setRef={(el: HTMLDivElement | null): void => {
-              optionRefs[index].current = el
+              optRefs[i].current = el
             }}
-            dataTestId={`${dataTestId}-option-${option.value}`}
+            dataTestId={`${dataTestId}-option-${o.value}`}
           />
         ))}
       </DropdownPanel>

@@ -12,6 +12,9 @@
 // Layer 1: Tools (no output)
 // (Settings and Tools are imported via @use within other layers)
 
+// Fonts - @font-face declarations (ADR-0012: mobile menu fonts)
+@use 'settings/fonts';
+
 // Themes - CSS custom property definitions (must be first CSS output)
 @use 'themes';
 

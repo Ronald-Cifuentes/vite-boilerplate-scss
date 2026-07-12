@@ -1,4 +1,4 @@
-export type SupportedCurrency = 'USD' | 'EUR' | 'GBP' | 'MXN'
+export type SupportedCurrency = 'COP' | 'USD' | 'EUR' | 'GBP' | 'MXN' | 'CNY' | 'JPY'
 
 export interface CurrencyMetadata {
   readonly code: SupportedCurrency

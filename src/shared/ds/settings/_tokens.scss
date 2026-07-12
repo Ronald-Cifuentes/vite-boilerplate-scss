@@ -59,3 +59,21 @@ $transition-duration-normal: 250ms;
 $transition-duration-slow: 400ms;
 $transition-timing-default: ease;
 $transition-timing-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+// Mobile Menu (ADR-0012: CodePen OJLMgYY fidelity)
+// Timing tokens - exact values from reference pen
+$mobile-menu-td: 150ms;
+$mobile-menu-te: cubic-bezier(0.215, 0.61, 0.355, 1);
+
+// Font families for mobile menu
+// CJK fallback: Rubik Mono One has NO CJK coverage; zh/ja render in Noto Sans or system fonts
+$font-family-mobile-menu-heading:
+  'Rubik Mono One', 'Noto Sans SC', 'Noto Sans JP', ui-monospace, monospace;
+$font-family-mobile-menu-body:
+  'Roboto Mono', 'Noto Sans SC', 'Noto Sans JP', ui-monospace, monospace;
+
+// Mobile menu visual tokens from pen
+$mobile-menu-pull: 30%; // Sibling pull on hover
+$mobile-menu-dim: 0.25; // Sibling dim opacity
+$mobile-menu-top-item-size: 10vmin; // Top-level item font size
+$mobile-menu-submenu-item-size: 3.5vmin; // Submenu item font size

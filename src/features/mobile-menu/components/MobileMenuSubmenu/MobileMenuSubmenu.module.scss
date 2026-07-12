@@ -1,0 +1,90 @@
+@use '../../../../shared/ds/settings/tokens' as t;
+
+// Mobile menu submenu - CodePen OJLMgYY fidelity
+// Submenu items: Roboto Mono at 3.5vmin, text-shadow
+
+.submenu {
+  list-style: none;
+  margin: 0;
+  padding: t.$space-2 0;
+  opacity: 0;
+  transform: translateY(-10%);
+  visibility: hidden;
+  transition:
+    opacity calc(t.$mobile-menu-td * 2) t.$mobile-menu-te,
+    transform calc(t.$mobile-menu-td * 2) t.$mobile-menu-te,
+    visibility 0s calc(t.$mobile-menu-td * 2);
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
+.visible {
+  opacity: 1;
+  transform: translateY(0);
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+.option {
+  display: block;
+  width: 100%;
+}
+
+.optionButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: t.$space-2 t.$space-4;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: t.$font-family-mobile-menu-body;
+  font-size: t.$mobile-menu-submenu-item-size;
+  font-weight: 400;
+  color: var(--color-mobile-menu-secondary);
+  text-decoration: none;
+  text-shadow:
+    1px 1px 0 var(--color-mobile-menu-overlay),
+    2px 2px 0 var(--color-mobile-menu-overlay);
+  transition:
+    color t.$mobile-menu-td t.$mobile-menu-te,
+    transform t.$mobile-menu-td t.$mobile-menu-te;
+
+  &:hover {
+    color: var(--color-mobile-menu-highlight);
+    transform: scale(1.05);
+  }
+
+  &:focus-visible {
+    outline: t.$focus-ring-width solid var(--color-mobile-menu-highlight);
+    outline-offset: t.$focus-ring-offset;
+    border-radius: t.$radius-md;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+
+    &:hover {
+      transform: none;
+    }
+  }
+}
+
+.selected {
+  color: var(--color-mobile-menu-highlight);
+  font-weight: 700;
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  font-size: 1.2em;
+}
+
+.label {
+  white-space: nowrap;
+}

@@ -12,6 +12,15 @@ export interface TranslationDictionary {
     label: string
     changeLanguage: string
   }
+  mobileMenu: {
+    openMenu: string
+    closeMenu: string
+    menuLabel: string
+    language: string
+    country: string
+    currency: string
+    theme: string
+  }
   navbar: {
     language: string
     theme: string
@@ -31,10 +40,19 @@ export interface TranslationDictionary {
     themeModeSystem: string
   }
   currency: {
+    cop: string
     usd: string
     eur: string
     gbp: string
     mxn: string
+    cny: string
+    jpy: string
+  }
+  rates: {
+    loading: string
+    stale: string
+    unavailable: string
+    partial: string
   }
   a11y: {
     languageSelectorDescription: string
@@ -44,6 +62,7 @@ export interface TranslationDictionary {
     countryChangedTo: string
     currencyChangedTo: string
     skipToContent: string
+    locationDetected: string
   }
 }
 

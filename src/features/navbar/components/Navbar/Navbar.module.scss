@@ -7,7 +7,10 @@
   align-items: center;
   justify-content: flex-end;
   padding: t.$space-3 t.$space-4;
-  background-color: var(--color-surface-raised);
+  // Task-8: Transparent navbar per user requirement; position:static (in-flow)
+  // so transparency reveals the page background. Controls use theme tokens
+  // (--color-text-primary) so contrast is maintained in both themes.
+  background-color: transparent;
   border-bottom: 1px solid var(--color-border-default);
   @include anim.theme-transition;
 
@@ -16,12 +19,26 @@
   }
 }
 
-.controls {
+// Mobile controls: hamburger button
+// Visible at < 768px (base styles)
+.mobileControls {
   display: flex;
+  align-items: center;
+
+  @include r.media-md {
+    display: none;
+  }
+}
+
+// Desktop controls: inline dropdowns
+// Hidden at < 768px (base), visible at >= 768px
+.desktopControls {
+  display: none;
   align-items: center;
   gap: t.$space-2;
 
   @include r.media-md {
+    display: flex;
     gap: t.$space-3;
   }
 }

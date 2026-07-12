@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from '../helpers/fixtures'
 
 /**
  * Dropdown Keyboard Navigation E2E Tests
@@ -8,6 +8,11 @@ import { test, expect } from '@playwright/test'
  *
  * NOTE: Theme is no longer a dropdown per ADR-0009 (now a tri-state cycle button).
  * Only Language, Country, and Currency dropdowns are tested here.
+ *
+ * STABILITY NOTE: The Dropdown component defers initial focus via setTimeout(..., 0)
+ * after opening. Tests MUST await the initially-focused option to be focused BEFORE
+ * sending any subsequent keypresses. This prevents race conditions where the keypress
+ * lands on a stale target (FLAKE-1 mitigation per state.json harnessNotes).
  */
 test.describe('Dropdown Keyboard Navigation (ADR-0007)', () => {
   test.beforeEach(async ({ page }) => {
@@ -33,94 +38,106 @@ test.describe('Dropdown Keyboard Navigation (ADR-0007)', () => {
       await expect(selectedOption).toBeFocused()
     })
 
-    test('ArrowDown navigates through options with wrap-around', async ({ page }) => {
+    test('ArrowDown navigates through options with wrap-around (4 locales: en, es, zh, ja)', async ({
+      page,
+    }) => {
       const trigger = page.getByTestId('app-navbar-language-trigger')
+      const enOption = page.getByTestId('app-navbar-language-option-en')
+      const esOption = page.getByTestId('app-navbar-language-option-es')
+      const zhOption = page.getByTestId('app-navbar-language-option-zh')
+      const jaOption = page.getByTestId('app-navbar-language-option-ja')
 
       // Open dropdown
       await trigger.click()
       await expect(trigger).toHaveAttribute('aria-expanded', 'true')
-
-      // First option should be focused (en is selected by default)
-      const enOption = page.getByTestId('app-navbar-language-option-en')
-      const esOption = page.getByTestId('app-navbar-language-option-es')
+      // CRITICAL: Wait for deferred focus to settle before sending keys
       await expect(enOption).toBeFocused()
 
-      // ArrowDown moves to next option
+      // ArrowDown moves through all 4 options
       await page.keyboard.press('ArrowDown')
       await expect(esOption).toBeFocused()
+      await page.keyboard.press('ArrowDown')
+      await expect(zhOption).toBeFocused()
+      await page.keyboard.press('ArrowDown')
+      await expect(jaOption).toBeFocused()
 
-      // ArrowDown from last option wraps to first
+      // ArrowDown from last option (ja) wraps to first (en)
       await page.keyboard.press('ArrowDown')
       await expect(enOption).toBeFocused()
     })
 
-    test('ArrowUp navigates through options with wrap-around', async ({ page }) => {
+    test('ArrowUp navigates through options with wrap-around (4 locales)', async ({ page }) => {
       const trigger = page.getByTestId('app-navbar-language-trigger')
+      const enOption = page.getByTestId('app-navbar-language-option-en')
+      const jaOption = page.getByTestId('app-navbar-language-option-ja')
 
       // Open dropdown
       await trigger.click()
       await expect(trigger).toHaveAttribute('aria-expanded', 'true')
-
-      const enOption = page.getByTestId('app-navbar-language-option-en')
-      const esOption = page.getByTestId('app-navbar-language-option-es')
+      // CRITICAL: Wait for deferred focus to settle before sending keys
       await expect(enOption).toBeFocused()
 
-      // ArrowUp from first option wraps to last
+      // ArrowUp from first option (en) wraps to last (ja)
       await page.keyboard.press('ArrowUp')
-      await expect(esOption).toBeFocused()
+      await expect(jaOption).toBeFocused()
 
-      // ArrowUp again moves to previous (wraps back to en)
+      // ArrowUp again moves to previous (wraps back to zh then es then en)
       await page.keyboard.press('ArrowUp')
-      await expect(enOption).toBeFocused()
+      const zhOption = page.getByTestId('app-navbar-language-option-zh')
+      await expect(zhOption).toBeFocused()
     })
 
     test('Home key jumps to first option', async ({ page }) => {
       const trigger = page.getByTestId('app-navbar-language-trigger')
+      const enOption = page.getByTestId('app-navbar-language-option-en')
+      const jaOption = page.getByTestId('app-navbar-language-option-ja')
 
       // Open dropdown
       await trigger.click()
       await expect(trigger).toHaveAttribute('aria-expanded', 'true')
+      // CRITICAL: Wait for deferred focus to settle before sending keys
+      await expect(enOption).toBeFocused()
 
-      const enOption = page.getByTestId('app-navbar-language-option-en')
-      const esOption = page.getByTestId('app-navbar-language-option-es')
-
-      // Navigate to last option
+      // Navigate to last option (ja is now the last with 4 locales)
       await page.keyboard.press('End')
-      await expect(esOption).toBeFocused()
+      await expect(jaOption).toBeFocused()
 
       // Home should jump to first
       await page.keyboard.press('Home')
       await expect(enOption).toBeFocused()
     })
 
-    test('End key jumps to last option', async ({ page }) => {
+    test('End key jumps to last option (ja is now last with 4 locales)', async ({ page }) => {
       const trigger = page.getByTestId('app-navbar-language-trigger')
+      const enOption = page.getByTestId('app-navbar-language-option-en')
+      const jaOption = page.getByTestId('app-navbar-language-option-ja')
 
       // Open dropdown
       await trigger.click()
       await expect(trigger).toHaveAttribute('aria-expanded', 'true')
-
-      const enOption = page.getByTestId('app-navbar-language-option-en')
-      const esOption = page.getByTestId('app-navbar-language-option-es')
+      // CRITICAL: Wait for deferred focus to settle before sending keys
       await expect(enOption).toBeFocused()
 
-      // End should jump to last
+      // End should jump to last (ja)
       await page.keyboard.press('End')
-      await expect(esOption).toBeFocused()
+      await expect(jaOption).toBeFocused()
     })
 
     test('Enter on focused option selects it, closes dropdown, returns focus to trigger', async ({
       page,
     }) => {
       const trigger = page.getByTestId('app-navbar-language-trigger')
+      const enOption = page.getByTestId('app-navbar-language-option-en')
+      const esOption = page.getByTestId('app-navbar-language-option-es')
 
       // Open dropdown
       await trigger.click()
       await expect(trigger).toHaveAttribute('aria-expanded', 'true')
+      // CRITICAL: Wait for deferred focus to settle before sending keys
+      await expect(enOption).toBeFocused()
 
       // Navigate to Spanish option
       await page.keyboard.press('ArrowDown')
-      const esOption = page.getByTestId('app-navbar-language-option-es')
       await expect(esOption).toBeFocused()
 
       // Press Enter to select
@@ -140,13 +157,18 @@ test.describe('Dropdown Keyboard Navigation (ADR-0007)', () => {
       page,
     }) => {
       const trigger = page.getByTestId('app-navbar-language-trigger')
+      const enOption = page.getByTestId('app-navbar-language-option-en')
 
       // Open dropdown
       await trigger.click()
       await expect(trigger).toHaveAttribute('aria-expanded', 'true')
+      // CRITICAL: Wait for deferred focus to settle before sending keys
+      await expect(enOption).toBeFocused()
 
       // Navigate to Spanish
       await page.keyboard.press('ArrowDown')
+      const esOption = page.getByTestId('app-navbar-language-option-es')
+      await expect(esOption).toBeFocused()
 
       // Press Escape
       await page.keyboard.press('Escape')
@@ -164,10 +186,13 @@ test.describe('Dropdown Keyboard Navigation (ADR-0007)', () => {
     test('Tab closes dropdown and moves focus to next element', async ({ page }) => {
       const langTrigger = page.getByTestId('app-navbar-language-trigger')
       const themeButton = page.getByTestId('app-navbar-theme-button')
+      const enOption = page.getByTestId('app-navbar-language-option-en')
 
       // Open dropdown
       await langTrigger.click()
       await expect(langTrigger).toHaveAttribute('aria-expanded', 'true')
+      // CRITICAL: Wait for deferred focus to settle before sending keys
+      await expect(enOption).toBeFocused()
 
       // Press Tab
       await page.keyboard.press('Tab')
@@ -181,7 +206,9 @@ test.describe('Dropdown Keyboard Navigation (ADR-0007)', () => {
   })
 
   test.describe('Country Dropdown', () => {
-    test('Full keyboard navigation cycle: ArrowDown/Up/Home/End/Enter', async ({ page }) => {
+    test('Full keyboard navigation cycle with 7 regions: US, ES, GB, MX, CO, CN, JP', async ({
+      page,
+    }) => {
       const trigger = page.getByTestId('app-navbar-country-trigger')
 
       // Open with Space
@@ -194,23 +221,33 @@ test.describe('Dropdown Keyboard Navigation (ADR-0007)', () => {
       const esOption = page.getByTestId('app-navbar-country-option-ES')
       const gbOption = page.getByTestId('app-navbar-country-option-GB')
       const mxOption = page.getByTestId('app-navbar-country-option-MX')
+      const coOption = page.getByTestId('app-navbar-country-option-CO')
+      const cnOption = page.getByTestId('app-navbar-country-option-CN')
+      const jpOption = page.getByTestId('app-navbar-country-option-JP')
+      // CRITICAL: Wait for deferred focus to settle before sending keys
       await expect(usOption).toBeFocused()
 
-      // ArrowDown through all options
+      // ArrowDown through all 7 options
       await page.keyboard.press('ArrowDown')
       await expect(esOption).toBeFocused()
       await page.keyboard.press('ArrowDown')
       await expect(gbOption).toBeFocused()
       await page.keyboard.press('ArrowDown')
       await expect(mxOption).toBeFocused()
+      await page.keyboard.press('ArrowDown')
+      await expect(coOption).toBeFocused()
+      await page.keyboard.press('ArrowDown')
+      await expect(cnOption).toBeFocused()
+      await page.keyboard.press('ArrowDown')
+      await expect(jpOption).toBeFocused()
 
-      // Wrap around
+      // Wrap around (JP is now last, wraps to US)
       await page.keyboard.press('ArrowDown')
       await expect(usOption).toBeFocused()
 
-      // End to last
+      // End to last (JP is now the last)
       await page.keyboard.press('End')
-      await expect(mxOption).toBeFocused()
+      await expect(jpOption).toBeFocused()
 
       // Home to first
       await page.keyboard.press('Home')
@@ -218,6 +255,7 @@ test.describe('Dropdown Keyboard Navigation (ADR-0007)', () => {
 
       // Navigate to GB and select
       await page.keyboard.press('ArrowDown')
+      await expect(esOption).toBeFocused()
       await page.keyboard.press('ArrowDown')
       await expect(gbOption).toBeFocused()
 
@@ -233,7 +271,9 @@ test.describe('Dropdown Keyboard Navigation (ADR-0007)', () => {
   })
 
   test.describe('Currency Dropdown', () => {
-    test('Keyboard navigation with ArrowUp (reverse direction)', async ({ page }) => {
+    test('Keyboard navigation with ArrowUp (7 currencies: COP, USD, EUR, GBP, MXN, CNY, JPY)', async ({
+      page,
+    }) => {
       const trigger = page.getByTestId('app-navbar-currency-trigger')
 
       // Open with Enter
@@ -241,23 +281,57 @@ test.describe('Dropdown Keyboard Navigation (ADR-0007)', () => {
       await page.keyboard.press('Enter')
       await expect(trigger).toHaveAttribute('aria-expanded', 'true')
 
-      // USD should be default
+      // USD should be default (region US -> default currency USD)
+      // Currency order per CONTRACTS v3.3.0: COP, USD, EUR, GBP, MXN, CNY, JPY
+      const copOption = page.getByTestId('app-navbar-currency-option-COP')
       const usdOption = page.getByTestId('app-navbar-currency-option-USD')
-      const mxnOption = page.getByTestId('app-navbar-currency-option-MXN')
+      const jpyOption = page.getByTestId('app-navbar-currency-option-JPY')
+      // CRITICAL: Wait for deferred focus to settle before sending keys
       await expect(usdOption).toBeFocused()
 
-      // ArrowUp wraps to last
+      // ArrowUp from USD (index 1) goes to COP (index 0)
       await page.keyboard.press('ArrowUp')
-      await expect(mxnOption).toBeFocused()
+      await expect(copOption).toBeFocused()
 
-      // Select MXN with Enter
+      // ArrowUp from COP (index 0) wraps to JPY (index 6, the new last)
+      await page.keyboard.press('ArrowUp')
+      await expect(jpyOption).toBeFocused()
+
+      // Select JPY with Enter
       await page.keyboard.press('Enter')
 
       // Verify
       await expect(trigger).toHaveAttribute('aria-expanded', 'false')
       await expect(trigger).toBeFocused()
-      // aria-label uses full currency name "Mexican Peso", not currency code "MXN"
-      await expect(trigger).toHaveAccessibleName(/mexican peso/i)
+      // aria-label uses full currency name "Japanese Yen", not currency code "JPY"
+      await expect(trigger).toHaveAccessibleName(/japanese yen/i)
+    })
+
+    test('End key jumps to JPY (last currency) and Home jumps to COP (first)', async ({ page }) => {
+      const trigger = page.getByTestId('app-navbar-currency-trigger')
+
+      // Open with Enter
+      await trigger.focus()
+      await page.keyboard.press('Enter')
+      await expect(trigger).toHaveAttribute('aria-expanded', 'true')
+
+      const usdOption = page.getByTestId('app-navbar-currency-option-USD')
+      const copOption = page.getByTestId('app-navbar-currency-option-COP')
+      const jpyOption = page.getByTestId('app-navbar-currency-option-JPY')
+      // CRITICAL: Wait for deferred focus
+      await expect(usdOption).toBeFocused()
+
+      // End to last (JPY)
+      await page.keyboard.press('End')
+      await expect(jpyOption).toBeFocused()
+
+      // Home to first (COP)
+      await page.keyboard.press('Home')
+      await expect(copOption).toBeFocused()
+
+      // Close
+      await page.keyboard.press('Escape')
+      await expect(trigger).toHaveAttribute('aria-expanded', 'false')
     })
   })
 
@@ -283,6 +357,7 @@ test.describe('Dropdown Keyboard Navigation (ADR-0007)', () => {
           'aria-expanded',
           'true'
         )
+        // CRITICAL: Wait for deferred focus to settle before sending keys
         await expect(firstOption, `${dd.name} first option should be focused`).toBeFocused()
 
         // Close with Escape

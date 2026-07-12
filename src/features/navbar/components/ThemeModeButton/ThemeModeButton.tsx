@@ -1,30 +1,13 @@
 import { FC, useCallback } from 'react'
 import { useSignals } from '@preact/signals-react/runtime'
-import { MdLightMode, MdDarkMode, MdSettingsBrightness } from 'react-icons/md'
-import type { IconType } from 'react-icons'
 import { IconButton } from '../../../../shared/components/IconButton'
 import { Announcer } from '../../../../shared/components/Announcer'
-import { useTheme } from '../../../../theme'
+import { useTheme, PREFERENCE_ICONS, PREFERENCE_LABEL_KEYS } from '../../../../theme'
 import type { ThemePreference } from '../../../../theme'
 import { useTranslation } from '../../../../i18n'
 import { themeAnnouncementSignal, setThemeAnnouncement } from '../../signals/announcement-signal'
 import type { ThemeModeButtonProps } from './interfaces'
 import styles from './ThemeModeButton.module.scss'
-
-const PREFERENCE_ICONS: Record<ThemePreference, IconType> = {
-  light: MdLightMode,
-  dark: MdDarkMode,
-  system: MdSettingsBrightness,
-}
-
-const PREFERENCE_LABEL_KEYS: Record<
-  ThemePreference,
-  'navbar.themeModeLight' | 'navbar.themeModeDark' | 'navbar.themeModeSystem'
-> = {
-  light: 'navbar.themeModeLight',
-  dark: 'navbar.themeModeDark',
-  system: 'navbar.themeModeSystem',
-}
 
 /**
  * Tri-state icon cycle button for theme preference.

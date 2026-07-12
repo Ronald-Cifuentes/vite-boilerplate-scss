@@ -1,6 +1,6 @@
 import { FC, useCallback, useMemo } from 'react'
 import { useSignals } from '@preact/signals-react/runtime'
-import { MdAttachMoney, MdEuro, MdCurrencyPound } from 'react-icons/md'
+import { MdAttachMoney, MdEuro, MdCurrencyPound, MdCurrencyYen } from 'react-icons/md'
 import { Dropdown } from '../../../../shared/components/Dropdown'
 import type { DropdownOption } from '../../../../shared/components/Dropdown'
 import { Announcer } from '../../../../shared/components/Announcer'
@@ -15,10 +15,13 @@ import type { CurrencyDropdownProps } from './interfaces'
 
 // Map currencies to their icons
 const CURRENCY_ICONS: Record<SupportedCurrency, typeof MdAttachMoney> = {
+  COP: MdAttachMoney, // COP uses dollar sign icon (same as USD/MXN)
   USD: MdAttachMoney,
   EUR: MdEuro,
   GBP: MdCurrencyPound,
   MXN: MdAttachMoney, // MXN uses same icon as USD (dollar sign)
+  CNY: MdCurrencyYen, // CNY uses yen icon (both CNY/JPY use yen symbol variations)
+  JPY: MdCurrencyYen, // JPY uses yen icon
 }
 
 /**

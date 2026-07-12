@@ -43,31 +43,120 @@
 
 .panel {
   position: absolute;
-  top: 100%;
-  left: 0;
   z-index: z.$z-dropdown;
   min-width: 160px;
-  max-width: 90vw;
+  // Hard clamp: panel always fits within viewport with 8px gutter (ADR-0010)
+  max-width: calc(100vw - 16px);
   max-height: 70vh;
-  margin-top: t.$space-1;
   overflow-y: auto;
   background: var(--color-surface-overlay);
   border: 1px solid var(--color-border-default);
   border-radius: t.$radius-md;
   box-shadow: var(--shadow-md);
 
-  // Hidden state - use opacity and pointer-events instead of visibility
-  // This avoids focus issues with visibility: hidden transitions
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(-8px);
+  // Default position: below trigger, left-aligned
+  top: 100%;
+  left: 0;
+  margin-top: t.$space-1;
 
-  @include anim.transition-fast(opacity, transform);
+  // Task-8 FIX: Closed panels use display:none to prevent overflow
+  // (FE-005 click-through: solved by removal from layout, no pointer-events needed)
+  // (POS-RACE-1: flip calc still runs in useLayoutEffect when isOpen becomes true,
+  //  measuring the panel after React renders it with display:block but before paint)
+  display: none;
 
   &--open {
+    display: block;
+    // Use CSS animation for entrance (works with display change, unlike transition)
+    animation: dropdownFadeIn t.$transition-duration-fast t.$transition-timing-default both;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+
+  // Closing state: animate out before display:none
+  // pointer-events:none prevents clicks during exit (FE-005 safety)
+  &--closing {
+    display: block;
+    pointer-events: none;
+    animation: dropdownFadeOut t.$transition-duration-fast t.$transition-timing-default both;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+
+  // Vertical flip: open above trigger when insufficient space below (ADR-0010)
+  &--flip-vertical {
+    top: auto;
+    bottom: 100%;
+    margin-top: 0;
+    margin-bottom: t.$space-1;
+
+    &.panel--open {
+      animation-name: dropdownFadeInUp;
+    }
+
+    &.panel--closing {
+      animation-name: dropdownFadeOutDown;
+    }
+  }
+
+  // Horizontal flip: right-align when right edge would overflow (ADR-0010)
+  &--flip-horizontal {
+    left: auto;
+    right: 0;
+  }
+}
+
+// Keyframes for dropdown entrance animations
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
     opacity: 1;
-    pointer-events: auto;
     transform: translateY(0);
+  }
+}
+
+@keyframes dropdownFadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Exit animations (reverse of entrance)
+@keyframes dropdownFadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes dropdownFadeOutDown {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(8px);
   }
 }
 

@@ -1,4 +1,4 @@
-export type SupportedLocale = 'en' | 'es'
+export type SupportedLocale = 'en' | 'es' | 'zh' | 'ja'
 
 export interface LocaleMetadata {
   readonly code: SupportedLocale

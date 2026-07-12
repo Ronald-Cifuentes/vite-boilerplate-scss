@@ -19,7 +19,7 @@ const config = {
   ],
   webServer: {
     command:
-      './node_modules/.bin/vite build && ./node_modules/.bin/vite preview --port 4173 --strictPort',
+      'VITE_BANXICO_TOKEN=e2e-mock-token ./node_modules/.bin/vite build && ./node_modules/.bin/vite preview --port 4173 --strictPort',
     url: 'http://localhost:4173',
     reuseExistingServer: !process.env.CI,
     cwd: '..',

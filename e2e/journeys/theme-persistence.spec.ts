@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from '../helpers/fixtures'
 
 test.describe('Theme Persistence (Tri-State per ADR-0009)', () => {
   test.describe('Preference persistence across page reloads', () => {

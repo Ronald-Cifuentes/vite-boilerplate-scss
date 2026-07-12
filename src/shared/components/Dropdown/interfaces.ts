@@ -39,6 +39,11 @@ export interface DropdownPanelProps {
   'aria-labelledby': string
   children: ReactNode
   isOpen: boolean
+  isClosing?: boolean
+  onCloseAnimationEnd?: () => void
+  flipVertical?: boolean
+  flipHorizontal?: boolean
+  panelRef?: RefObject<HTMLDivElement | null>
   dataTestId?: string
 }
 

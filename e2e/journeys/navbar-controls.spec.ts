@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from '../helpers/fixtures'
 
 test.describe('Navbar Controls', () => {
   test.beforeEach(async ({ page }) => {
@@ -252,13 +252,22 @@ test.describe('Navbar Controls', () => {
   })
 
   test.describe('Responsive Design', () => {
-    test('controls are visible at 375px (mobile)', async ({ page }) => {
+    test('controls are visible at 375px (mobile) via hamburger menu', async ({ page }) => {
       await page.setViewportSize({ width: 375, height: 667 })
 
-      await expect(page.getByTestId('app-navbar-language-trigger')).toBeVisible()
-      await expect(page.getByTestId('app-navbar-theme-button')).toBeVisible()
-      await expect(page.getByTestId('app-navbar-country-trigger')).toBeVisible()
-      await expect(page.getByTestId('app-navbar-currency-trigger')).toBeVisible()
+      // At mobile viewport, hamburger button should be visible instead of inline controls
+      const hamburger = page.getByRole('button', { name: /open menu/i })
+      await expect(hamburger).toBeVisible()
+
+      // Open mobile menu to access controls
+      await hamburger.click()
+      await expect(page.getByRole('dialog', { name: /menu/i })).toBeVisible()
+
+      // Verify all 4 menu items are present
+      await expect(page.getByTestId('app-mobile-menu-item-language')).toBeVisible()
+      await expect(page.getByTestId('app-mobile-menu-item-country')).toBeVisible()
+      await expect(page.getByTestId('app-mobile-menu-item-currency')).toBeVisible()
+      await expect(page.getByTestId('app-mobile-menu-item-theme')).toBeVisible()
     })
 
     test('controls are visible at 768px (tablet)', async ({ page }) => {

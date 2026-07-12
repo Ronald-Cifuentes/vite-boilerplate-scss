@@ -16,12 +16,16 @@ describe('Region Configuration', () => {
       expect(DEFAULT_REGION).toBe('US')
     })
 
-    it('SUPPORTED_REGIONS includes all expected regions', () => {
+    it('SUPPORTED_REGIONS includes all expected regions in order', () => {
       expect(SUPPORTED_REGIONS).toContain('US')
       expect(SUPPORTED_REGIONS).toContain('ES')
       expect(SUPPORTED_REGIONS).toContain('GB')
       expect(SUPPORTED_REGIONS).toContain('MX')
-      expect(SUPPORTED_REGIONS).toHaveLength(4)
+      expect(SUPPORTED_REGIONS).toContain('CO')
+      expect(SUPPORTED_REGIONS).toContain('CN')
+      expect(SUPPORTED_REGIONS).toContain('JP')
+      expect(SUPPORTED_REGIONS).toHaveLength(7)
+      expect(SUPPORTED_REGIONS).toEqual(['US', 'ES', 'GB', 'MX', 'CO', 'CN', 'JP'])
     })
   })
 
@@ -69,6 +73,39 @@ describe('Region Configuration', () => {
         currency: 'MXN',
       })
     })
+
+    it('CO metadata is correct', () => {
+      expect(REGION_METADATA.CO).toEqual({
+        code: 'CO',
+        nativeName: 'Colombia',
+        englishName: 'Colombia',
+        dateLocale: 'es-CO',
+        numberLocale: 'es-CO',
+        currency: 'COP',
+      })
+    })
+
+    it('CN metadata is correct', () => {
+      expect(REGION_METADATA.CN).toEqual({
+        code: 'CN',
+        nativeName: '中国',
+        englishName: 'China',
+        dateLocale: 'zh-CN',
+        numberLocale: 'zh-CN',
+        currency: 'CNY',
+      })
+    })
+
+    it('JP metadata is correct', () => {
+      expect(REGION_METADATA.JP).toEqual({
+        code: 'JP',
+        nativeName: '日本',
+        englishName: 'Japan',
+        dateLocale: 'ja-JP',
+        numberLocale: 'ja-JP',
+        currency: 'JPY',
+      })
+    })
   })
 
   describe('isValidRegion', () => {
@@ -77,6 +114,9 @@ describe('Region Configuration', () => {
       expect(isValidRegion('ES')).toBe(true)
       expect(isValidRegion('GB')).toBe(true)
       expect(isValidRegion('MX')).toBe(true)
+      expect(isValidRegion('CO')).toBe(true)
+      expect(isValidRegion('CN')).toBe(true)
+      expect(isValidRegion('JP')).toBe(true)
     })
 
     it('returns false for invalid regions', () => {

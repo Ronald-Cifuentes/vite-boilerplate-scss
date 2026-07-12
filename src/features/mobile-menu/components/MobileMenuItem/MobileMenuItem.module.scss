@@ -1,0 +1,190 @@
+@use '../../../../shared/ds/settings/tokens' as t;
+
+// Mobile menu item - CodePen OJLMgYY fidelity
+// Top-level items: Rubik Mono One at 10vmin, centered
+// Includes sibling pull effect from reference pen
+
+// Pull effect variable
+$pull: 30%;
+
+.item {
+  position: relative;
+  display: block;
+  text-align: center;
+  opacity: 0;
+  transform: translateX(-1rem);
+  transition:
+    opacity calc(t.$mobile-menu-td * 2) t.$mobile-menu-te,
+    transform calc(t.$mobile-menu-td * 2) t.$mobile-menu-te;
+  // Stagger delay based on item index
+  transition-delay: calc(t.$mobile-menu-td * 2 * (var(--item-index, 0) * 0.25));
+
+  @media (prefers-reduced-motion: reduce) {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+// When menu is open, items become visible (controlled by parent)
+:global(.menuOpen) .item {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+// Sibling dimming effect (when another item is hovered)
+.dimmed {
+  opacity: t.$mobile-menu-dim;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem 0.125rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: t.$font-family-mobile-menu-heading;
+  font-size: t.$mobile-menu-top-item-size;
+  font-weight: normal;
+  color: var(--color-mobile-menu-text);
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+
+  // Sibling pull effect: default state (pulled up, dimmed)
+  // When list is hovered/focused, non-hovered items pull up
+  opacity: 0.25;
+  transform: translate(0, calc($pull * -1));
+  transition:
+    color t.$mobile-menu-td t.$mobile-menu-te,
+    opacity calc(t.$mobile-menu-td * 3) t.$mobile-menu-te,
+    transform calc(t.$mobile-menu-td * 3) t.$mobile-menu-te;
+
+  // Light-band hover effect
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    background-color: var(--color-mobile-menu-highlight);
+    transform: translateX(-110%);
+    transform-origin: 0 50%;
+    transition: transform 0s t.$mobile-menu-te;
+    z-index: -1;
+  }
+
+  &::before {
+    top: 0;
+  }
+
+  &::after {
+    bottom: 0;
+  }
+
+  &:focus-visible {
+    outline: t.$focus-ring-width solid var(--color-mobile-menu-highlight);
+    outline-offset: t.$focus-ring-offset;
+    border-radius: t.$radius-md;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    opacity: 1;
+    transform: none;
+    transition: none;
+
+    &::before,
+    &::after {
+      display: none;
+    }
+  }
+}
+
+// =================================
+// Sibling pull effect (CodePen OJLMgYY fidelity)
+// =================================
+
+// When list is NOT hovered/focused: all items at rest (no pull, full opacity)
+:global(.menuOpen):not(:hover):not(:focus-within) .button {
+  opacity: 1;
+  transform: translate(0, 0);
+}
+
+// Hovered item: snap to center, full opacity
+.item:hover > .button,
+.item:focus-within > .button {
+  color: var(--color-mobile-menu-secondary);
+  opacity: 1;
+  transform: translate(0, 0);
+
+  // Light-band animation on hover/focus
+  &::before,
+  &::after {
+    animation: blink 1s t.$mobile-menu-td steps(1, end) forwards infinite;
+    transform: translateX(calc(100% - 0.5rem));
+    transition-duration: calc(t.$mobile-menu-td * 3);
+  }
+
+  &::after {
+    transition-delay: calc(t.$mobile-menu-td / 2);
+  }
+}
+
+// Items AFTER the hovered one: pushed down
+.item:hover ~ .item > .button,
+.item:focus-within ~ .item > .button {
+  transform: translate(0, $pull);
+}
+
+// Disable pull effect animations with reduced motion
+@media (prefers-reduced-motion: reduce) {
+  :global(.menuOpen):not(:hover):not(:focus-within) .button,
+  .item:hover > .button,
+  .item:focus-within > .button,
+  .item:hover ~ .item > .button,
+  .item:focus-within ~ .item > .button {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  font-size: 0.8em;
+}
+
+.label {
+  white-space: nowrap;
+}
+
+.submenuContainer {
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition:
+    opacity calc(t.$mobile-menu-td * 2) t.$mobile-menu-te,
+    max-height calc(t.$mobile-menu-td * 2) t.$mobile-menu-te;
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
+.expanded .submenuContainer {
+  opacity: 1;
+  max-height: 50vh;
+}
+
+// Blink animation for caret (from CodePen OJLMgYY)
+@keyframes blink {
+  50%,
+  100% {
+    opacity: 0;
+  }
+}

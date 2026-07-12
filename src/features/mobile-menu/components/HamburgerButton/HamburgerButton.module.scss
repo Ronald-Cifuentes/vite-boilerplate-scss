@@ -1,0 +1,84 @@
+@use '../../../../shared/ds/settings/tokens' as t;
+
+// Hamburger button - CodePen OJLMgYY fidelity
+// 2-bar icon that rotates 1turn and transforms to X on open
+
+.hamburger {
+  position: relative;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: t.$touch-target-min;
+  height: t.$touch-target-min;
+  padding: 0.5rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: t.$focus-ring-width solid var(--color-border-focus);
+    outline-offset: t.$focus-ring-offset;
+    border-radius: t.$radius-md;
+  }
+}
+
+.bars {
+  position: relative;
+  display: block;
+  width: 1.5rem;
+  height: 1.5rem;
+  transition: transform calc(t.$mobile-menu-td * 3) t.$mobile-menu-te;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 4px;
+    margin: auto;
+    background-color: var(--color-text-primary);
+    transition: transform calc(t.$mobile-menu-td * 3) t.$mobile-menu-te;
+  }
+
+  &::before {
+    top: 25%;
+    transform: rotate(0) translateY(0);
+  }
+
+  &::after {
+    bottom: 25%;
+    transform: rotate(0) translateY(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+
+    &::before,
+    &::after {
+      transition: none;
+    }
+  }
+}
+
+// Open state - 1turn spin + X formation
+// ADR-0012 Amendment 1: X bars use highlight token to contrast overlay
+.open .bars {
+  transform: rotate(1turn);
+
+  &::before,
+  &::after {
+    background-color: var(--color-mobile-menu-highlight);
+  }
+
+  &::before {
+    top: 50%;
+    transform: rotate(45deg) translateY(-50%);
+  }
+
+  &::after {
+    bottom: 50%;
+    transform: rotate(-45deg) translateY(50%);
+  }
+}

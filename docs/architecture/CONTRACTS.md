@@ -1,7 +1,23 @@
 # Architecture Contracts
 
-**Version:** 3.1.0 **Date:** 2026-07-09 **Status:** Authoritative - Frontend Engineer implements
-against this document
+**Version:** 3.4.0 **Date:** 2026-07-10 (task 7) **Status:** Authoritative - Frontend Engineer
+implements against this document
+
+**CHANGE from v3.3.0 (Task 7 - PENDING HUMAN DECISIONS):** Responsive navbar with fullscreen mobile
+menu replicating CodePen OJLMgYY. MobileMenu feature added at < 768px breakpoint. Fonts: Rubik Mono
+One + Roboto Mono (self-hosted woff2, ~39 KB). See ADR-0012.
+
+**CHANGE from v3.2.1 (Task 6 - PENDING HUMAN DECISIONS):** CJK locales (zh, ja) and regions (CN, JP)
+with currencies (CNY, JPY). Exchange rates via BanRep SUAMECA series 28/33 (pending ratification).
+Bundle strategy pending (lazy chunks or budget rev.6). See ADR-0011.
+
+**CHANGE from v3.2.0:** Added Colombia (CO) to SUPPORTED_REGIONS with metadata { code: 'CO',
+nativeName: 'Colombia', englishName: 'Colombia', dateLocale: 'es-CO', numberLocale: 'es-CO',
+currency: 'COP' }. Additive change, no breaking impact.
+
+**CHANGE from v3.1.0:** Currency conversion via BanRep SUAMECA + Banxico SIE (ADR-0010), COP added
+to currencies, MXN via USD cross-rate, viewport-safe dropdown positioning, display format override
+(en-US separators). Budget rev.4 approved (228KB/72KB).
 
 **CHANGE from v3.0.0:** Theme control changed from ThemeDropdown to ThemeModeButton (tri-state cycle
 button: light/dark/system) per user requirement supersession #2. See ADR-0009 for rationale.
@@ -15,7 +31,7 @@ convention defined here is binding.
 
 ---
 
-## 1. Target `src/` Tree (Updated for Task 3: ThemeModeButton)
+## 1. Target `src/` Tree (Updated for Task 4: Currency Conversion)
 
 ```
 src/
@@ -279,7 +295,7 @@ e2e/
 **File:** `src/i18n/types/Locale.ts`
 
 ```typescript
-export type SupportedLocale = 'en' | 'es'
+export type SupportedLocale = 'en' | 'es' | 'zh' | 'ja'
 
 export interface LocaleMetadata {
   readonly code: SupportedLocale
@@ -331,6 +347,8 @@ export interface TranslationDictionary {
     eur: string
     gbp: string
     mxn: string
+    cny: string
+    jpy: string
   }
   a11y: {
     languageSelectorDescription: string
@@ -383,11 +401,13 @@ import type { SupportedLocale, LocaleMetadata } from '../types/Locale'
 
 export const LOCALE_STORAGE_KEY = 'app-locale' as const
 export const DEFAULT_LOCALE: SupportedLocale = 'en'
-export const SUPPORTED_LOCALES: readonly SupportedLocale[] = ['en', 'es'] as const
+export const SUPPORTED_LOCALES: readonly SupportedLocale[] = ['en', 'es', 'zh', 'ja'] as const
 
 export const LOCALE_METADATA: Readonly<Record<SupportedLocale, LocaleMetadata>> = {
   en: { code: 'en', nativeName: 'English', englishName: 'English', direction: 'ltr' },
   es: { code: 'es', nativeName: 'Espanol', englishName: 'Spanish', direction: 'ltr' },
+  zh: { code: 'zh', nativeName: '中文', englishName: 'Chinese', direction: 'ltr' },
+  ja: { code: 'ja', nativeName: '日本語', englishName: 'Japanese', direction: 'ltr' },
 } as const
 
 export function isSupportedLocale(value: string): value is SupportedLocale {
@@ -700,7 +720,7 @@ export { useTheme } from './hooks/useTheme'
  * Region codes for Intl date/number formatting.
  * Distinct from language: e.g., user may read English but want European date formats.
  */
-export type SupportedRegion = 'US' | 'ES' | 'GB' | 'MX'
+export type SupportedRegion = 'US' | 'ES' | 'GB' | 'MX' | 'CO' | 'CN' | 'JP'
 
 export interface RegionMetadata {
   readonly code: SupportedRegion
@@ -744,7 +764,15 @@ import type { SupportedRegion, RegionMetadata } from '../types/Region'
 
 export const REGION_STORAGE_KEY = 'app-region' as const
 export const DEFAULT_REGION: SupportedRegion = 'US'
-export const SUPPORTED_REGIONS: readonly SupportedRegion[] = ['US', 'ES', 'GB', 'MX'] as const
+export const SUPPORTED_REGIONS: readonly SupportedRegion[] = [
+  'US',
+  'ES',
+  'GB',
+  'MX',
+  'CO',
+  'CN',
+  'JP',
+] as const
 
 export const REGION_METADATA: Readonly<Record<SupportedRegion, RegionMetadata>> = {
   US: {
@@ -778,6 +806,30 @@ export const REGION_METADATA: Readonly<Record<SupportedRegion, RegionMetadata>> 
     dateLocale: 'es-MX',
     numberLocale: 'es-MX',
     defaultCurrency: 'MXN',
+  },
+  CO: {
+    code: 'CO',
+    nativeName: 'Colombia',
+    englishName: 'Colombia',
+    dateLocale: 'es-CO',
+    numberLocale: 'es-CO',
+    defaultCurrency: 'COP',
+  },
+  CN: {
+    code: 'CN',
+    nativeName: '中国',
+    englishName: 'China',
+    dateLocale: 'zh-CN',
+    numberLocale: 'zh-CN',
+    defaultCurrency: 'CNY',
+  },
+  JP: {
+    code: 'JP',
+    nativeName: '日本',
+    englishName: 'Japan',
+    dateLocale: 'ja-JP',
+    numberLocale: 'ja-JP',
+    defaultCurrency: 'JPY',
   },
 } as const
 
@@ -822,7 +874,7 @@ export { useRegion } from './hooks/useRegion'
 **File:** `src/currency/types/Currency.ts`
 
 ```typescript
-export type SupportedCurrency = 'USD' | 'EUR' | 'GBP' | 'MXN'
+export type SupportedCurrency = 'COP' | 'USD' | 'EUR' | 'GBP' | 'MXN' | 'CNY' | 'JPY'
 
 export interface CurrencyMetadata {
   readonly code: SupportedCurrency
@@ -859,6 +911,7 @@ import type { SupportedCurrency, CurrencyMetadata } from '../types/Currency'
 
 export const CURRENCY_STORAGE_KEY = 'app-currency' as const
 export const SUPPORTED_CURRENCIES: readonly SupportedCurrency[] = [
+  'COP', // Colombian Peso (base currency for conversion)
   'USD',
   'EUR',
   'GBP',
@@ -866,11 +919,19 @@ export const SUPPORTED_CURRENCIES: readonly SupportedCurrency[] = [
 ] as const
 
 export const CURRENCY_METADATA: Readonly<Record<SupportedCurrency, CurrencyMetadata>> = {
+  COP: {
+    code: 'COP',
+    symbol: '$',
+    name: 'Colombian Peso',
+    localizedNameKey: 'currency.cop',
+    decimals: 0,
+  },
   USD: {
     code: 'USD',
     symbol: '$',
     name: 'US Dollar',
     localizedNameKey: 'currency.usd',
+    decimals: 2,
   },
   EUR: {
     code: 'EUR',
@@ -889,6 +950,20 @@ export const CURRENCY_METADATA: Readonly<Record<SupportedCurrency, CurrencyMetad
     symbol: 'MX$',
     name: 'Mexican Peso',
     localizedNameKey: 'currency.mxn',
+  },
+  CNY: {
+    code: 'CNY',
+    symbol: 'CN¥',
+    name: 'Chinese Yuan',
+    localizedNameKey: 'currency.cny',
+    decimals: 2,
+  },
+  JPY: {
+    code: 'JPY',
+    symbol: '¥',
+    name: 'Japanese Yen',
+    localizedNameKey: 'currency.jpy',
+    decimals: 0,
   },
 } as const
 
@@ -1206,6 +1281,24 @@ export interface DropdownOptionProps<T extends string = string> {
 }
 ```
 
+**Implementation Note (Task 8):** The actual implementation in `Dropdown.module.scss` uses
+`display: none` for closed panels (not `opacity: 0` + `pointer-events: none`). This prevents closed
+panels from contributing to layout overflow. Both open AND close use CSS `@keyframes` animations
+(since `display: none` elements cannot transition). This approach:
+
+1. **Prevents horizontal overflow** - closed panels are removed from layout entirely
+2. **Maintains FE-005 click-through safety** - `display: none` elements cannot receive events;
+   closing panels have `pointer-events: none` during the exit animation
+3. **Preserves POS-RACE-1 flip measurement** - `useLayoutEffect` still measures synchronously when
+   `isOpen` becomes true (React renders with `display: block` before paint)
+4. **Respects `prefers-reduced-motion`** - animations disabled via `animation: none`
+
+**Open animation:** `dropdownFadeIn` keyframes (opacity 0→1, translateY -8px→0). **Close animation
+(UX-001):** `dropdownFadeOut` keyframes (reverse of open). The `isClosing` state keeps the panel
+visible during the exit animation while `isOpen` immediately becomes false (for aria-expanded and
+focus-return). A 200ms fallback timeout ensures the panel hides even if `animationend` doesn't fire
+(e.g., reduced-motion disables animations).
+
 ### 6.5 Announcer
 
 **File:** `src/shared/components/Announcer/interfaces.ts`
@@ -1405,6 +1498,266 @@ export interface CurrencyDropdownProps {
 
 ---
 
+### 7.6 MobileMenu (NEW - Task 7, ADR-0012)
+
+**Feature Location:** `src/features/mobile-menu/`
+
+```
+src/features/mobile-menu/
+  components/
+    MobileMenu/
+      MobileMenu.tsx
+      MobileMenu.module.scss
+      MobileMenu.spec.tsx
+      interfaces.ts
+      index.ts
+    MobileMenuItem/
+      MobileMenuItem.tsx
+      MobileMenuItem.module.scss
+      MobileMenuItem.spec.tsx
+      interfaces.ts
+      index.ts
+    MobileMenuSubmenu/
+      MobileMenuSubmenu.tsx
+      MobileMenuSubmenu.module.scss
+      MobileMenuSubmenu.spec.tsx
+      interfaces.ts
+      index.ts
+    HamburgerButton/
+      HamburgerButton.tsx
+      HamburgerButton.module.scss
+      HamburgerButton.spec.tsx
+      interfaces.ts
+      index.ts
+  hooks/
+    useFocusTrap.ts
+    useFocusTrap.spec.ts
+  index.ts
+```
+
+#### 7.6.1 Breakpoint Contract
+
+| Viewport | Hamburger | Inline Controls | MobileMenu |
+| -------- | --------- | --------------- | ---------- |
+| < 768px  | Visible   | Hidden          | Available  |
+| >= 768px | Hidden    | Visible         | N/A        |
+
+**Token:** `$breakpoint-md: 768px` (existing in `src/shared/ds/settings/_breakpoints.scss`)
+
+**Mobile-first enforcement:** Base styles = mobile (hamburger visible). Desktop styles via
+`@include media-md`.
+
+#### 7.6.2 HamburgerButton Contract
+
+**File:** `src/features/mobile-menu/components/HamburgerButton/interfaces.ts`
+
+```typescript
+export interface HamburgerButtonProps {
+  isOpen: boolean
+  onClick: () => void
+  dataTestId?: string
+  className?: string
+}
+```
+
+**ARIA:**
+
+| Attribute       | Value                                                            |
+| --------------- | ---------------------------------------------------------------- |
+| `role`          | Implicit `button`                                                |
+| `aria-expanded` | `{isOpen}`                                                       |
+| `aria-controls` | `"mobile-menu"`                                                  |
+| `aria-label`    | `t('mobileMenu.openMenu')` / `t('mobileMenu.closeMenu')` dynamic |
+
+**Animation (per CodePen OJLMgYY):**
+
+- Two horizontal bars (`::before`, `::after`)
+- Open: `transform: rotate(1turn)` on wrapper, bars rotate to form X (45deg, -45deg)
+- Timing: `--td: 150ms`, `--te: cubic-bezier(0.215, 0.61, 0.355, 1)`
+
+**Test ID:** `app-navbar-hamburger`
+
+#### 7.6.3 MobileMenu Contract
+
+**File:** `src/features/mobile-menu/components/MobileMenu/interfaces.ts`
+
+```typescript
+export interface MobileMenuProps {
+  isOpen: boolean
+  onClose: () => void
+  dataTestId?: string
+}
+```
+
+**ARIA:**
+
+| Attribute    | Value                       |
+| ------------ | --------------------------- |
+| `role`       | `dialog`                    |
+| `aria-modal` | `true`                      |
+| `aria-label` | `t('mobileMenu.menuLabel')` |
+| `id`         | `"mobile-menu"`             |
+
+**Focus Management:**
+
+- On open: focus moves to first menu item
+- On close: focus returns to hamburger button
+- Tab cycle contained within menu (focus trap)
+- Escape key closes menu
+
+**Test ID:** `app-mobile-menu`
+
+**Animation (per CodePen OJLMgYY):**
+
+- Overlay: two half-height `::before`/`::after` bands
+- Slide from `translateX(-110%)` to `translateX(0)`
+- Stagger: top band immediate, bottom band `calc(var(--td) / 2)` delay
+- Menu items: stagger entrance via nth-child delays
+
+#### 7.6.4 MobileMenuItem Contract
+
+**File:** `src/features/mobile-menu/components/MobileMenuItem/interfaces.ts`
+
+```typescript
+export interface MobileMenuItemProps {
+  labelKey: string // Translation key for item label
+  icon?: IconType // Optional icon
+  onClick?: () => void // For immediate action (e.g., theme cycle)
+  hasSubmenu?: boolean // Whether item expands
+  isExpanded?: boolean // If hasSubmenu, current state
+  onToggleSubmenu?: () => void
+  dataTestId?: string
+}
+```
+
+**Menu Items:**
+
+| Item     | labelKey              | Behavior                                |
+| -------- | --------------------- | --------------------------------------- |
+| Language | `mobileMenu.language` | Expands submenu with locale options     |
+| Country  | `mobileMenu.country`  | Expands submenu with region options     |
+| Currency | `mobileMenu.currency` | Expands submenu with currency options   |
+| Theme    | `mobileMenu.theme`    | Cycles preference on click (no submenu) |
+
+**Styling (per CodePen OJLMgYY):**
+
+- Font: Rubik Mono One at `10vmin`
+- Sibling pull: `--pull: 30%` translateY on hover
+- Sibling dim: `opacity: 0.25` on non-hovered
+
+**Test IDs:** `app-mobile-menu-item-language`, `app-mobile-menu-item-country`,
+`app-mobile-menu-item-currency`, `app-mobile-menu-item-theme`
+
+#### 7.6.5 MobileMenuSubmenu Contract
+
+**File:** `src/features/mobile-menu/components/MobileMenuSubmenu/interfaces.ts`
+
+```typescript
+export interface MobileMenuSubmenuProps<T extends string> {
+  options: readonly { value: T; label: string; icon?: IconType }[]
+  selectedValue: T
+  onSelect: (value: T) => void
+  isVisible: boolean
+  dataTestId?: string
+}
+```
+
+**Options source:**
+
+- Language: `LOCALE_METADATA` (nativeName)
+- Country: `REGION_METADATA` (nativeName)
+- Currency: `CURRENCY_METADATA` (localizedName via `t()`)
+
+**Styling (per CodePen OJLMgYY):**
+
+- Font: Roboto Mono at `3.5vmin`
+- Light-band hover effect on options
+- Blink caret animation
+
+**Selection behavior:** Selection closes submenu, menu stays open.
+
+#### 7.6.6 Font Tokens (NEW)
+
+**File:** `src/shared/ds/settings/_tokens.scss` (additions)
+
+```scss
+// Mobile menu fonts (CodePen OJLMgYY fidelity)
+--font-family-mobile-menu-heading:
+  'Rubik Mono One', 'Noto Sans SC', 'Noto Sans JP', ui-monospace, monospace;
+--font-family-mobile-menu-body:
+  'Roboto Mono', 'Noto Sans SC', 'Noto Sans JP', ui-monospace, monospace;
+```
+
+**Font files (self-hosted, OFL license):**
+
+| File           | Path                                      |  Size |
+| -------------- | ----------------------------------------- | ----: |
+| Rubik Mono One | `public/fonts/rubik-mono-one-latin.woff2` |  7 KB |
+| Roboto Mono    | `public/fonts/roboto-mono-latin.woff2`    | 33 KB |
+
+**Preload (index.html):**
+
+```html
+<link
+  rel="preload"
+  href="/fonts/rubik-mono-one-latin.woff2"
+  as="font"
+  type="font/woff2"
+  crossorigin
+/>
+<link rel="preload" href="/fonts/roboto-mono-latin.woff2" as="font" type="font/woff2" crossorigin />
+```
+
+**CJK Fallback:** Rubik Mono One has no CJK coverage. Chinese/Japanese labels render in fallback
+fonts (Noto Sans SC/JP or system).
+
+#### 7.6.7 Color Tokens (NEW)
+
+**File:** `src/shared/ds/themes/_contract.scss` (additions)
+
+```scss
+// Mobile menu colors (theme-aware mapping of CodePen OJLMgYY palette)
+--color-mobile-menu-overlay: #18181a; // Band overlay (works both themes)
+--color-mobile-menu-text: var(--color-text-primary);
+--color-mobile-menu-secondary: #75757c;
+--color-mobile-menu-highlight: #f5f5f5;
+```
+
+#### 7.6.8 Animation Tokens (NEW)
+
+**File:** `src/shared/ds/settings/_tokens.scss` (additions)
+
+```scss
+// Mobile menu timing (CodePen OJLMgYY fidelity)
+--mobile-menu-td: 150ms;
+--mobile-menu-te: cubic-bezier(0.215, 0.61, 0.355, 1);
+```
+
+#### 7.6.9 Accessibility Contract
+
+| Requirement     | Implementation                                                 |
+| --------------- | -------------------------------------------------------------- |
+| Semantic toggle | `<button>` with aria-expanded, aria-controls                   |
+| Focus on open   | First menu item receives focus                                 |
+| Focus on close  | Hamburger button receives focus                                |
+| Escape closes   | KeyboardEvent handler                                          |
+| Tab containment | useFocusTrap hook                                              |
+| Touch submenus  | Tap/focus triggers in addition to hover                        |
+| Reduced motion  | `prefers-reduced-motion: reduce` disables/shortens transitions |
+
+#### 7.6.10 i18n Keys (NEW)
+
+| Key                    | en         | es          | zh       | ja               |
+| ---------------------- | ---------- | ----------- | -------- | ---------------- |
+| `mobileMenu.openMenu`  | Open menu  | Abrir menu  | 打开菜单 | メニューを開く   |
+| `mobileMenu.closeMenu` | Close menu | Cerrar menu | 关闭菜单 | メニューを閉じる |
+| `mobileMenu.language`  | Language   | Idioma      | 语言     | 言語             |
+| `mobileMenu.country`   | Country    | Pais        | 国家     | 国               |
+| `mobileMenu.currency`  | Currency   | Moneda      | 货币     | 通貨             |
+| `mobileMenu.theme`     | Theme      | Tema        | 主题     | テーマ           |
+
+---
+
 ## 8. Design System Layer Contracts
 
 ### 8.1 Token File Contract
@@ -1507,9 +1860,213 @@ coverageThreshold: {
 
 ---
 
-## 10. Acceptance Criteria for Task 3 (ThemeModeButton)
+## 10. Acceptance Criteria for Task 4 (Currency Conversion & Positioning)
 
-The Frontend Engineer's work is complete when:
+The Frontend Engineer's work is complete when ALL Task 3 criteria remain met PLUS:
+
+### Must Pass (Machine-Verifiable)
+
+- [ ] `pnpm exec tsc --noEmit` exits 0
+- [ ] `pnpm test` exits 0 with 100% coverage
+- [ ] `pnpm exec playwright test` exits 0 (including new conversion + positioning tests)
+- [ ] Bundle size under budget (pending rev.4 approval if needed)
+
+### Currency Conversion (FX-xxx)
+
+- [ ] FX-001: BanRep adapter fetches rates from SUAMECA (idSerie 1/30/31)
+- [ ] FX-002: Rates cached in localStorage with 24h staleness bound
+- [ ] FX-003: UI states: loading / live / stale (with age) / unavailable
+- [ ] FX-004: Conversion math in major units (COP / copPerUnit = foreign)
+- [ ] FX-005: Half-up rounding to currency decimals (COP=0, others=2)
+- [ ] FX-006: Display format: {symbol}{amount} {ISO} (e.g., "$4,500 COP")
+- [ ] FX-007: Separators: comma for thousands, period for decimals (override locale)
+- [ ] FX-008: Base price 4500 COP in config (not hardcoded in Greeting)
+- [ ] FX-009: COP identity conversion (4500 COP -> 4500 COP)
+- [ ] FX-010: Graceful degradation when rates unavailable (show COP)
+- [ ] FX-011: AbortController timeout 8000ms on fetch
+- [ ] FX-012: Fail-closed: reject rate if unidad field malformed
+
+### COP in Selector (COP-xxx)
+
+- [ ] COP-001: COP added to SupportedCurrency type
+- [ ] COP-002: COP in SUPPORTED_CURRENCIES array (first position)
+- [ ] COP-003: COP metadata: symbol=$, decimals=0, localizedNameKey=currency.cop
+- [ ] COP-004: COP icon: MdAttachMoney
+- [ ] COP-005: i18n keys: currency.cop (en: "Colombian Peso", es: "Peso Colombiano")
+
+### Dropdown Positioning (POS-xxx)
+
+- [ ] POS-001: Panel flips above trigger when insufficient space below
+- [ ] POS-002: Panel right-aligns when left edge would overflow viewport
+- [ ] POS-003: Measurement on open + window resize (debounced)
+- [ ] POS-004: Hard clamp: max-width: calc(100vw - 16px)
+- [ ] POS-005: 8px gutter maintained on all edges
+- [ ] POS-006: SSR-safe (calculation in useEffect)
+- [ ] POS-007: No new dependencies (no floating-ui)
+
+### Responsive (RESP-xxx)
+
+- [ ] RESP-001: All dropdowns work at 375px viewport
+- [ ] RESP-002: All dropdowns work at 768px viewport
+- [ ] RESP-003: All dropdowns work at 1440px viewport
+- [ ] RESP-004: Trigger near right edge -> panel stays in viewport
+
+### E2E Tests (E2E-xxx)
+
+- [ ] E2E-001: Mock rates via page.route for deterministic tests
+- [ ] E2E-002: Test with user's example rates (verify exact numbers)
+- [ ] E2E-003: Test rates unavailable -> shows COP fallback
+- [ ] E2E-004: Test stale rates -> shows age indicator
+- [ ] E2E-005: Positioning test at 375px with trigger near right edge
+- [ ] E2E-006: Positioning test vertical flip near bottom
+
+---
+
+## 11. Exchange Rates Domain Contracts (NEW - v3.2.0)
+
+### 11.1 Domain Structure
+
+**Location:** `src/exchange-rates/` (sibling to `src/currency/`)
+
+```
+src/exchange-rates/
+  ports/
+    ExchangeRates.ts
+  adapters/
+    BanrepRatesAdapter.ts
+  signals/
+    rates-signal.ts
+  config/
+    series.ts
+    prices.ts
+  types/
+    Rate.ts
+  hooks/
+    useExchangeRates.ts
+  index.ts
+```
+
+### 11.2 Rate Types
+
+**File:** `src/exchange-rates/types/Rate.ts`
+
+```typescript
+export type RateStatus = 'loading' | 'live' | 'stale' | 'unavailable' | 'partial'
+
+export interface RateSnapshot {
+  copPerUnit: number // COP per 1 foreign unit
+  sourceDate: Date // When BanRep published it
+  retrievedAt: Date // When we fetched it
+}
+
+export interface RatesState {
+  status: RateStatus
+  rates: Partial<Record<SupportedCurrency, RateSnapshot>>
+  staleAgeMs?: number // If stale, how old
+  unavailableCurrencies?: SupportedCurrency[] // If partial, which failed
+  error?: string // If unavailable, why
+}
+```
+
+### 11.3 Exchange Rates Port
+
+**File:** `src/exchange-rates/ports/ExchangeRates.ts`
+
+```typescript
+export interface ExchangeRatesPort {
+  state: RatesState
+  refresh: () => Promise<void>
+  convert: (amountCop: number, toCurrency: SupportedCurrency) => number | null
+  getLastRefresh: () => Date | null
+}
+```
+
+### 11.4 Series Configuration
+
+**File:** `src/exchange-rates/config/series.ts`
+
+```typescript
+export const BANREP_SERIES: Record<'USD' | 'EUR' | 'GBP' | 'CNY' | 'JPY', number> = {
+  USD: 1, // TRM (Tasa Representativa del Mercado)
+  EUR: 30, // COP/EUR reserve rate
+  GBP: 31, // COP/GBP reserve rate
+  CNY: 28, // COP/CNY reserve rate (ADR-0011)
+  JPY: 33, // COP/JPY reserve rate (ADR-0011)
+}
+
+// MXN via Banxico cross-rate (see ADR-0010 Section 4)
+export const BANXICO_SERIES = 'SF43718' // Tipo de cambio FIX (MXN/USD)
+export const BANXICO_BASE_URL =
+  'https://www.banxico.org.mx/SieAPIRest/service/v1/series/SF43718/datos/oportuno'
+// Token via VITE_BANXICO_TOKEN env var (never committed)
+
+export const SUAMECA_BASE_URL =
+  'https://suameca.banrep.gov.co/estadisticas-economicas-back/rest/estadisticaEconomicaRestService/consultaInformacionSerie'
+
+export const RATES_STORAGE_KEY = 'app-exchange-rates'
+export const STALENESS_BOUND_MS = 24 * 60 * 60 * 1000 // 24 hours
+export const FETCH_TIMEOUT_MS = 8000
+```
+
+### 11.5 Price Configuration
+
+**File:** `src/exchange-rates/config/prices.ts`
+
+```typescript
+export const BASE_PRICE_COP = 4500 as const
+```
+
+### 11.6 Display Format Contract
+
+**Requirement:** User specified "$4,500 COP = $1.37 USD = $1.20 EUR = $23.94 MXN = $1.02 GBP"
+
+**Format:** `{symbol}{amount} {ISO}`
+
+| Currency | Symbol | Decimals | Example      |
+| -------- | ------ | -------- | ------------ |
+| COP      | $      | 0        | $4,500 COP   |
+| USD      | $      | 2        | $1.37 USD    |
+| EUR      | EUR    | 2        | EUR1.20 EUR  |
+| GBP      | GBP    | 2        | GBP1.02 GBP  |
+| MXN      | MX$    | 2        | MX$23.94 MXN |
+| CNY      | CN¥    | 2        | CN¥9.23 CNY  |
+| JPY      | ¥      | 0        | ¥220 JPY     |
+
+**Separators (OVERRIDE locale):**
+
+- Thousands: `,` (comma)
+- Decimals: `.` (period)
+
+### 11.7 Conversion Math
+
+```typescript
+function convertCopTo(amountCop: number, toCurrency: SupportedCurrency): number | null {
+  if (toCurrency === 'COP') return amountCop
+  const rate = rates[toCurrency]
+  if (!rate) return null
+  const foreign = amountCop / rate.copPerUnit
+  const decimals = CURRENCY_DECIMALS[toCurrency]
+  return Math.round(foreign * 10 ** decimals) / 10 ** decimals
+}
+```
+
+### 11.8 i18n Keys (NEW)
+
+| Key                 | en                | es                   |
+| ------------------- | ----------------- | -------------------- |
+| `currency.cop`      | Colombian Peso    | Peso Colombiano      |
+| `rates.loading`     | Loading rates...  | Cargando tasas...    |
+| `rates.stale`       | Rates from {age}  | Tasas de hace {age}  |
+| `rates.ago`         | ago               | atras                |
+| `rates.unavailable` | Rates unavailable | Tasas no disponibles |
+| `currency.cny`      | Chinese Yuan      | Yuan Chino           |
+| `currency.jpy`      | Japanese Yen      | Yen Japones          |
+
+---
+
+## 11.9 Task 3 Acceptance Criteria (Preserved)
+
+The following Task 3 criteria MUST remain passing:
 
 ### Must Pass (Machine-Verifiable)
 
@@ -1557,7 +2114,167 @@ The Frontend Engineer's work is complete when:
 
 ---
 
-## 11. References
+## 13. Task 6 Acceptance Criteria (CJK Locales + CNY/JPY Rates)
+
+**STATUS:** Pending (awaiting human decisions on rate sources and bundle strategy)
+
+The Frontend Engineer's work is complete when ALL prior criteria remain met PLUS:
+
+### Must Pass (Machine-Verifiable)
+
+- [ ] `pnpm exec tsc --noEmit` exits 0
+- [ ] `pnpm test` exits 0 with 100% coverage
+- [ ] `pnpm exec playwright test` exits 0
+- [ ] Bundle size within ratified budget (rev.5 or rev.6 per human decision)
+
+### Locale Expansion (LOC-xxx)
+
+- [ ] LOC-001: SupportedLocale type extended: 'en' | 'es' | 'zh' | 'ja'
+- [ ] LOC-002: SUPPORTED_LOCALES order: ['en', 'es', 'zh', 'ja'] (append only)
+- [ ] LOC-003: LOCALE_METADATA zh: { nativeName: '中文', englishName: 'Chinese' }
+- [ ] LOC-004: LOCALE_METADATA ja: { nativeName: '日本語', englishName: 'Japanese' }
+- [ ] LOC-005: zh.ts translation file with all keys (TranslationKeys enforced)
+- [ ] LOC-006: ja.ts translation file with all keys (TranslationKeys enforced)
+- [ ] LOC-007: isSupportedLocale validates 'zh' and 'ja' as true
+- [ ] LOC-008: Language dropdown shows 4 options
+- [ ] LOC-009: html[lang] updates to 'zh' or 'ja' on selection
+
+### Region Expansion (REG-xxx)
+
+- [ ] REG-001: SupportedRegion type extended: + 'CN' | 'JP'
+- [ ] REG-002: SUPPORTED_REGIONS order: [..., 'CN', 'JP'] (append only)
+- [ ] REG-003: REGION_METADATA CN: { nativeName: '中国', dateLocale: 'zh-CN', currency: 'CNY' }
+- [ ] REG-004: REGION_METADATA JP: { nativeName: '日本', dateLocale: 'ja-JP', currency: 'JPY' }
+- [ ] REG-005: isValidRegion validates 'CN' and 'JP' as true
+- [ ] REG-006: Country dropdown shows 7 options
+- [ ] REG-007: syncCurrencyToRegion: CN -> CNY, JP -> JPY
+
+### Currency Expansion (CUR-xxx)
+
+- [ ] CUR-001: SupportedCurrency type extended: + 'CNY' | 'JPY'
+- [ ] CUR-002: SUPPORTED_CURRENCIES order: [..., 'CNY', 'JPY'] (append only)
+- [ ] CUR-003: CURRENCY_METADATA CNY: { symbol: 'CN¥', decimals: 2 }
+- [ ] CUR-004: CURRENCY_METADATA JPY: { symbol: '¥', decimals: 0 }
+- [ ] CUR-005: formatAmount handles JPY 0-decimals correctly
+- [ ] CUR-006: isValidCurrency validates 'CNY' and 'JPY' as true
+- [ ] CUR-007: Currency dropdown shows 7 options
+
+### Exchange Rate Sources (RATE-xxx) [PENDING HUMAN RATIFICATION]
+
+- [ ] RATE-001: BANREP_SERIES extended: CNY: 28, JPY: 33
+- [ ] RATE-002: CNY rate fetched from SUAMECA series 28 with unidad='COP/CNY' assertion
+- [ ] RATE-003: JPY rate fetched from SUAMECA series 33 with unidad='COP/JPY' assertion
+- [ ] RATE-004: Fail-closed validation for CNY/JPY
+- [ ] RATE-005: 24h staleness bound applies to CNY/JPY
+- [ ] RATE-006: Partial availability: CNY/JPY failures isolated
+
+### Translation Keys (TRANS-xxx)
+
+- [ ] TRANS-001: TranslationDictionary.currency extended: + cny, jpy
+- [ ] TRANS-002: en.ts has currency.cny/jpy
+- [ ] TRANS-003: es.ts has currency.cny/jpy
+- [ ] TRANS-004: zh.ts has currency.cny/jpy
+- [ ] TRANS-005: ja.ts has currency.cny/jpy
+- [ ] TRANS-006: All 4 locale files pass TranslationKeys type check
+
+### Keyboard Navigation (KBD-xxx)
+
+- [ ] KBD-001: Language dropdown End->ja, wrap ja->en
+- [ ] KBD-002: Country dropdown End->JP, wrap JP->US
+- [ ] KBD-003: Currency dropdown End->JPY, wrap JPY->COP
+
+### E2E Tests (E2E-xxx)
+
+- [ ] E2E-001: zh locale selection renders Chinese UI
+- [ ] E2E-002: ja locale selection renders Japanese UI
+- [ ] E2E-003: CN region triggers CNY sync
+- [ ] E2E-004: JP region triggers JPY sync
+- [ ] E2E-005: CNY displays CN¥X.XX CNY format
+- [ ] E2E-006: JPY displays ¥XXX JPY format (0 decimals)
+- [ ] E2E-007: Keyboard e2e updated for 4/7/7 counts
+
+### Provenance (PROV-xxx)
+
+- [ ] PROV-001: zh.ts flagged machine-authored
+- [ ] PROV-002: ja.ts flagged machine-authored
+- [ ] PROV-003: Native speaker review required before production
+
+---
+
+## 15. Acceptance Criteria for Task 7 (Responsive Navbar - PENDING HUMAN DECISIONS)
+
+The Frontend Engineer's work is complete when ALL prior criteria remain met PLUS:
+
+### Must Pass (Machine-Verifiable)
+
+- [ ] `pnpm exec tsc --noEmit` exits 0
+- [ ] `pnpm test` exits 0 with 100% coverage
+- [ ] `pnpm exec playwright test` exits 0
+- [ ] Bundle size within ratified budget (rev.7 pending approval)
+
+### Mobile Menu Feature (MM-xxx)
+
+- [ ] MM-001: MobileMenu feature created at `src/features/mobile-menu/`
+- [ ] MM-002: HamburgerButton visible at < 768px, hidden at >= 768px
+- [ ] MM-003: Inline controls hidden at < 768px, visible at >= 768px
+- [ ] MM-004: Menu opens on hamburger click with fullscreen overlay
+- [ ] MM-005: Menu closes on Escape key
+- [ ] MM-006: Focus moves to first menu item on open
+- [ ] MM-007: Focus returns to hamburger on close
+- [ ] MM-008: Tab cycle contained within open menu (focus trap)
+- [ ] MM-009: 4 menu items: Language, Country, Currency, Theme
+
+### Visual Fidelity (VF-xxx) per CodePen OJLMgYY
+
+- [ ] VF-001: Band-slide overlay (two half-height bands from left)
+- [ ] VF-002: Stagger timing: --td 150ms, --te cubic-bezier(0.215, 0.61, 0.355, 1)
+- [ ] VF-003: Hamburger 2-bar to X with 1turn spin
+- [ ] VF-004: Top-level items in Rubik Mono One at 10vmin
+- [ ] VF-005: Submenu items in Roboto Mono at 3.5vmin
+- [ ] VF-006: Sibling pull (--pull: 30%) on hover
+- [ ] VF-007: Sibling dim (opacity: 0.25) on hover
+- [ ] VF-008: Light-band slide on link hover
+- [ ] VF-009: Blink caret animation
+
+### Fonts (FONT-xxx)
+
+- [ ] FONT-001: Rubik Mono One woff2 committed at public/fonts/
+- [ ] FONT-002: Roboto Mono woff2 committed at public/fonts/
+- [ ] FONT-003: OFL license file committed alongside fonts
+- [ ] FONT-004: @font-face declarations with font-display: swap
+- [ ] FONT-005: Preload links in index.html
+- [ ] FONT-006: Total font transfer <= 45 KB
+
+### Accessibility Deviations (A11Y-xxx)
+
+- [ ] A11Y-001: Real button toggle (not checkbox hack)
+- [ ] A11Y-002: aria-expanded on hamburger
+- [ ] A11Y-003: aria-controls pointing to menu
+- [ ] A11Y-004: Touch-usable submenus (tap/focus, not hover-only)
+- [ ] A11Y-005: prefers-reduced-motion: reduce disables/shortens transitions
+
+### E2E Adaptation (E2E7-xxx)
+
+- [ ] E2E7-001: openMobileMenuIfNeeded helper created
+- [ ] E2E7-002: 375px viewport tests adapted to use menu
+- [ ] E2E7-003: Desktop (1280x720) tests unchanged
+- [ ] E2E7-004: New mobile menu journey tests added
+- [ ] E2E7-005: All existing e2e tests pass (no_desktop_regression)
+
+### i18n (I18N7-xxx)
+
+- [ ] I18N7-001: mobileMenu.openMenu key in all 4 locales
+- [ ] I18N7-002: mobileMenu.closeMenu key in all 4 locales
+- [ ] I18N7-003: mobileMenu.language/country/currency/theme keys in all 4 locales
+
+### Quality (QUALITY7-xxx)
+
+- [ ] QUALITY7-001: No @media (max-width in SCSS (mobile-first)
+- [ ] QUALITY7-002: No hardcoded colors in mobile-menu SCSS
+- [ ] QUALITY7-003: No new npm dependencies
+- [ ] QUALITY7-004: Hand-rolled focus trap (no focus-trap library)
+
+## 16. References
 
 - ADR-0001: Architecture Style
 - ADR-0002: i18n Design
@@ -1566,6 +2283,343 @@ The Frontend Engineer's work is complete when:
 - ADR-0005: Design System Architecture
 - ADR-0006: Theming Architecture
 - ADR-0007: Navbar Dropdown Interaction Pattern
-- ADR-0009: Theme Mode Button (Tri-State Cycle) **NEW**
+- ADR-0009: Theme Mode Button (Tri-State Cycle)
+- ADR-0010: Currency Conversion and Positioning **NEW**
+- ADR-0011: CJK Locales and CNY/JPY Rates **NEW (pending human decisions)**
+- ADR-0012: Responsive Navbar with Fullscreen Mobile Menu **NEW (ratified: self-host fonts + budget
+  rev.7, owner 2026-07-10)**
+- docs/PRD.md
+- docs/REQUIREMENTS-CHECKLIST.md
+
+---
+
+## 17. Task 9 Contracts (NEW - v3.5.0)
+
+### 17.1 Theme-Aware Mobile Menu Color Tokens (ADR-0012 Amendment 1)
+
+**SUPERSEDES Section 7.6.7.** The pen palette is now the DARK theme only. Light theme gets coherent equivalents.
+
+**Dark Theme (_dark.scss):**
+
+```scss
+--color-mobile-menu-overlay: #18181a;
+--color-mobile-menu-text: #{p.$palette-gray-200};
+--color-mobile-menu-secondary: #75757c;
+--color-mobile-menu-highlight: #f5f5f5;
+```
+
+**Light Theme (_light.scss):**
+
+```scss
+--color-mobile-menu-overlay: #{p.$palette-gray-50};
+--color-mobile-menu-text: #{p.$palette-gray-900};
+--color-mobile-menu-secondary: #{p.$palette-gray-500};
+--color-mobile-menu-highlight: #18181a;
+```
+
+**Hamburger/X Bar Contrast Contract:**
+
+| State | Light Theme Bars | Dark Theme Bars |
+|-------|------------------|-----------------|
+| Closed (over navbar) | `--color-text-primary` | `--color-text-primary` |
+| Open (over overlay) | `--color-mobile-menu-highlight` | `--color-mobile-menu-highlight` |
+
+**Test IDs for contrast verification:**
+- `app-navbar-hamburger` (button)
+- Bars are `::before`/`::after` of `.bars` span
+
+### 17.2 Menu Scroll Contract (ADR-0012 Amendment 2)
+
+**Requirements:**
+
+| ID | Requirement | Implementation |
+|----|-------------|----------------|
+| SCROLL-001 | Overlay scrolls when content exceeds viewport | `overflow-y: auto` on `.menu` |
+| SCROLL-002 | All items reachable at landscape 667x375 | E2E test with Tab navigation |
+| SCROLL-003 | All items reachable at 320px class heights | E2E test with Tab navigation |
+| SCROLL-004 | Scrollbar styled consistent with DS | `-webkit-scrollbar` rules with DS tokens |
+| SCROLL-005 | Focus-visible items scrolled into view | `scrollIntoView({ block: 'nearest' })` |
+
+### 17.3 Menu Close on Breakpoint Cross Contract (ADR-0012 Amendment 2)
+
+**Requirements:**
+
+| ID | Requirement | Implementation |
+|----|-------------|----------------|
+| CROSS-001 | Viewport crossing 768px with menu open closes menu | `matchMedia('(min-width: 768px)')` change listener |
+| CROSS-002 | Close uses EXISTING task-8 path | Call same `onClose()` that Escape/hamburger use |
+| CROSS-003 | Immediate aria/focus update | `aria-expanded=false`, focus moves |
+| CROSS-004 | Deferred visual hide | Animation or immediate per existing logic |
+| CROSS-005 | Scroll lock released | `body.style.overflow` restored |
+| CROSS-006 | Focus destination after auto-close | First inline control trigger OR body |
+
+**NOT ALLOWED:** Resize event polling, separate close path, focus lost.
+
+### 17.4 Breakpoint Tokens (ADR-0013)
+
+**File:** `src/shared/ds/settings/_breakpoints.scss`
+
+```scss
+$breakpoint-sm: 640px;   // Large phones / small tablets (Tailwind-aligned)
+$breakpoint-md: 768px;   // Tablet / hamburger->inline switch
+$breakpoint-lg: 1024px;  // Desktop
+$breakpoint-xl: 1280px;  // Large desktop
+$breakpoint-2xl: 1536px; // Extra large
+
+$breakpoints: (
+  'sm': $breakpoint-sm,
+  'md': $breakpoint-md,
+  'lg': $breakpoint-lg,
+  'xl': $breakpoint-xl,
+  '2xl': $breakpoint-2xl,
+);
+
+$breakpoint-mobile-menu-switch: $breakpoint-md;
+```
+
+**Migration:** Only `sm` changes (375->640, unused). All others unchanged.
+
+### 17.5 Geo Auto-Detection Domain (ADR-0014 - AMENDED with GPS)
+
+**Location:** `src/geo-detection/` (lazy chunk, not in main bundle)
+
+```
+src/geo-detection/
+  adapters/
+    GeoDetectionAdapter.ts    # Orchestrates detection flow
+    GpsAdapter.ts             # navigator.geolocation wrapper
+    ReverseGeocodeAdapter.ts  # BigDataCloud API
+  config/
+    country-mapping.ts
+    providers.ts
+  hooks/
+    useGeoDetection.ts
+  types/
+    GeoResult.ts
+  index.ts
+```
+
+#### 17.5.1 Precedence Chain (CRITICAL)
+
+| Priority | Source | Condition |
+|----------|--------|-----------|
+| 1 | Stored user choice | localStorage has any pref set |
+| 2 | GPS | User grants permission, coords -> reverse geocode succeeds |
+| 3 | IP geolocation | GPS denied/timeout/unavailable, IP-geo succeeds |
+| 4 | Device language | Both GPS and IP-geo fail |
+| 5 | Defaults (en/US/USD) | Device language unsupported |
+
+**Rationale for GPS > IP-geo:** Owner's VPN testing scenario. User physically in Colombia using US VPN should detect as Colombia (GPS reports physical location), not US (IP reports VPN exit).
+
+#### 17.5.2 Provider Contract
+
+**IP Geolocation:**
+
+| Provider | URL | Timeout | Response Field |
+|----------|-----|---------|----------------|
+| Primary | `https://api.country.is/` | 3000ms | `country` (ISO alpha-2) |
+| Fallback | `https://get.geojs.io/v1/ip/country.json` | 3000ms | `country` (ISO alpha-2) |
+
+**Reverse Geocoding (GPS path):**
+
+| Provider | URL | Timeout | Response Field |
+|----------|-----|---------|----------------|
+| BigDataCloud | `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=..&longitude=..&localityLanguage=en` | 3000ms | `countryCode` (ISO alpha-2) |
+
+**Fail-closed validation:**
+- IP-geo: `country` must match `^[A-Z]{2}$`
+- Reverse geocode: `countryCode` must match `^[A-Z]{2}$`
+
+#### 17.5.3 GPS Parameters
+
+| Parameter | Value | Rationale |
+|-----------|-------|-----------|
+| `timeout` | 5000ms | Balance between waiting and UX |
+| `maximumAge` | 600000ms | 10 min cached position OK for country-level |
+| `enableHighAccuracy` | false | Country-level resolution, save battery |
+
+#### 17.5.4 Country Mapping (Unchanged)
+
+```typescript
+export const COUNTRY_TO_PREFS: Record<string, { locale: SupportedLocale; region: SupportedRegion; currency: SupportedCurrency }> = {
+  CO: { locale: 'es', region: 'CO', currency: 'COP' },
+  US: { locale: 'en', region: 'US', currency: 'USD' },
+  ES: { locale: 'es', region: 'ES', currency: 'EUR' },
+  GB: { locale: 'en', region: 'GB', currency: 'GBP' },
+  MX: { locale: 'es', region: 'MX', currency: 'MXN' },
+  CN: { locale: 'zh', region: 'CN', currency: 'CNY' },
+  JP: { locale: 'ja', region: 'JP', currency: 'JPY' },
+}
+```
+
+#### 17.5.5 Detection Flow Contract
+
+| Step | Condition | Action |
+|------|-----------|--------|
+| 1 | Any pref set in localStorage | Skip detection entirely, use stored |
+| 2 | All prefs unset | Start GPS AND IP-geo in parallel |
+| 3 | GPS granted + coords | Reverse geocode via BigDataCloud |
+| 4 | Reverse geocode success + supported country | Apply GPS country (precedence 2) |
+| 5 | Reverse geocode fail OR GPS denied/timeout | Use IP-geo result if available (precedence 3) |
+| 6 | IP-geo success + supported country | Apply IP country |
+| 7 | IP-geo success + unsupported country | Device language fallback |
+| 8 | Both GPS and IP-geo fail | Device language fallback |
+| 9 | Device language supported | Apply { locale, region: default, currency: default } |
+| 10 | Device language unsupported | Apply defaults (en/US/USD) |
+
+#### 17.5.6 E2E Mocking Seam
+
+```typescript
+// e2e/helpers/geo-mock.ts
+
+// IP geolocation mocks
+export async function mockGeoResponse(page: Page, countryCode: string): Promise<void>
+export async function mockGeoFailure(page: Page): Promise<void>
+
+// Reverse geocode mocks
+export async function mockReverseGeocode(page: Page, countryCode: string): Promise<void>
+export async function mockReverseGeocodeFailure(page: Page): Promise<void>
+
+// GPS mocks (Playwright context)
+export async function mockGpsGranted(context: BrowserContext, coords: { lat: number; lng: number }): Promise<void>
+export async function mockGpsDenied(context: BrowserContext): Promise<void>
+```
+
+**Test matrix (expanded):**
+- GPS granted + all 7 countries (via reverse geocode mock)
+- VPN scenario: GPS=CO + IP=US -> CO wins
+- GPS denied + all 7 countries (via IP mock)
+- GPS timeout + IP fallback
+- GPS + reverse geocode failure + IP fallback
+- Both fail -> device language fallback
+- Unsupported country (FR) -> device language fallback
+- Returning user with prefs -> stored wins
+
+#### 17.5.7 External Origins
+
+| Origin | Purpose | Data Transmitted | Privacy Note |
+|--------|---------|------------------|--------------|
+| api.country.is | IP geolocation | IP (inherent) | First visit only |
+| get.geojs.io | IP fallback | IP (inherent) | If primary fails |
+| api.bigdatacloud.net | Reverse geocode | Lat/Lng coords | GPS granted only |
+
+**CRITICAL:** Coordinates sent to BigDataCloud ONLY after user grants browser permission prompt.
+
+### 17.6 Lazy Chunk Structure (ADR-0014 + ADR-0011 Option A)
+
+| Chunk | Contents | Load Condition |
+|-------|----------|----------------|
+| main.js | App shell, en/es translations | Always |
+| geo.js | Detection adapter + config | First visit, no stored prefs |
+| locale-zh.js | zh.ts translations | User selects Chinese |
+| locale-ja.js | ja.ts translations | User selects Japanese |
+
+**Dynamic import pattern:**
+
+```typescript
+// For geo detection
+const loadGeoDetection = () => import('./geo-detection')
+
+// For locale loading (in I18nProvider)
+const loadLocale = async (locale: SupportedLocale) => {
+  if (locale === 'zh') return (await import('./translations/zh')).default
+  if (locale === 'ja') return (await import('./translations/ja')).default
+  // en/es bundled
+}
+```
+
+### 17.7 Budget Structure (Rev.9 Proposed)
+
+| Chunk | Max Raw | Max Gzip | Warning |
+|-------|---------|----------|---------|
+| main.js | 237 KB | 75 KB | 236.5 KB / 74.5 KB |
+| geo.js | 3 KB | 1.5 KB | 2.5 KB |
+| locale-zh.js | 3 KB | 1 KB | 2.5 KB |
+| locale-ja.js | 3 KB | 1 KB | 2.5 KB |
+| Total transfer (worst) | 246 KB | 78.5 KB | - |
+
+---
+
+## 18. Task 9 Acceptance Criteria
+
+### Must Pass (Machine-Verifiable)
+
+- [ ] `pnpm exec tsc --noEmit` exits 0
+- [ ] `pnpm test` exits 0 with 100% coverage
+- [ ] `pnpm exec playwright test` exits 0
+- [ ] Bundle within ratified rev.9 structure (pending human approval)
+
+### Theme-Aware Menu (THEME9-xxx)
+
+- [ ] THEME9-001: Light theme menu overlay is light (gray-50 or similar)
+- [ ] THEME9-002: Dark theme menu overlay is dark (#18181A)
+- [ ] THEME9-003: Menu text contrasts overlay in BOTH themes
+- [ ] THEME9-004: X/hamburger bars visible over navbar (closed state) BOTH themes
+- [ ] THEME9-005: X/hamburger bars visible over overlay (open state) BOTH themes
+- [ ] THEME9-006: E2E computed color assertions for overlay in both themes
+
+### Breakpoints (BP-xxx)
+
+- [ ] BP-001: _breakpoints.scss updated with Tailwind-aligned scale
+- [ ] BP-002: $breakpoint-sm changed to 640px (was 375px)
+- [ ] BP-003: All other breakpoints unchanged
+- [ ] BP-004: Hamburger switch remains at 768px (md)
+- [ ] BP-005: No max-width queries (mobile-first preserved)
+
+### Menu Scroll (SCROLL-xxx)
+
+- [ ] SCROLL-001: Menu has overflow-y: auto
+- [ ] SCROLL-002: All items reachable at 667x375 (landscape)
+- [ ] SCROLL-003: All items reachable at 320x480 (small height)
+- [ ] SCROLL-004: Scrollbar styled with DS tokens
+- [ ] SCROLL-005: Focus-visible items scrolled into view
+
+### Menu Close on Cross (CROSS-xxx)
+
+- [ ] CROSS-001: matchMedia listener at 768px
+- [ ] CROSS-002: Menu closes when viewport crosses to >= 768px
+- [ ] CROSS-003: Scroll lock released after cross-close
+- [ ] CROSS-004: Focus moves to inline controls after cross-close
+- [ ] CROSS-005: No resize event polling
+- [ ] CROSS-006: Reuses existing close path (not separate implementation)
+
+### Geo Detection (GEO-xxx) [PENDING HUMAN RATIFICATION]
+
+- [ ] GEO-001: geo-detection/ directory exists as lazy chunk
+- [ ] GEO-002: api.country.is primary provider
+- [ ] GEO-003: get.geojs.io fallback provider
+- [ ] GEO-004: 3s timeout per provider
+- [ ] GEO-005: 7 supported countries mapped correctly
+- [ ] GEO-006: Unsupported country -> device language fallback
+- [ ] GEO-007: Provider failure -> device language fallback
+- [ ] GEO-008: Stored prefs -> skip detection entirely
+- [ ] GEO-009: Detected values persisted via existing setters
+- [ ] GEO-010: E2E mock seam for all 7 countries + unsupported + failure
+
+### Lazy Chunks (CHUNK-xxx) [PENDING HUMAN RATIFICATION]
+
+- [ ] CHUNK-001: zh.ts lazy loaded (not in main bundle)
+- [ ] CHUNK-002: ja.ts lazy loaded (not in main bundle)
+- [ ] CHUNK-003: geo-detection lazy loaded (not in main bundle)
+- [ ] CHUNK-004: main.js under 237 KB raw
+- [ ] CHUNK-005: Per-chunk under 3 KB raw
+
+---
+
+## 19. References (Updated)
+
+- ADR-0001: Architecture Style
+- ADR-0002: i18n Design
+- ADR-0003: Language Selector
+- ADR-0004: Testing and Quality
+- ADR-0005: Design System Architecture
+- ADR-0006: Theming Architecture
+- ADR-0007: Navbar Dropdown Interaction Pattern
+- ADR-0009: Theme Mode Button (Tri-State Cycle)
+- ADR-0010: Currency Conversion and Positioning
+- ADR-0011: CJK Locales and CNY/JPY Rates (Option A lazy locales activated)
+- ADR-0012: Responsive Navbar with Fullscreen Mobile Menu (Amendments 1+2 added)
+- ADR-0013: Breakpoint Scale **NEW**
+- ADR-0014: Geo Auto-Detection and Bundle Chunking **NEW (pending human decisions)**
 - docs/PRD.md
 - docs/REQUIREMENTS-CHECKLIST.md

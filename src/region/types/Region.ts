@@ -2,7 +2,7 @@
  * Region codes for Intl date/number formatting.
  * Distinct from language: e.g., user may read English but want European date formats.
  */
-export type SupportedRegion = 'US' | 'ES' | 'GB' | 'MX'
+export type SupportedRegion = 'US' | 'ES' | 'GB' | 'MX' | 'CO' | 'CN' | 'JP'
 
 export interface RegionMetadata {
   readonly code: SupportedRegion

@@ -53,3 +53,9 @@
     @include typo.text-base;
   }
 }
+
+.rateStatus {
+  @include typo.text-xs;
+  color: var(--color-text-muted);
+  font-style: italic;
+}

@@ -1,0 +1,7 @@
+export { detectGeoPreferences } from './GeoDetectionAdapter'
+export { requestGpsPosition } from './GpsAdapter'
+export type { GpsCoords, GpsResult } from './GpsAdapter'
+export { reverseGeocode } from './ReverseGeocodeAdapter'
+export type { ReverseGeocodeResult } from './ReverseGeocodeAdapter'
+export { getIpCountry } from './IpGeoAdapter'
+export type { IpGeoResult } from './IpGeoAdapter'

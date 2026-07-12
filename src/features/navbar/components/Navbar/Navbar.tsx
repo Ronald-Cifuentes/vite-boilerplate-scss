@@ -1,28 +1,60 @@
-import { FC } from 'react'
+import { FC, useRef } from 'react'
+import { useSignals } from '@preact/signals-react/runtime'
 import { LanguageDropdown } from '../LanguageDropdown'
 import { ThemeModeButton } from '../ThemeModeButton'
 import { CountryDropdown } from '../CountryDropdown'
 import { CurrencyDropdown } from '../CurrencyDropdown'
+import { HamburgerButton, MobileMenu } from '../../../mobile-menu'
+import {
+  mobileMenuOpenSignal,
+  toggleMobileMenu,
+  closeMobileMenu,
+} from '../../../mobile-menu/signals/mobile-menu-signal'
 import type { NavbarProps } from './interfaces'
 import styles from './Navbar.module.scss'
 
 /**
  * Navbar containing settings controls: language, theme, country, currency.
- * Language, country, currency are dropdown menus per ADR-0007.
- * Theme is a tri-state cycle button per ADR-0009 (supersedes ThemeDropdown).
+ * At < 768px: shows hamburger button that opens fullscreen mobile menu.
+ * At >= 768px: shows inline dropdown controls.
+ * Per ADR-0012.
  */
 export const Navbar: FC<NavbarProps> = ({ dataTestId = 'navbar', className }) => {
+  useSignals()
+  const hamburgerRef = useRef<HTMLButtonElement>(null)
+
   const classNames = [styles.navbar, className].filter(Boolean).join(' ')
 
   return (
-    <nav className={classNames} data-testid={dataTestId} aria-label='Settings'>
-      <div className={styles.controls}>
-        <LanguageDropdown dataTestId={`${dataTestId}-language`} />
-        <ThemeModeButton dataTestId={`${dataTestId}-theme`} />
-        <CountryDropdown dataTestId={`${dataTestId}-country`} />
-        <CurrencyDropdown dataTestId={`${dataTestId}-currency`} />
-      </div>
-    </nav>
+    <>
+      <nav className={classNames} data-testid={dataTestId} aria-label='Settings'>
+        {/* Mobile: hamburger button (visible < 768px) */}
+        <div className={styles.mobileControls}>
+          <HamburgerButton
+            isOpen={mobileMenuOpenSignal.value}
+            onClick={toggleMobileMenu}
+            buttonRef={hamburgerRef}
+            dataTestId={`${dataTestId}-hamburger`}
+          />
+        </div>
+
+        {/* Desktop: inline controls (visible >= 768px) */}
+        <div className={styles.desktopControls}>
+          <LanguageDropdown dataTestId={`${dataTestId}-language`} />
+          <ThemeModeButton dataTestId={`${dataTestId}-theme`} />
+          <CountryDropdown dataTestId={`${dataTestId}-country`} />
+          <CurrencyDropdown dataTestId={`${dataTestId}-currency`} />
+        </div>
+      </nav>
+
+      {/* Mobile menu (fullscreen overlay) */}
+      <MobileMenu
+        isOpen={mobileMenuOpenSignal.value}
+        onClose={closeMobileMenu}
+        hamburgerRef={hamburgerRef}
+        dataTestId='app-mobile-menu'
+      />
+    </>
   )
 }
 

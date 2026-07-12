@@ -16,6 +16,14 @@ describe('locales config', () => {
       it('When "es" is passed, Then it returns true', () => {
         expect(isSupportedLocale('es')).toBe(true)
       })
+
+      it('When "zh" is passed, Then it returns true', () => {
+        expect(isSupportedLocale('zh')).toBe(true)
+      })
+
+      it('When "ja" is passed, Then it returns true', () => {
+        expect(isSupportedLocale('ja')).toBe(true)
+      })
     })
 
     describe('Given an invalid locale code', () => {
@@ -38,10 +46,13 @@ describe('locales config', () => {
       expect(DEFAULT_LOCALE).toBe('en')
     })
 
-    it('SUPPORTED_LOCALES should contain en and es', () => {
+    it('SUPPORTED_LOCALES should contain en, es, zh, ja in order', () => {
       expect(SUPPORTED_LOCALES).toContain('en')
       expect(SUPPORTED_LOCALES).toContain('es')
-      expect(SUPPORTED_LOCALES).toHaveLength(2)
+      expect(SUPPORTED_LOCALES).toContain('zh')
+      expect(SUPPORTED_LOCALES).toContain('ja')
+      expect(SUPPORTED_LOCALES).toHaveLength(4)
+      expect(SUPPORTED_LOCALES).toEqual(['en', 'es', 'zh', 'ja'])
     })
 
     it('LOCALE_STORAGE_KEY should be "app-locale"', () => {
@@ -60,6 +71,20 @@ describe('locales config', () => {
         code: 'es',
         nativeName: 'Español',
         englishName: 'Spanish',
+        direction: 'ltr',
+      })
+
+      expect(LOCALE_METADATA.zh).toEqual({
+        code: 'zh',
+        nativeName: '中文',
+        englishName: 'Chinese',
+        direction: 'ltr',
+      })
+
+      expect(LOCALE_METADATA.ja).toEqual({
+        code: 'ja',
+        nativeName: '日本語',
+        englishName: 'Japanese',
         direction: 'ltr',
       })
     })

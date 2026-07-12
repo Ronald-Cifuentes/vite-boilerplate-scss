@@ -14,22 +14,29 @@ describe('Currency Configuration', () => {
   })
 
   describe('SUPPORTED_CURRENCIES', () => {
-    it('should contain exactly 4 currencies', () => {
-      expect(SUPPORTED_CURRENCIES).toHaveLength(4)
+    it('should contain exactly 7 currencies', () => {
+      expect(SUPPORTED_CURRENCIES).toHaveLength(7)
     })
 
-    it('should include USD, EUR, GBP, MXN', () => {
+    it('should include COP, USD, EUR, GBP, MXN, CNY, JPY', () => {
+      expect(SUPPORTED_CURRENCIES).toContain('COP')
       expect(SUPPORTED_CURRENCIES).toContain('USD')
       expect(SUPPORTED_CURRENCIES).toContain('EUR')
       expect(SUPPORTED_CURRENCIES).toContain('GBP')
       expect(SUPPORTED_CURRENCIES).toContain('MXN')
+      expect(SUPPORTED_CURRENCIES).toContain('CNY')
+      expect(SUPPORTED_CURRENCIES).toContain('JPY')
     })
 
-    it('should be a constant array', () => {
+    it('should have COP first (base currency)', () => {
+      expect(SUPPORTED_CURRENCIES[0]).toBe('COP')
+    })
+
+    it('should be a constant array in correct order', () => {
       // TypeScript enforces readonly via `as const` at compile time
       // At runtime, we verify it's an array with expected values
       expect(Array.isArray(SUPPORTED_CURRENCIES)).toBe(true)
-      expect(SUPPORTED_CURRENCIES).toEqual(['USD', 'EUR', 'GBP', 'MXN'])
+      expect(SUPPORTED_CURRENCIES).toEqual(['COP', 'USD', 'EUR', 'GBP', 'MXN', 'CNY', 'JPY'])
     })
   })
 
@@ -76,6 +83,24 @@ describe('Currency Configuration', () => {
       })
     })
 
+    it('should have correct structure for CNY (ADR-0011 CN¥ disambiguation)', () => {
+      expect(CURRENCY_METADATA.CNY).toEqual({
+        code: 'CNY',
+        symbol: 'CN¥',
+        name: 'Chinese Yuan',
+        localizedNameKey: 'currency.cny',
+      })
+    })
+
+    it('should have correct structure for JPY (¥ symbol)', () => {
+      expect(CURRENCY_METADATA.JPY).toEqual({
+        code: 'JPY',
+        symbol: '¥',
+        name: 'Japanese Yen',
+        localizedNameKey: 'currency.jpy',
+      })
+    })
+
     it('each currency should have all required fields', () => {
       for (const currency of SUPPORTED_CURRENCIES) {
         const meta = CURRENCY_METADATA[currency]
@@ -90,16 +115,29 @@ describe('Currency Configuration', () => {
     })
   })
 
+  describe('CURRENCY_METADATA COP', () => {
+    it('should have correct structure for COP', () => {
+      expect(CURRENCY_METADATA.COP).toEqual({
+        code: 'COP',
+        symbol: '$',
+        name: 'Colombian Peso',
+        localizedNameKey: 'currency.cop',
+      })
+    })
+  })
+
   describe('isValidCurrency', () => {
     it('should return true for valid currencies', () => {
+      expect(isValidCurrency('COP')).toBe(true)
       expect(isValidCurrency('USD')).toBe(true)
       expect(isValidCurrency('EUR')).toBe(true)
       expect(isValidCurrency('GBP')).toBe(true)
       expect(isValidCurrency('MXN')).toBe(true)
+      expect(isValidCurrency('CNY')).toBe(true)
+      expect(isValidCurrency('JPY')).toBe(true)
     })
 
     it('should return false for invalid currencies', () => {
-      expect(isValidCurrency('JPY')).toBe(false)
       expect(isValidCurrency('CHF')).toBe(false)
       expect(isValidCurrency('CAD')).toBe(false)
       expect(isValidCurrency('')).toBe(false)

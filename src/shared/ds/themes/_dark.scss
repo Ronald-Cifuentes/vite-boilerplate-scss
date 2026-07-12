@@ -48,6 +48,12 @@
   --transition-fast: #{t.$transition-duration-fast} #{t.$transition-timing-default};
   --transition-normal: #{t.$transition-duration-normal} #{t.$transition-timing-default};
 
+  // Mobile menu colors (ADR-0012 Amendment 1: pen palette preserved for dark theme)
+  --color-mobile-menu-overlay: #18181a;
+  --color-mobile-menu-text: #{p.$palette-gray-200};
+  --color-mobile-menu-secondary: #75757c;
+  --color-mobile-menu-highlight: #f5f5f5;
+
   // Browser hint for native form controls
   color-scheme: dark;
 }
