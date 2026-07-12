@@ -192,14 +192,19 @@ All 6 user items verified with artifact evidence. Zero defects found.
 
 **Rows Marked:** 80/84
 
-All 84 TASK 9 + GPS9 checklist rows were reviewed. 80 rows marked `[x]` with evidence pointers. 4 rows remain unmarked due to gaps:
+All 84 TASK 9 + GPS9 checklist rows were reviewed. 80 rows marked `[x]` with evidence pointers. 4
+rows remain unmarked due to gaps:
 
-| ID         | Requirement                                   | Gap |
-| ---------- | --------------------------------------------- | --- |
-| SCROLL9-04 | All items reachable at 320x480 (small height) | No e2e test exists for this viewport |
-| SCROLL9-05 | Focus-visible items scrolled into view        | No scrollIntoView implementation |
+| ID         | Requirement                                     | Gap                                                            |
+| ---------- | ----------------------------------------------- | -------------------------------------------------------------- |
+| SCROLL9-04 | All items reachable at 320x480 (small height)   | No e2e test exists for this viewport                           |
+| SCROLL9-05 | Focus-visible items scrolled into view          | No scrollIntoView implementation                               |
 | CROSS9-04  | Focus moves to inline controls after auto-close | Marked [~]: controls visible but focus not explicitly asserted |
 
-**Severity:** LOW - These are contract requirements from ADR-0012 Amendment 2 not fully implemented. They do not block sign-off because the 6 user items (theme-aware, X visible, breakpoints, scroll at 667x375, close-on-cross, geo detection) are all verified PASS. The gaps are enhancements beyond the minimum user requirement.
+**Severity:** LOW - These are contract requirements from ADR-0012 Amendment 2 not fully implemented.
+They do not block sign-off because the 6 user items (theme-aware, X visible, breakpoints, scroll at
+667x375, close-on-cross, geo detection) are all verified PASS. The gaps are enhancements beyond the
+minimum user requirement.
 
-**Checklist updated:** docs/REQUIREMENTS-CHECKLIST.md now has all 84 rows with Status and Evidence columns.
+**Checklist updated:** docs/REQUIREMENTS-CHECKLIST.md now has all 84 rows with Status and Evidence
+columns.

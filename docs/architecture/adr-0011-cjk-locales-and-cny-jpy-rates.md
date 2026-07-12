@@ -375,8 +375,10 @@ use. This MUST be flagged in the delivery report.
 
 ## Open Questions
 
-1. **Q1 (Rate Source):** RESOLVED — SUAMECA series 28 (CNY) / 33 (JPY), curl-verified twice (architect + orchestrator).
-2. **Q2 (Bundle Strategy):** RESOLVED — Option B, budget rev.6 (233 KB raw / 74 KB gzip), owner-ratified 2026-07-10.
+1. **Q1 (Rate Source):** RESOLVED — SUAMECA series 28 (CNY) / 33 (JPY), curl-verified twice
+   (architect + orchestrator).
+2. **Q2 (Bundle Strategy):** RESOLVED — Option B, budget rev.6 (233 KB raw / 74 KB gzip),
+   owner-ratified 2026-07-10.
 
 ---
 

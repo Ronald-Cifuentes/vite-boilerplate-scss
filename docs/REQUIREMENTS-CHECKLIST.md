@@ -554,25 +554,25 @@ ADR-0013, ADR-0014 + GPS amendment + CONTRACTS v3.5.0.
 
 ### SCROLL9. Menu Scroll Contract (ADR-0012 Amendment 2)
 
-| ID         | Requirement                                   | Test Location          | Status | Evidence                                           |
-| ---------- | --------------------------------------------- | ---------------------- | ------ | -------------------------------------------------- |
-| SCROLL9-01 | .menu has overflow-y: auto                    | MobileMenu.module.scss | [x]    | menu-theme-scroll-resize.spec.ts:134-143           |
-| SCROLL9-02 | Scrollbar uses DS tokens                      | MobileMenu.module.scss | [x]    | MobileMenu.module.scss:30 (--color-border-default) |
-| SCROLL9-03 | All items reachable at 667x375 (landscape)    | e2e                    | [x]    | menu-theme-scroll-resize.spec.ts:103-132           |
-| SCROLL9-04 | All items reachable at 320x480 (small height) | e2e                    | [x]    | menu-theme-scroll-resize.spec.ts:145 (FE att.2); full suite green |
+| ID         | Requirement                                   | Test Location          | Status | Evidence                                                                               |
+| ---------- | --------------------------------------------- | ---------------------- | ------ | -------------------------------------------------------------------------------------- |
+| SCROLL9-01 | .menu has overflow-y: auto                    | MobileMenu.module.scss | [x]    | menu-theme-scroll-resize.spec.ts:134-143                                               |
+| SCROLL9-02 | Scrollbar uses DS tokens                      | MobileMenu.module.scss | [x]    | MobileMenu.module.scss:30 (--color-border-default)                                     |
+| SCROLL9-03 | All items reachable at 667x375 (landscape)    | e2e                    | [x]    | menu-theme-scroll-resize.spec.ts:103-132                                               |
+| SCROLL9-04 | All items reachable at 320x480 (small height) | e2e                    | [x]    | menu-theme-scroll-resize.spec.ts:145 (FE att.2); full suite green                      |
 | SCROLL9-05 | Focus-visible items scrolled into view        | MobileMenuItem.tsx     | [x]    | scrollIntoView on focus impl (FE att.2, helper deduped to utils/motion.ts); unit + e2e |
 
 ### CROSS9. Menu Close on Breakpoint Cross (ADR-0012 Amendment 2)
 
-| ID        | Requirement                                     | Test Location  | Status | Evidence                                                        |
-| --------- | ----------------------------------------------- | -------------- | ------ | --------------------------------------------------------------- |
-| CROSS9-01 | matchMedia listener at 768px                    | MobileMenu.tsx | [x]    | MobileMenu.tsx:76                                               |
-| CROSS9-02 | Menu closes when viewport crosses >= 768px      | e2e            | [x]    | menu-theme-scroll-resize.spec.ts:147-179                        |
-| CROSS9-03 | Scroll lock released after auto-close           | e2e            | [x]    | menu-theme-scroll-resize.spec.ts:172-173                        |
+| ID        | Requirement                                     | Test Location  | Status | Evidence                                                                            |
+| --------- | ----------------------------------------------- | -------------- | ------ | ----------------------------------------------------------------------------------- |
+| CROSS9-01 | matchMedia listener at 768px                    | MobileMenu.tsx | [x]    | MobileMenu.tsx:76                                                                   |
+| CROSS9-02 | Menu closes when viewport crosses >= 768px      | e2e            | [x]    | menu-theme-scroll-resize.spec.ts:147-179                                            |
+| CROSS9-03 | Scroll lock released after auto-close           | e2e            | [x]    | menu-theme-scroll-resize.spec.ts:172-173                                            |
 | CROSS9-04 | Focus moves to inline controls after auto-close | e2e            | [x]    | menu-theme-scroll-resize.spec.ts:323 asserts languageTrigger toBeFocused (FE att.2) |
-| CROSS9-05 | No resize event polling (matchMedia only)       | Code review    | [x]    | MobileMenu.tsx:71 comment + no resize listener                  |
-| CROSS9-06 | Reuses existing close path (not separate impl)  | Code review    | [x]    | MobileMenu.tsx:82 calls onClose()                               |
-| CROSS9-07 | No orphaned overlay after cross                 | e2e            | [x]    | menu-theme-scroll-resize.spec.ts:182-206                        |
+| CROSS9-05 | No resize event polling (matchMedia only)       | Code review    | [x]    | MobileMenu.tsx:71 comment + no resize listener                                      |
+| CROSS9-06 | Reuses existing close path (not separate impl)  | Code review    | [x]    | MobileMenu.tsx:82 calls onClose()                                                   |
+| CROSS9-07 | No orphaned overlay after cross                 | e2e            | [x]    | menu-theme-scroll-resize.spec.ts:182-206                                            |
 
 ### GEO9. Geo Auto-Detection (ADR-0014)
 
@@ -654,11 +654,11 @@ ADR-0013, ADR-0014 + GPS amendment + CONTRACTS v3.5.0.
 
 **Gaps (4 rows unmarked):**
 
-| ID         | Requirement                                     | Status | Gap Reason                                                   |
-| ---------- | ----------------------------------------------- | ------ | ------------------------------------------------------------ |
-| SCROLL9-04 | All items reachable at 320x480 (small height)   | [x]    | DUPLICATE ROW — see marked SCROLL9-04 above; menu-theme-scroll-resize.spec.ts:145 |
+| ID         | Requirement                                     | Status | Gap Reason                                                                         |
+| ---------- | ----------------------------------------------- | ------ | ---------------------------------------------------------------------------------- |
+| SCROLL9-04 | All items reachable at 320x480 (small height)   | [x]    | DUPLICATE ROW — see marked SCROLL9-04 above; menu-theme-scroll-resize.spec.ts:145  |
 | SCROLL9-05 | Focus-visible items scrolled into view          | [x]    | DUPLICATE ROW — see marked SCROLL9-05 above; scrollIntoView impl + utils/motion.ts |
-| CROSS9-04  | Focus moves to inline controls after auto-close | [~]    | Inline controls visible but explicit focus assertion missing |
+| CROSS9-04  | Focus moves to inline controls after auto-close | [~]    | Inline controls visible but explicit focus assertion missing                       |
 
 **Note:** SCROLL9-04 and SCROLL9-05 are contract requirements from ADR-0012 Amendment 2 that lack
 implementation/test. CROSS9-04 is partially met (controls visible, focus not explicitly asserted).

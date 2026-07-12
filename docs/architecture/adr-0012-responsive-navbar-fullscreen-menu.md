@@ -536,53 +536,57 @@ self-hosted.
 
 ## Amendment 1: Theme-Aware Menu Colors (2026-07-11)
 
-**Status:** Accepted (supersedes Section 1.2 Color Adaptation)
-**Date:** 2026-07-11
-**Trigger:** User requirement supersession - menu must follow the active theme
+**Status:** Accepted (supersedes Section 1.2 Color Adaptation) **Date:** 2026-07-11 **Trigger:**
+User requirement supersession - menu must follow the active theme
 
 ### Problem Statement
 
-The original Section 1.2 decision mapped the pen's #18181A palette identically to both light and dark themes, reasoning that the dark overlay is a "takeover" effect. User feedback (Task 9) demonstrates this causes:
+The original Section 1.2 decision mapped the pen's #18181A palette identically to both light and
+dark themes, reasoning that the dark overlay is a "takeover" effect. User feedback (Task 9)
+demonstrates this causes:
 
-1. **ITEM 1 (Theme Coherence):** Menu overlay stays dark (#18181A) even in light theme, breaking visual consistency
-2. **ITEM 2 (X Visibility):** Hamburger/X bars use `--color-text-primary` (light theme: dark gray #111827) which is invisible against the #18181A overlay when menu is open
+1. **ITEM 1 (Theme Coherence):** Menu overlay stays dark (#18181A) even in light theme, breaking
+   visual consistency
+2. **ITEM 2 (X Visibility):** Hamburger/X bars use `--color-text-primary` (light theme: dark gray
+   #111827) which is invisible against the #18181A overlay when menu is open
 
 **Root cause:** Both themes have identical menu tokens.
 
 ### Supersession
 
-The user explicitly supersedes the "verbatim color fidelity" portion of Section 1.2. The pen palette becomes the DARK-theme variant only. Light theme gets coherent equivalents.
+The user explicitly supersedes the "verbatim color fidelity" portion of Section 1.2. The pen palette
+becomes the DARK-theme variant only. Light theme gets coherent equivalents.
 
 ### Amended Color Tokens
 
 **DARK THEME (pen palette preserved):**
 
-| Token | Value | Usage |
-|-------|-------|-------|
-| `--color-mobile-menu-overlay` | #18181A | Band overlay background |
-| `--color-mobile-menu-text` | #E5E7EB (gray-200) | Item text (light on dark) |
-| `--color-mobile-menu-secondary` | #75757C | Submenu/hover text |
-| `--color-mobile-menu-highlight` | #F5F5F5 | Light-band hover |
-| `--color-mobile-menu-hamburger-bars` | `var(--color-text-primary)` closed, #F5F5F5 open | X must contrast overlay |
+| Token                                | Value                                            | Usage                     |
+| ------------------------------------ | ------------------------------------------------ | ------------------------- |
+| `--color-mobile-menu-overlay`        | #18181A                                          | Band overlay background   |
+| `--color-mobile-menu-text`           | #E5E7EB (gray-200)                               | Item text (light on dark) |
+| `--color-mobile-menu-secondary`      | #75757C                                          | Submenu/hover text        |
+| `--color-mobile-menu-highlight`      | #F5F5F5                                          | Light-band hover          |
+| `--color-mobile-menu-hamburger-bars` | `var(--color-text-primary)` closed, #F5F5F5 open | X must contrast overlay   |
 
 **LIGHT THEME (coherent equivalents):**
 
-| Token | Value | Rationale |
-|-------|-------|-----------|
-| `--color-mobile-menu-overlay` | #F9FAFB (gray-50) | Light equivalent of dark overlay |
-| `--color-mobile-menu-text` | #111827 (gray-900) | Dark on light, readable |
-| `--color-mobile-menu-secondary` | #6B7280 (gray-500) | Muted secondary |
-| `--color-mobile-menu-highlight` | #18181A | Dark band on light overlay (inverted) |
-| `--color-mobile-menu-hamburger-bars` | `var(--color-text-primary)` closed, #18181A open | X contrasts light overlay |
+| Token                                | Value                                            | Rationale                             |
+| ------------------------------------ | ------------------------------------------------ | ------------------------------------- |
+| `--color-mobile-menu-overlay`        | #F9FAFB (gray-50)                                | Light equivalent of dark overlay      |
+| `--color-mobile-menu-text`           | #111827 (gray-900)                               | Dark on light, readable               |
+| `--color-mobile-menu-secondary`      | #6B7280 (gray-500)                               | Muted secondary                       |
+| `--color-mobile-menu-highlight`      | #18181A                                          | Dark band on light overlay (inverted) |
+| `--color-mobile-menu-hamburger-bars` | `var(--color-text-primary)` closed, #18181A open | X contrasts light overlay             |
 
 ### Hamburger/X Contrast Contract
 
 **CRITICAL:** The hamburger bars must ALWAYS contrast their backdrop.
 
-| State | Backdrop | Light Theme Bars | Dark Theme Bars |
-|-------|----------|------------------|-----------------|
-| Closed | Navbar (page surface) | `--color-text-primary` (#111827) | `--color-text-primary` (#F9FAFB) |
-| Open | Menu overlay | `--color-mobile-menu-highlight` (#18181A) | `--color-mobile-menu-highlight` (#F5F5F5) |
+| State  | Backdrop              | Light Theme Bars                          | Dark Theme Bars                           |
+| ------ | --------------------- | ----------------------------------------- | ----------------------------------------- |
+| Closed | Navbar (page surface) | `--color-text-primary` (#111827)          | `--color-text-primary` (#F9FAFB)          |
+| Open   | Menu overlay          | `--color-mobile-menu-highlight` (#18181A) | `--color-mobile-menu-highlight` (#F5F5F5) |
 
 **Implementation:**
 
@@ -603,7 +607,8 @@ The user explicitly supersedes the "verbatim color fidelity" portion of Section 
 
 The pen's visual language is preserved across both themes:
 
-1. **Band contrast:** Light text on dark overlay (dark theme) OR dark text on light overlay (light theme)
+1. **Band contrast:** Light text on dark overlay (dark theme) OR dark text on light overlay (light
+   theme)
 2. **Dim/pull opacities:** Unchanged (0.25 dim, 30% pull)
 3. **Motion timing:** Unchanged (--td 150ms, --te cubic-bezier)
 4. **Typography:** Unchanged (Rubik Mono One 10vmin, Roboto Mono 3.5vmin)
@@ -612,6 +617,7 @@ The pen's visual language is preserved across both themes:
 ### Items NOT Changed (Motion/Typography Fidelity)
 
 Per original Section 1.1, these remain identical to the pen:
+
 - Band-slide overlay animation
 - Stagger timing
 - Hamburger 1turn spin
@@ -622,7 +628,8 @@ Per original Section 1.1, these remain identical to the pen:
 
 ### SCSS Implementation
 
-**_light.scss:**
+**\_light.scss:**
+
 ```scss
 // Mobile menu colors (ADR-0012 Amendment 1: theme-coherent)
 --color-mobile-menu-overlay: #{p.$palette-gray-50};
@@ -631,7 +638,8 @@ Per original Section 1.1, these remain identical to the pen:
 --color-mobile-menu-highlight: #18181a;
 ```
 
-**_dark.scss:**
+**\_dark.scss:**
+
 ```scss
 // Mobile menu colors (ADR-0012: CodePen OJLMgYY palette preserved)
 --color-mobile-menu-overlay: #18181a;
@@ -650,13 +658,12 @@ Per original Section 1.1, these remain identical to the pen:
 
 ## Amendment 2: Menu Scroll and Resize Contracts (2026-07-11)
 
-**Status:** Accepted
-**Date:** 2026-07-11
-**Trigger:** Task 9 items 4 and 5
+**Status:** Accepted **Date:** 2026-07-11 **Trigger:** Task 9 items 4 and 5
 
 ### Item 4: Menu Scroll Contract
 
-**Problem:** Overlay has `overflow-y: visible` (fixed positioning). Content exceeding viewport (landscape 667x375, 320px devices, font scaling) clips unreachable.
+**Problem:** Overlay has `overflow-y: visible` (fixed positioning). Content exceeding viewport
+(landscape 667x375, 320px devices, font scaling) clips unreachable.
 
 **Solution:**
 
@@ -664,7 +671,7 @@ Per original Section 1.1, these remain identical to the pen:
 .menu {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  
+
   // Scrollbar styling consistent with DS
   &::-webkit-scrollbar {
     width: var(--scrollbar-width, 8px);
@@ -679,7 +686,8 @@ Per original Section 1.1, these remain identical to the pen:
 }
 ```
 
-**Focus-visible scroll:** When focus moves to an item via keyboard navigation, ensure it scrolls into view:
+**Focus-visible scroll:** When focus moves to an item via keyboard navigation, ensure it scrolls
+into view:
 
 ```typescript
 // In MobileMenuItem or useFocusTrap
@@ -687,13 +695,15 @@ element.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
 ```
 
 **E2E verification:**
+
 - Test at 667x375 (landscape phone)
 - Test at 320x480 (small height)
 - Assert all items reachable via Tab
 
 ### Item 5: Menu Close on Breakpoint Cross
 
-**Problem:** Resizing from mobile to desktop with menu open orphans the overlay, leaks scroll lock, and renders app unusable.
+**Problem:** Resizing from mobile to desktop with menu open orphans the overlay, leaks scroll lock,
+and renders app unusable.
 
 **Solution:** Close menu when viewport crosses the hamburger/inline breakpoint (768px).
 
@@ -703,28 +713,33 @@ element.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
 // In MobileMenu or Navbar
 useEffect(() => {
   const mql = window.matchMedia('(min-width: 768px)')
-  
+
   const handleChange = (e: MediaQueryListEvent) => {
     if (e.matches && isOpen) {
       // Crossed to desktop - close menu via existing close path
       onClose()
     }
   }
-  
+
   mql.addEventListener('change', handleChange)
   return () => mql.removeEventListener('change', handleChange)
 }, [isOpen, onClose])
 ```
 
 **Requirements:**
-1. Use matchMedia change listener, NOT resize event polling
-2. Trigger the EXISTING close path (task-8 UX-001): immediate aria/focus + deferred visual hide + scroll-lock release
-3. Focus destination after auto-close: the inline controls container (first dropdown trigger) or body if nothing focusable
 
-**Focus destination rationale:** After auto-close, user is on desktop. Inline controls are now visible. Moving focus to the first inline control (LanguageDropdown trigger) is sensible. If no inline controls exist (edge case), focus body.
+1. Use matchMedia change listener, NOT resize event polling
+2. Trigger the EXISTING close path (task-8 UX-001): immediate aria/focus + deferred visual hide +
+   scroll-lock release
+3. Focus destination after auto-close: the inline controls container (first dropdown trigger) or
+   body if nothing focusable
+
+**Focus destination rationale:** After auto-close, user is on desktop. Inline controls are now
+visible. Moving focus to the first inline control (LanguageDropdown trigger) is sensible. If no
+inline controls exist (edge case), focus body.
 
 **E2E verification:**
+
 - Open menu at 375px
 - Resize to 1024px
 - Assert: menu closed, scroll unlocked, focus on inline control, no orphaned overlay
-

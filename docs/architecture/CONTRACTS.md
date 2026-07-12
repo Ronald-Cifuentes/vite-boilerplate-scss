@@ -2297,9 +2297,10 @@ The Frontend Engineer's work is complete when ALL prior criteria remain met PLUS
 
 ### 17.1 Theme-Aware Mobile Menu Color Tokens (ADR-0012 Amendment 1)
 
-**SUPERSEDES Section 7.6.7.** The pen palette is now the DARK theme only. Light theme gets coherent equivalents.
+**SUPERSEDES Section 7.6.7.** The pen palette is now the DARK theme only. Light theme gets coherent
+equivalents.
 
-**Dark Theme (_dark.scss):**
+**Dark Theme (\_dark.scss):**
 
 ```scss
 --color-mobile-menu-overlay: #18181a;
@@ -2308,7 +2309,7 @@ The Frontend Engineer's work is complete when ALL prior criteria remain met PLUS
 --color-mobile-menu-highlight: #f5f5f5;
 ```
 
-**Light Theme (_light.scss):**
+**Light Theme (\_light.scss):**
 
 ```scss
 --color-mobile-menu-overlay: #{p.$palette-gray-50};
@@ -2319,12 +2320,13 @@ The Frontend Engineer's work is complete when ALL prior criteria remain met PLUS
 
 **Hamburger/X Bar Contrast Contract:**
 
-| State | Light Theme Bars | Dark Theme Bars |
-|-------|------------------|-----------------|
-| Closed (over navbar) | `--color-text-primary` | `--color-text-primary` |
-| Open (over overlay) | `--color-mobile-menu-highlight` | `--color-mobile-menu-highlight` |
+| State                | Light Theme Bars                | Dark Theme Bars                 |
+| -------------------- | ------------------------------- | ------------------------------- |
+| Closed (over navbar) | `--color-text-primary`          | `--color-text-primary`          |
+| Open (over overlay)  | `--color-mobile-menu-highlight` | `--color-mobile-menu-highlight` |
 
 **Test IDs for contrast verification:**
+
 - `app-navbar-hamburger` (button)
 - Bars are `::before`/`::after` of `.bars` span
 
@@ -2332,26 +2334,26 @@ The Frontend Engineer's work is complete when ALL prior criteria remain met PLUS
 
 **Requirements:**
 
-| ID | Requirement | Implementation |
-|----|-------------|----------------|
-| SCROLL-001 | Overlay scrolls when content exceeds viewport | `overflow-y: auto` on `.menu` |
-| SCROLL-002 | All items reachable at landscape 667x375 | E2E test with Tab navigation |
-| SCROLL-003 | All items reachable at 320px class heights | E2E test with Tab navigation |
-| SCROLL-004 | Scrollbar styled consistent with DS | `-webkit-scrollbar` rules with DS tokens |
-| SCROLL-005 | Focus-visible items scrolled into view | `scrollIntoView({ block: 'nearest' })` |
+| ID         | Requirement                                   | Implementation                           |
+| ---------- | --------------------------------------------- | ---------------------------------------- |
+| SCROLL-001 | Overlay scrolls when content exceeds viewport | `overflow-y: auto` on `.menu`            |
+| SCROLL-002 | All items reachable at landscape 667x375      | E2E test with Tab navigation             |
+| SCROLL-003 | All items reachable at 320px class heights    | E2E test with Tab navigation             |
+| SCROLL-004 | Scrollbar styled consistent with DS           | `-webkit-scrollbar` rules with DS tokens |
+| SCROLL-005 | Focus-visible items scrolled into view        | `scrollIntoView({ block: 'nearest' })`   |
 
 ### 17.3 Menu Close on Breakpoint Cross Contract (ADR-0012 Amendment 2)
 
 **Requirements:**
 
-| ID | Requirement | Implementation |
-|----|-------------|----------------|
+| ID        | Requirement                                        | Implementation                                     |
+| --------- | -------------------------------------------------- | -------------------------------------------------- |
 | CROSS-001 | Viewport crossing 768px with menu open closes menu | `matchMedia('(min-width: 768px)')` change listener |
-| CROSS-002 | Close uses EXISTING task-8 path | Call same `onClose()` that Escape/hamburger use |
-| CROSS-003 | Immediate aria/focus update | `aria-expanded=false`, focus moves |
-| CROSS-004 | Deferred visual hide | Animation or immediate per existing logic |
-| CROSS-005 | Scroll lock released | `body.style.overflow` restored |
-| CROSS-006 | Focus destination after auto-close | First inline control trigger OR body |
+| CROSS-002 | Close uses EXISTING task-8 path                    | Call same `onClose()` that Escape/hamburger use    |
+| CROSS-003 | Immediate aria/focus update                        | `aria-expanded=false`, focus moves                 |
+| CROSS-004 | Deferred visual hide                               | Animation or immediate per existing logic          |
+| CROSS-005 | Scroll lock released                               | `body.style.overflow` restored                     |
+| CROSS-006 | Focus destination after auto-close                 | First inline control trigger OR body               |
 
 **NOT ALLOWED:** Resize event polling, separate close path, focus lost.
 
@@ -2360,10 +2362,10 @@ The Frontend Engineer's work is complete when ALL prior criteria remain met PLUS
 **File:** `src/shared/ds/settings/_breakpoints.scss`
 
 ```scss
-$breakpoint-sm: 640px;   // Large phones / small tablets (Tailwind-aligned)
-$breakpoint-md: 768px;   // Tablet / hamburger->inline switch
-$breakpoint-lg: 1024px;  // Desktop
-$breakpoint-xl: 1280px;  // Large desktop
+$breakpoint-sm: 640px; // Large phones / small tablets (Tailwind-aligned)
+$breakpoint-md: 768px; // Tablet / hamburger->inline switch
+$breakpoint-lg: 1024px; // Desktop
+$breakpoint-xl: 1280px; // Large desktop
 $breakpoint-2xl: 1536px; // Extra large
 
 $breakpoints: (
@@ -2401,47 +2403,52 @@ src/geo-detection/
 
 #### 17.5.1 Precedence Chain (CRITICAL)
 
-| Priority | Source | Condition |
-|----------|--------|-----------|
-| 1 | Stored user choice | localStorage has any pref set |
-| 2 | GPS | User grants permission, coords -> reverse geocode succeeds |
-| 3 | IP geolocation | GPS denied/timeout/unavailable, IP-geo succeeds |
-| 4 | Device language | Both GPS and IP-geo fail |
-| 5 | Defaults (en/US/USD) | Device language unsupported |
+| Priority | Source               | Condition                                                  |
+| -------- | -------------------- | ---------------------------------------------------------- |
+| 1        | Stored user choice   | localStorage has any pref set                              |
+| 2        | GPS                  | User grants permission, coords -> reverse geocode succeeds |
+| 3        | IP geolocation       | GPS denied/timeout/unavailable, IP-geo succeeds            |
+| 4        | Device language      | Both GPS and IP-geo fail                                   |
+| 5        | Defaults (en/US/USD) | Device language unsupported                                |
 
-**Rationale for GPS > IP-geo:** Owner's VPN testing scenario. User physically in Colombia using US VPN should detect as Colombia (GPS reports physical location), not US (IP reports VPN exit).
+**Rationale for GPS > IP-geo:** Owner's VPN testing scenario. User physically in Colombia using US
+VPN should detect as Colombia (GPS reports physical location), not US (IP reports VPN exit).
 
 #### 17.5.2 Provider Contract
 
 **IP Geolocation:**
 
-| Provider | URL | Timeout | Response Field |
-|----------|-----|---------|----------------|
-| Primary | `https://api.country.is/` | 3000ms | `country` (ISO alpha-2) |
-| Fallback | `https://get.geojs.io/v1/ip/country.json` | 3000ms | `country` (ISO alpha-2) |
+| Provider | URL                                       | Timeout | Response Field          |
+| -------- | ----------------------------------------- | ------- | ----------------------- |
+| Primary  | `https://api.country.is/`                 | 3000ms  | `country` (ISO alpha-2) |
+| Fallback | `https://get.geojs.io/v1/ip/country.json` | 3000ms  | `country` (ISO alpha-2) |
 
 **Reverse Geocoding (GPS path):**
 
-| Provider | URL | Timeout | Response Field |
-|----------|-----|---------|----------------|
-| BigDataCloud | `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=..&longitude=..&localityLanguage=en` | 3000ms | `countryCode` (ISO alpha-2) |
+| Provider     | URL                                                                                                     | Timeout | Response Field              |
+| ------------ | ------------------------------------------------------------------------------------------------------- | ------- | --------------------------- |
+| BigDataCloud | `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=..&longitude=..&localityLanguage=en` | 3000ms  | `countryCode` (ISO alpha-2) |
 
 **Fail-closed validation:**
+
 - IP-geo: `country` must match `^[A-Z]{2}$`
 - Reverse geocode: `countryCode` must match `^[A-Z]{2}$`
 
 #### 17.5.3 GPS Parameters
 
-| Parameter | Value | Rationale |
-|-----------|-------|-----------|
-| `timeout` | 5000ms | Balance between waiting and UX |
-| `maximumAge` | 600000ms | 10 min cached position OK for country-level |
-| `enableHighAccuracy` | false | Country-level resolution, save battery |
+| Parameter            | Value    | Rationale                                   |
+| -------------------- | -------- | ------------------------------------------- |
+| `timeout`            | 5000ms   | Balance between waiting and UX              |
+| `maximumAge`         | 600000ms | 10 min cached position OK for country-level |
+| `enableHighAccuracy` | false    | Country-level resolution, save battery      |
 
 #### 17.5.4 Country Mapping (Unchanged)
 
 ```typescript
-export const COUNTRY_TO_PREFS: Record<string, { locale: SupportedLocale; region: SupportedRegion; currency: SupportedCurrency }> = {
+export const COUNTRY_TO_PREFS: Record<
+  string,
+  { locale: SupportedLocale; region: SupportedRegion; currency: SupportedCurrency }
+> = {
   CO: { locale: 'es', region: 'CO', currency: 'COP' },
   US: { locale: 'en', region: 'US', currency: 'USD' },
   ES: { locale: 'es', region: 'ES', currency: 'EUR' },
@@ -2454,18 +2461,18 @@ export const COUNTRY_TO_PREFS: Record<string, { locale: SupportedLocale; region:
 
 #### 17.5.5 Detection Flow Contract
 
-| Step | Condition | Action |
-|------|-----------|--------|
-| 1 | Any pref set in localStorage | Skip detection entirely, use stored |
-| 2 | All prefs unset | Start GPS AND IP-geo in parallel |
-| 3 | GPS granted + coords | Reverse geocode via BigDataCloud |
-| 4 | Reverse geocode success + supported country | Apply GPS country (precedence 2) |
-| 5 | Reverse geocode fail OR GPS denied/timeout | Use IP-geo result if available (precedence 3) |
-| 6 | IP-geo success + supported country | Apply IP country |
-| 7 | IP-geo success + unsupported country | Device language fallback |
-| 8 | Both GPS and IP-geo fail | Device language fallback |
-| 9 | Device language supported | Apply { locale, region: default, currency: default } |
-| 10 | Device language unsupported | Apply defaults (en/US/USD) |
+| Step | Condition                                   | Action                                               |
+| ---- | ------------------------------------------- | ---------------------------------------------------- |
+| 1    | Any pref set in localStorage                | Skip detection entirely, use stored                  |
+| 2    | All prefs unset                             | Start GPS AND IP-geo in parallel                     |
+| 3    | GPS granted + coords                        | Reverse geocode via BigDataCloud                     |
+| 4    | Reverse geocode success + supported country | Apply GPS country (precedence 2)                     |
+| 5    | Reverse geocode fail OR GPS denied/timeout  | Use IP-geo result if available (precedence 3)        |
+| 6    | IP-geo success + supported country          | Apply IP country                                     |
+| 7    | IP-geo success + unsupported country        | Device language fallback                             |
+| 8    | Both GPS and IP-geo fail                    | Device language fallback                             |
+| 9    | Device language supported                   | Apply { locale, region: default, currency: default } |
+| 10   | Device language unsupported                 | Apply defaults (en/US/USD)                           |
 
 #### 17.5.6 E2E Mocking Seam
 
@@ -2481,11 +2488,15 @@ export async function mockReverseGeocode(page: Page, countryCode: string): Promi
 export async function mockReverseGeocodeFailure(page: Page): Promise<void>
 
 // GPS mocks (Playwright context)
-export async function mockGpsGranted(context: BrowserContext, coords: { lat: number; lng: number }): Promise<void>
+export async function mockGpsGranted(
+  context: BrowserContext,
+  coords: { lat: number; lng: number }
+): Promise<void>
 export async function mockGpsDenied(context: BrowserContext): Promise<void>
 ```
 
 **Test matrix (expanded):**
+
 - GPS granted + all 7 countries (via reverse geocode mock)
 - VPN scenario: GPS=CO + IP=US -> CO wins
 - GPS denied + all 7 countries (via IP mock)
@@ -2497,22 +2508,22 @@ export async function mockGpsDenied(context: BrowserContext): Promise<void>
 
 #### 17.5.7 External Origins
 
-| Origin | Purpose | Data Transmitted | Privacy Note |
-|--------|---------|------------------|--------------|
-| api.country.is | IP geolocation | IP (inherent) | First visit only |
-| get.geojs.io | IP fallback | IP (inherent) | If primary fails |
-| api.bigdatacloud.net | Reverse geocode | Lat/Lng coords | GPS granted only |
+| Origin               | Purpose         | Data Transmitted | Privacy Note     |
+| -------------------- | --------------- | ---------------- | ---------------- |
+| api.country.is       | IP geolocation  | IP (inherent)    | First visit only |
+| get.geojs.io         | IP fallback     | IP (inherent)    | If primary fails |
+| api.bigdatacloud.net | Reverse geocode | Lat/Lng coords   | GPS granted only |
 
 **CRITICAL:** Coordinates sent to BigDataCloud ONLY after user grants browser permission prompt.
 
 ### 17.6 Lazy Chunk Structure (ADR-0014 + ADR-0011 Option A)
 
-| Chunk | Contents | Load Condition |
-|-------|----------|----------------|
-| main.js | App shell, en/es translations | Always |
-| geo.js | Detection adapter + config | First visit, no stored prefs |
-| locale-zh.js | zh.ts translations | User selects Chinese |
-| locale-ja.js | ja.ts translations | User selects Japanese |
+| Chunk        | Contents                      | Load Condition               |
+| ------------ | ----------------------------- | ---------------------------- |
+| main.js      | App shell, en/es translations | Always                       |
+| geo.js       | Detection adapter + config    | First visit, no stored prefs |
+| locale-zh.js | zh.ts translations            | User selects Chinese         |
+| locale-ja.js | ja.ts translations            | User selects Japanese        |
 
 **Dynamic import pattern:**
 
@@ -2530,13 +2541,13 @@ const loadLocale = async (locale: SupportedLocale) => {
 
 ### 17.7 Budget Structure (Rev.9 Proposed)
 
-| Chunk | Max Raw | Max Gzip | Warning |
-|-------|---------|----------|---------|
-| main.js | 237 KB | 75 KB | 236.5 KB / 74.5 KB |
-| geo.js | 3 KB | 1.5 KB | 2.5 KB |
-| locale-zh.js | 3 KB | 1 KB | 2.5 KB |
-| locale-ja.js | 3 KB | 1 KB | 2.5 KB |
-| Total transfer (worst) | 246 KB | 78.5 KB | - |
+| Chunk                  | Max Raw | Max Gzip | Warning            |
+| ---------------------- | ------- | -------- | ------------------ |
+| main.js                | 237 KB  | 75 KB    | 236.5 KB / 74.5 KB |
+| geo.js                 | 3 KB    | 1.5 KB   | 2.5 KB             |
+| locale-zh.js           | 3 KB    | 1 KB     | 2.5 KB             |
+| locale-ja.js           | 3 KB    | 1 KB     | 2.5 KB             |
+| Total transfer (worst) | 246 KB  | 78.5 KB  | -                  |
 
 ---
 
