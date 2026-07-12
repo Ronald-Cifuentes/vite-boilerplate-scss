@@ -57,12 +57,11 @@ Exit Code: Non-zero (1 moderate finding)
 
 ### 2.2 Supply Chain Controls
 
-| Control                 | Status    | Evidence                                 |
-| ----------------------- | --------- | ---------------------------------------- |
-| pnpm lockfile           | Present   | `pnpm-lock.yaml` (220.8KB)               |
-| Lockfile in .gitignore  | No (good) | Lockfile tracked in git                  |
-| npm/npx blocked         | Yes       | User-defined hooks prevent npm/npx usage |
-| pnpm integrity checking | Enabled   | pnpm default behavior                    |
+| Control                 | Status    | Evidence                                                                                                                                                                                                                                           |
+| ----------------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Lockfiles not committed | By design | Owner directive 2026-07-12: template is package-manager-agnostic (Bun/Yarn/pnpm/...); all lockfile patterns gitignored; CI/Docker install fresh from package.json. Residual risk accepted by owner: no transitive-dependency pinning at build time |
+| npm/npx blocked         | Yes       | User-defined hooks prevent npm/npx usage                                                                                                                                                                                                           |
+| pnpm integrity checking | Enabled   | pnpm default behavior                                                                                                                                                                                                                              |
 
 ---
 
@@ -175,6 +174,11 @@ Strict-Transport-Security: max-age=31536000; includeSubDomains
 
 Note: `'unsafe-inline'` for styles is needed for CSS modules. Consider using nonces or hashes in
 production.
+
+**Status 2026-07-12 (task 25):** implemented in `docker/security-headers.conf` and runtime-verified
+6/6 on every response class (`/`, SPA routes, hashed assets, `/health`). The headers had previously
+been declared only at nginx server level, where the per-location `add_header` directives (cache
+blocks) silently dropped them on all real responses — nginx add_header inheritance trap.
 
 ---
 

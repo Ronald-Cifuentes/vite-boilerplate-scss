@@ -1,0 +1,3 @@
+# Machine-generated files that are git-tracked (prettier 3 already skips
+# .gitignore'd paths — this file covers tracked exceptions only).
+state.json

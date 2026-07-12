@@ -21,7 +21,7 @@
     "format": "prettier --write .",
     "lint": "eslint src --ext ts,tsx",
     "ts-check": "tsc --noEmit --skipLibCheck",
-    "depcheck": "out=\"$(npx depcheck 2>&1)\"; code=$?; printf '%s\\n' \"$out\"; [ \"$code\" -eq 0 ] && [ \"$out\" = \"No depcheck issue\" ]",
+    "depcheck": "depcheck",
     "sonar:report": "./scripts/quality-gate-report.sh",
     "check:css": "node scripts/check-empty-css-rules.mjs"
   },
@@ -46,6 +46,7 @@
     "@typescript-eslint/parser": "8.62.0",
     "@vitejs/plugin-react": "6.0.3",
     "commitlint-config-gitmoji": "2.3.1",
+    "depcheck": "1.4.7",
     "eslint": "10.6.0",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-prettier": "5.5.6",
@@ -61,6 +62,6 @@
   },
   "packageManager": "pnpm@11.5.1",
   "engines": {
-    "node": ">=24.18.0"
+    "node": "24.18.0"
   }
 }

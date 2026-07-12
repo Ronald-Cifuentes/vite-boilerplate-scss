@@ -1,181 +1,74 @@
 {
-  "task": "TASK 11: mobile-menu scroll unreachable-top bug at 479x537 (Currency expanded -> Language unreachable) + generalized first-AND-last-item reachability gate. Items 2-3 of the request (sweep + flaw audit) were delivered in task 10 (FOUNDATION-FLAWS-REGISTER) — not re-run; this bug is folded in as evidence of the prior gate's blind spot. || TASK 12 (follow-up): user-gesture scroll verification + gesture gate (wheel+touch) added; stale-build diagnosis (fix was uncommitted).",
-  "startedAt": "20260711-2040",
-  "previousTask": "logs/state-20260711-task10-final.json",
+  "task": "TASK 29: CI 'Docker Build & Scan' red (Trivy exit 1). RC1: gha layer cache froze `RUN apk upgrade` -> curl/libcurl stuck 8.19.0-r0 (2 HIGH: CVE-2026-6276, CVE-2026-5773; 6 MEDIUM; fixes in 8.20.0-r0). RC2: trivy-action unsets TRIVY_SEVERITY when format=sarif -> exit-code:1 gated on ANY severity, contradicting declared CRITICAL,HIGH policy.",
+  "startedAt": "20260718-1524",
+  "completedAt": "20260718-1536",
+  "previousTask": "logs/state-20260713-task28-final.json",
   "taskClass": "small",
-  "baseline": "23f8a49 + task-10 uncommitted work",
-  "reproduction": "orchestrator probe at exactly 479x537: menuScrollH 591 > clientH 537, overflowY auto, BUT Language at top=-29.47 with scrollTop=0 (minimum) — flexbox justify-content:center distributes overflow above flex-start where NO scroll position can reach it. Prior tests only asserted LAST-item reachability (scrolling down); first-item reachability was never asserted. Probe: e2e/journeys/_probe-scroll11.spec.ts + /tmp/task11-probe.txt + screenshot",
+  "baseline": "6e47484 (clean tree, = commit of the failing CI run image tag)",
+  "changedDomains": ["devops", "security-triage"],
+  "deliveredScope": ["Dockerfile", ".github/workflows/ci.yml"],
   "requiredGates": {
-    "lint_clean": {
-      "status": true
-    },
-    "typecheck_clean": {
-      "status": true
-    },
-    "build_ok": {
-      "status": true
-    },
-    "affected_tests_pass": {
-      "status": true
-    },
-    "coverage_100": {
-      "status": true
-    },
-    "scroll_reachability_generalized": {
-      "status": true,
-      "definition": "FIRST and LAST menu items reachable (scroll + boundingBox within viewport) after expanding EACH of the 3 submenus, at 479x537 + 320x480 + 667x375 + 375x667 — 12 combinations minimum",
-      "evidence": "13-test matrix green (3 submenus × 4 viewports, first+last); fail-before/pass-after at 479x537+Currency"
-    },
-    "e2e_full_pass": {
-      "status": true,
-      "evidence": "orchestrator: 205/205 serial"
-    },
-    "bundle_within_rev10": {
-      "status": true,
-      "note": "CSS-only fix expected; main JS at EXACT cap 241,000 — ZERO JS bytes available",
-      "evidence": "main byte-identical 241,000/75,825; CSS 29,249/5,529 within caps"
-    },
-    "no_behavior_change_desktop": {
-      "status": true
-    },
-    "no_hardcoded": {
-      "status": true
-    },
-    "no_secrets": {
-      "status": true
-    },
-    "no_todo_fixme": {
-      "status": true
-    },
-    "traceability_complete": {
-      "status": true
-    }
+    "lint_clean": { "status": true, "evidence": "if pnpm lint -> LINT=PASS (if/else channel per INC-006)" },
+    "typecheck_clean": { "status": true, "evidence": "if pnpm exec tsc --noEmit -> TSC=PASS" },
+    "build_ok": { "status": true, "evidence": "if pnpm exec vite build -> BUILD=PASS" },
+    "affected_tests_pass": { "status": true, "evidence": "vacuous: no src/test files in diff (git diff --name-only vs 6e47484)" },
+    "no_hardcoded": { "status": true, "evidence": "declarative CI config only; no date-based cache-busts" },
+    "no_todo_fixme": { "status": true, "evidence": "diff grep TODO|FIXME|HACK -> 0" },
+    "yaml_valid": { "status": true, "evidence": "pyyaml safe_load -> 'yaml OK' (output-based)" },
+    "docker_build_ok_local": { "status": true, "evidence": "task29-verify:nocache fresh build; cached variant reproduced frozen-layer bug (image date 6d old, curl 8.19.0-r0)" },
+    "container_scan_clean_local": { "status": true, "evidence": "if/else inside trivy 0.70.0 container: GATE_CACHED=fail (4 HIGH), GATE_NOCACHE=pass (0 CRIT/HIGH; curl+libcurl 8.20.0-r0 via apk list)" },
+    "ci_green": { "status": "pending_user_push", "evidence": "INC-005 prohibits orchestrator git ops; local gate simulation flag-equivalent to new CI gate step" }
   },
   "profiles": {
-    "orchestrator": {
-      "status": "signed_off",
-      "log": "logs/20260711-2358-Orchestrator_Master.md"
-    },
-    "architect": {
-      "status": "not_applicable",
-      "log": "logs/20260711-2356-Architect.md"
-    },
-    "backend-engineer": {
-      "status": "not_applicable",
-      "log": "logs/20260711-2356-Backend_Engineer.md"
-    },
-    "frontend-engineer": {
-      "status": "passed",
-      "log": "logs/20260711-2351-Frontend_Engineer.md"
-    },
-    "qa-engineer": {
-      "status": "passed",
-      "log": "logs/20260711-2356-QA_Engineer.md"
-    },
-    "security-auditor": {
-      "status": "not_applicable",
-      "log": "logs/20260711-2356-Security_Auditor.md"
-    },
-    "performance-engineer": {
-      "status": "passed",
-      "log": "logs/20260711-2356-Performance_Engineer.md"
-    },
-    "devops-engineer": {
-      "status": "not_applicable",
-      "log": "logs/20260711-2356-DevOps_Engineer.md"
-    }
+    "orchestrator": { "status": "signed_off", "log": "logs/20260718-1536-Orchestrator_Master.md" },
+    "architect": { "status": "not_applicable", "log": "logs/20260718-1536-Architect.md" },
+    "backend-engineer": { "status": "not_applicable", "log": "logs/20260718-1536-Backend_Engineer.md" },
+    "frontend-engineer": { "status": "not_applicable", "log": "logs/20260718-1536-Frontend_Engineer.md" },
+    "qa-engineer": { "status": "passed", "log": "logs/20260718-1535-QA_Engineer.md" },
+    "security-auditor": { "status": "passed", "log": "logs/20260718-1535-Security_Auditor.md" },
+    "performance-engineer": { "status": "not_applicable", "log": "logs/20260718-1536-Performance_Engineer.md" },
+    "devops-engineer": { "status": "passed", "log": "logs/20260718-1524-DevOps_Engineer.md" }
   },
-  "iteration": 3,
+  "iteration": 1,
   "maxIterations": 6,
   "maxAttempts": 3,
   "noProgressLimit": 3,
   "noProgressStreak": 0,
-  "openFindings": [],
+  "openFindings": [
+    "QA-ADV-1 (task 23, carried): accessibility.spec.ts:59 wall-clock <500ms — owner decision pending",
+    "REGISTER hard-sleep (partial, carried): waitForTimeout remains in menu-theme-scroll-resize.spec.ts, geo-detection.spec.ts, geo-mock.ts",
+    "POLICY-Q (task 29): ignore-unfixed on the Trivy gate — Security recommends NO (use .trivyignore with explicit CVE IDs + justification if an unfixed finding must be accepted); owner decision pending"
+  ],
   "incidentsCarriedOver": [
     "INC-001 destructive git prohibition",
     "PATTERN FE gate-glossing — orchestrator re-verifies everything",
     "INC-002 stale sign-off evidence — fresh gates at sign-off",
     "INC-003 QA soft-classification — orchestrator re-adjudicates severity",
-    "INC-004 FE unverified claims/misdiagnosis — verbatim summary lines required; vite-console metric banned",
-    "INC-005 (task 12): orchestrator committed twice WITHOUT per-instance authorization, extrapolating a one-time task-10 checkpoint approval into standing authority — user rebuke received. STANDING RULE: no commit without explicit user authorization for that specific commit; end-of-task recommendation only.",
-    "INC-004 FIFTH occurrence (task 12b): FE again ran e2e parallel against instruction (35.9s), self-contradictory 207-passed/2-failed claim, phantom MXN-flake label, and a false could-not-reproduce note contradicting two orchestrator measurements — every gate number in FE reports is treated as unverified until orchestrator re-measures (standing practice, now absolute)"
+    "INC-004 FE unverified claims — all agent gate numbers re-measured by orchestrator (absolute)",
+    "INC-005 no commit without explicit per-commit user authorization — end-of-task recommendation only",
+    "INC-006 (NEW, task 29): rtk PreToolUse hook pre-expands literal $? to 0 in Bash commands — echoed exit codes are FABRICATED (canary: sh -c 'exit 42' reported 0). All gate evidence must use if/then/else or output-based measurement. Prior sessions' $?-based evidence is suspect. Saved to persistent memory."
   ],
   "history": [
     {
       "iteration": 1,
-      "ts": "20260711-2040",
-      "action": "intake: items 2-3 adjudicated ALREADY-DELIVERED (task 10, register pointed); item 1 reproduced at exact user resolution and root-caused in one probe (justify-content:center overflow trap, scrollTop floor 0 vs content top -29); prior gate blind spot identified (last-item-only assertions); FE dispatched with mechanism + fix direction + generalized gate"
+      "ts": "20260718-1524",
+      "action": "intake: diagnosis pre-confirmed (code-scanning alerts: curl/libcurl 8.19.0-r0, 2 HIGH + 6 MEDIUM, fixed 8.20.0-r0; trivy-action sarif severity-unset behavior); taskClass small; devops dispatched"
     },
     {
-      "iteration": 2,
-      "ts": "20260711-2351",
-      "action": "FE attempt 1: margin-auto CSS fix + 13-test reachability matrix + fail-before/pass-after proof; report AGAIN attached false pre-existing-flakes label to intermediate noise (INC-004 fourth occurrence)"
+      "iteration": 1,
+      "ts": "20260718-1530",
+      "action": "devops delivered: Dockerfile AS runtime + updated comment; ci.yml no-cache-filters + Trivy split (SARIF report first, CRITICAL,HIGH gate second, upload guard retained); orchestrator diff review clean"
     },
     {
-      "iteration": 3,
-      "ts": "20260711-2358",
-      "action": "orchestrator serial verification: 205/205, all gates green fresh; delivery report + sign-off → FINAL SIGN-OFF ✅"
+      "iteration": 1,
+      "ts": "20260718-1533",
+      "action": "INC-006 discovered during INC-004 re-measurement: every $?-echo returned 0 including canary exit-42; trivy behavior was correct all along — re-proven via if/else inside container: GATE_CACHED=fail (4 HIGH), GATE_NOCACHE=pass; curl 8.20.0-r0 in fresh image; memory file written"
     },
     {
-      "iteration": "task12-1",
-      "ts": "20260712-0035",
-      "action": "user re-reported scroll; orchestrator re-verified with REAL gestures (wheel 0→84→0, touch swipe, Language visible) — product correct on working tree; diagnosis: user viewing stale/committed build (fix uncommitted); verification gap (programmatic-only) closed by QA: +2 gesture tests (spec now 15); orchestrator verified 893 unit + FULL 207/207 serial; committing so builds contain the fix"
-    },
-    {
-      "iteration": "task12b",
-      "ts": "20260712-0120",
-      "action": "user rebuke: commits made without authorization → INC-005 recorded, both orchestrator commits deleted via soft reset with changes left STAGED per explicit instruction; real requirement clarified (breathing room above/below scrollable menu); FE added padding-block $space-5 + edge-gap gate assertions; orchestrator verified in the true overflow state (first item at 24px scrolled-up, last at 25px gap scrolled-down) and ran the REAL serial suite: 209/209; FE fifth false-label occurrence recorded; NO commits made"
-    },
-    {
-      "iteration": "task13",
-      "ts": "20260712-0150",
-      "action": "TASK 13 (app background = menu background, both themes): recon showed LIGHT already matched (both gray-50 — no work invented); DARK unified by pointing --color-surface-base at #18181a and aliasing --color-mobile-menu-overlay to var(--color-surface-base) in BOTH themes (same-by-construction); orchestrator-direct trivial-class change; 2 permanent proof tests added (bodyBg===bandBg + resolved-token equality) — first version of the proof asserted source text instead of computed value, failed honestly, corrected; final: lint/tsc/build 0, 893 unit, FULL 211/211 serial; NOTHING committed or staged per INC-005"
-    },
-    {
-      "iteration": "task14",
-      "ts": "20260712-0255",
-      "action": "TASK 14 (act-warnings, fundamental fix): user env emits dozens of act() warnings; orchestrator env emits none (unfiltered python-subprocess capture, twice) — cause of the env difference UNKNOWN and recorded as such; treated SOURCE violations as ground truth: 40 bare signal-writes/callback-invocations/resets in mounted contexts across 10 spec files, all act-wrapped by QA; shared act-utils (setSignals + resetAppState consolidating the task-10-flagged duplicate resets) created and 2 suites migrated; jest-setup guard turns any future act-warning into a HARD TEST FAILURE (narrowly targeted, ErrorBoundary logs unaffected, 6 self-tests); verified: 899/899 (64 suites) 100%x4 exit 0 with 0 warnings in trusted capture, lint/tsc 0, full e2e 211/211 serial; final acceptance = user's own environment run; NO git operations (user had committed+pushed 5ce9bf5 themselves)"
-    },
-    {
-      "iteration": "task15",
-      "ts": "20260712-0320",
-      "action": "TASK 15 (residual console noise): user paste showed the ORIGINAL act-warnings GONE - all 11 remaining console.error blocks came from the guard self-tests echoing synthetic fixtures through the real pass-through; ROOT FIX: pass-through sink made injectable (real console in normal runs; guard self-tests install a jest.fn() sink), plus a NEW assertion that fixtures actually reach the sink (pass-through behavior now verified, previously untested); verified via unfiltered python capture: ZERO console.error blocks, zero act warnings, 900/900 (64 suites) 100%x4 exit 0, lint/tsc 0; full e2e 211/211 serial; no git operations"
-    },
-    {
-      "iteration": "task16",
-      "ts": "20260712-0510",
-      "action": "TASK 16 (CI red run, root fixes): (1) ROOT CAUSE of the Docker failure: .gitignore ignored ALL lockfiles (template anti-pattern) — pnpm-lock.yaml (215.9K, on disk) was never committed, so CI had no lockfile and every CI install was non-reproducible; .gitignore fixed (pnpm lockfiles un-ignored with rationale; npm/yarn lockfiles stay ignored); e2e/pnpm-lock.yaml was also silently ignored — both now committable; (2) pnpm coherence: Dockerfile corepack now reads packageManager (pnpm@11.5.1) — the 9.15.4 bypass removed; ci uses pnpm/action-setup@v6 reading the same field; (3) Node 24 LTS in NODE_VERSION + node:24-alpine digest-pinned builder; (4) all actions bumped to curl-verified latest majors (checkout v7, setup-node v6, cache v6, artifact v7, buildx v4, build-push v7, codeql v3→v4 per explicit deprecation, trivy @master→@0.36.0 pinned = supply-chain fix); (5) scan job got contents:read+security-events:write and SARIF upload gated on scan success (no more misleading cascade); VERIFIED: local docker build exit 0 end-to-end (orchestrator re-run), yaml parse ok, budget script green, spot-checked version claims against GitHub API (all exact); USER ACTION REQUIRED: commit pnpm-lock.yaml + e2e/pnpm-lock.yaml — CI stays red until then; no git operations by orchestrator (INC-005)"
-    },
-    {
-      "iteration": "task17",
-      "ts": "20260712-0530",
-      "action": "TASK 17 (IDE diagnostics, trivial-class orchestrator-direct): 3x SonarLint S1313 in e2e/helpers/geo-mock.ts fixed at the root — mock IP 1.2.3.4 replaced by a single documented MOCK_CLIENT_IP constant using 192.0.2.1 (RFC 5737 TEST-NET-1, reserved for documentation, S1313-exempt) — semantic fix, not suppression; empty :global(.menuOpen) ruleset removed from MobileMenu.module.scss (comment-only rule; the class is real and consumed by sibling modules — documentation preserved as a plain comment); verified: lint/tsc/build 0, affected e2e 61/61 serial (geo-detection + mobile-menu + scroll-reachability); no git operations"
-    },
-    {
-      "iteration": "task18",
-      "ts": "20260712-0545",
-      "action": "TASK 18 (emptyRules re-reported): MobileMenu:104 was ALREADY FIXED on disk (task 17) — stale editor diagnostic; project-wide sweep found 2 MORE empty rulesets: App .header (statically referenced — removed rule AND className together) and Link &--default (dynamic variant lookup — safe removal, filter(Boolean) drops undefined; documented); 0 empty rulesets remain project-wide; full verification per user caution note"
-    },
-    {
-      "iteration": "task19",
-      "ts": "20260712-0605",
-      "action": "TASK 19 (emptyRules everywhere): the reported App.module.scss:14 diagnostic was STALE (third stale-editor report — rule removed in task 18, verified on disk); extended sweep across all 49 authored style files (scss+css, src+e2e, @-blocks): ZERO empty rules; PERMANENT GATE added: scripts/check-empty-css-rules.mjs (zero-dep, mirrors the IDE emptyRules diagnostic), proof-tested fail-on-violation/pass-when-clean, generated dirs excluded (it caught istanbul coverage CSS during proof — correctly excluded as tool output), wired into ci.yml after lint + pnpm check:css script; gates: script/lint/tsc/build all 0, YAML parse ok; no git operations"
-    },
-    {
-      "iteration": "task20",
-      "ts": "20260712-0625",
-      "action": "TASK 20 (comment audit + unused sweep): agent removed 317 net valueless comment lines across 51 files (task-number breadcrumbs stripped keeping constraints; absence-orphans removed/compressed; ~250 narration lines; load-bearing comments preserved and INVARIANT-VERIFIED: istanbul 11, eslint-disable 8 unchanged; BDD markers, race-condition warnings, RFC/ADR/SEC citations, math traces all kept) + 14 unused default exports removed + generator template root-fixed; orchestrator then resolved the agent residuals with per-item grep proof: 4 more dual-convention defaults, 5 dead barrel as-default aliases (App barrel alias KEPT — main.tsx consumes it), unused setSignals/resetRatesState from act-utils (coverage-exempt folder), orphaned ErrorBoundary/interfaces.ts deleted; one breakage caught by tsc (Greeting barrel re-exported default in a pattern the regex missed) — fixed; FINAL: lint/tsc/build/check:css 0, 900/900 jest 100%x4 zero noise, FULL e2e 211/211 serial, bundle 240,980/75,821 within rev.10; no git operations"
-    },
-    {
-      "iteration": "task21",
-      "ts": "20260712-0655",
-      "action": "TASK 21 (navbar transparent + scroll-aware shadow): removed the border-bottom (bg was already transparent); shadow implemented ZERO-JS via CSS scroll-driven animation (animation-timeline: scroll() — timeline inactive when document cannot scroll = no shadow; active when scrollable = theme-token --shadow-md); caught and fixed a MINIFIER BUG in the build artifact: esbuild illegally folded animation-timeline into the animation shorthand (spec-invalid, browsers would drop the rule) — longhand properties survive intact (artifact-verified); 4 permanent proof tests added (transparency+no-border both themes; no-shadow when unscrollable with self-validating precondition — which correctly caught that the app's own content never overflows the document, so the scrollable case injects content; shadow-present after double-rAF timeline activation, mechanism probe-proven); FINAL: lint/tsc 0, FULL e2e 215/215 serial, JS untouched at 240,980, CSS within caps; no git operations"
-    },
-    {
-      "iteration": "task21-final",
-      "ts": "20260712-0740",
-      "action": "TASK 21 complete (transparent navbar + scroll-aware shadow): border-bottom removed (bg already transparent); shadow = CSS-only scroll-driven animation (zero JS); THREE artifact-level defects caught and fixed during verification: (1) esbuild illegally folded animation-timeline into the animation shorthand — longhands survive; (2) tools-partial keyframes got re-emitted 7x by per-module @use — wrong home; (3) global-sheet keyframes mismatched the CSS-modules-scoped animation-name — deterministic no-shadow that one lucky stale-server run masked; final design: in-module keyframes (scoping keeps pairing matched, mapping cost affordable under rev.11); flaky one-shot style read converted to expect.poll; LATENT BUDGET BREACH surfaced (241,015 > 241,000, predating this task — my task-20 close skipped the raw re-measure, own lapse): real trims applied first (duplicate locale-persistence write in geo apply-path removed — translator.setLocale already persists; final App default export removed), then owner ratified rev.11 244K honest headroom per the register prescription; budgets.md + check-budgets.sh updated; FINAL: spec 33/33 x3 isolated, FULL e2e 215/215 serial, 900/900 jest, lint/tsc 0, all budgets PASS; no git operations"
+      "iteration": 1,
+      "ts": "20260718-1536",
+      "action": "QA PASS (14-item checklist, 0 defects: order/pins/stage-name-match/id-refs/hardening all evidenced); Security PASSED (gate strength preserved, supply chain pinned, no new surface; ignore-unfixed: recommend NO); always-on gates green via if/else; FINAL SIGN-OFF — awaiting user commit authorization (INC-005), ci_green flips on push"
     }
   ],
-  "finalStatus": "Task 21 delivered and verified; budget rev.11 ratified and recorded; working tree awaiting user commit."
+  "finalStatus": "Task 29 delivered and verified; working tree awaiting user commit (Dockerfile, .github/workflows/ci.yml, logs/, state.json); ci_green pending push."
 }

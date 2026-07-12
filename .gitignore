@@ -149,13 +149,15 @@ dist
 .yarn/
 .pnp.*
 
-# Lock files from non-sanctioned package managers (npm, yarn) are ignored
-# because they should never be in this repository.
-# CRITICAL: pnpm is the ONLY sanctioned package manager per project constitution.
-# pnpm-lock.yaml MUST be committed for reproducible builds in CI/Docker.
-# Ignoring pnpm lockfiles is a common template anti-pattern that breaks production builds.
+# Lock files are NEVER committed (owner directive 2026-07-12): this template
+# must stay package-manager-agnostic (Bun, Yarn, pnpm, npm, ...). CI and
+# Docker install without frozen lockfiles by design.
 package-lock.json
 yarn.lock
+pnpm-lock.yaml
+pnpm-lock.yml
+bun.lock
+bun.lockb
 
 # Playwright / e2e artifacts
 test-results/

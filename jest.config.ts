@@ -57,12 +57,12 @@ export default {
     // parse. Pinning `require` makes jest load the CJS variants.
     customExportConditions: ['require', 'node'],
   },
-  testRegex: '(/_tests_/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$',
+  testRegex: String.raw`(/_tests_/.*|(\.|/)(test|spec))\.(jsx?|tsx?)$`,
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   clearMocks: true,
   moduleDirectories: ['node_modules', 'src'],
   setupFilesAfterEnv: ['<rootDir>/jest-setup.ts'],
   coverageDirectory: 'coverage',
-  coverageReporters: ['lcov', 'text', 'text-summary'],
+  coverageReporters: ['lcov', 'text', 'text-summary', 'json-summary'],
   modulePathIgnorePatterns: ['builds', 'node_modules'],
 }

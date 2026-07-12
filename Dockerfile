@@ -17,12 +17,9 @@ COPY package.json pnpm-workspace.yaml .npmrc ./
 RUN corepack enable && \
     corepack install
 
-# Copy lockfile after corepack setup (layer caching)
-COPY pnpm-lock.yaml ./
-
-# Install dependencies with pnpm
-# --frozen-lockfile ensures reproducible builds
-RUN pnpm install --frozen-lockfile
+# Install dependencies (no lockfile: repo is package-manager-agnostic by
+# owner directive — installs resolve fresh from package.json)
+RUN pnpm install
 
 # Copy source code and configs
 COPY tsconfig.json tsconfig.node.json vite.config.ts index.html ./
@@ -36,21 +33,30 @@ RUN ./node_modules/.bin/vite build
 # ========================================
 # Stage 2: Production runtime
 # ========================================
-FROM nginx:1.27-alpine
+# Digest-pinned like the builder stage — the previous unpinned 1.27-alpine tag
+# aged into 37 CRITICAL/HIGH alpine-3.21 CVEs (openssl, expat, libpng, c-ares)
+FROM nginx:1.30-alpine@sha256:0d3b80406a13a767339fbe2f41406d6c7da727ab89cf8fae399e81f780f814d1 AS runtime
+
+# Pull OS security patches newer than the base-image snapshot (alpine package
+# fixes land faster than nginx image digests). Named stage 'runtime' paired with
+# CI no-cache-filters ensures this layer always rebuilds (BuildKit gha cache
+# otherwise freezes the apk upgrade → ships stale packages with known CVEs).
+RUN apk upgrade --no-cache
 
 # Copy custom nginx config with SPA routing + security headers
 COPY docker/nginx.conf /etc/nginx/nginx.conf
+COPY docker/security-headers.conf /etc/nginx/security-headers.conf
 
 # Copy built assets from builder stage
 COPY --from=builder /build/dist /usr/share/nginx/html
 
 # Health check for container orchestration
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD wget --quiet --tries=1 --spider http://localhost:80/ || exit 1
+  CMD wget --quiet --tries=1 --spider http://127.0.0.1:8080/health || exit 1
 
 # Run as non-root user (nginx user, uid 101)
 USER nginx
 
-EXPOSE 80
+EXPOSE 8080
 
 CMD ["nginx", "-g", "daemon off;"]

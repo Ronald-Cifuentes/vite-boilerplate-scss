@@ -63,9 +63,12 @@ test.describe('Currency Conversion - Exact Example Fixture (ADR-0010 §13, ADR-0
 
     await page.goto('/')
     await page.evaluate(() => localStorage.clear())
+    // Observable condition: the reload triggers a fresh rates fetch — wait for
+    // the mocked BanRep response instead of a fixed sleep (S2925)
+    const ratesResponse = page.waitForResponse(r => r.url().includes('suameca.banrep.gov.co'))
     await page.reload()
-    // Wait for rates to load
-    await page.waitForTimeout(1000)
+    await ratesResponse
+    await expect(page.getByTestId('app-greeting-price-value')).toBeVisible()
   })
 
   test('COP displays exactly $4,500 COP', async ({ page }) => {
@@ -152,9 +155,9 @@ test.describe('Currency Conversion - Failure States', () => {
     await page.goto('/')
     await page.evaluate(() => localStorage.clear())
     await page.reload()
-    await page.waitForTimeout(1000)
 
-    // App should still be usable, showing COP fallback
+    // App should still be usable, showing COP fallback (auto-retrying expect
+    // is the synchronization — nothing to await when all routes abort)
     const priceValue = page.getByTestId('app-greeting-price-value')
     await expect(priceValue).toContainText('COP')
 
@@ -188,10 +191,10 @@ test.describe('Currency Conversion - Stale Rates', () => {
     )
 
     await page.reload()
-    await page.waitForTimeout(1000)
 
     const rateStatus = page.getByTestId('app-greeting-rate-status')
-    // The stale indicator should be visible with age
+    // The stale indicator should be visible with age (auto-retrying expect is
+    // the synchronization — nothing to await when all routes abort)
     await expect(rateStatus).toBeVisible()
   })
 })
@@ -218,8 +221,11 @@ test.describe('Currency Conversion - Partial Availability', () => {
 
     await page.goto('/')
     await page.evaluate(() => localStorage.clear())
+    // Observable condition: BanRep succeeds here — wait for its mocked
+    // response instead of a fixed sleep (S2925)
+    const ratesResponse = page.waitForResponse(r => r.url().includes('suameca.banrep.gov.co'))
     await page.reload()
-    await page.waitForTimeout(1000)
+    await ratesResponse
 
     // USD should still work
     const currencyTrigger = page.getByTestId('app-navbar-currency-trigger')
