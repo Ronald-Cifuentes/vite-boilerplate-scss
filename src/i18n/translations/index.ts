@@ -43,7 +43,6 @@ export function isLocaleLoaded(locale: SupportedLocale): boolean {
  * Returns the loaded dictionary, or null on failure
  */
 export async function loadLocale(locale: SupportedLocale): Promise<TranslationDictionary | null> {
-  // Already loaded
   if (loadedLocales.has(locale)) {
     return translations[locale]
   }

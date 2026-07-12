@@ -1,8 +1,6 @@
-// Types
 export type { CurrencyPort } from './ports/Currency'
 export type { SupportedCurrency, CurrencyMetadata } from './types/Currency'
 
-// Config
 export {
   SUPPORTED_CURRENCIES,
   CURRENCY_STORAGE_KEY,
@@ -10,11 +8,9 @@ export {
   isValidCurrency,
 } from './config/currencies'
 
-// Adapter
 export { CurrencyProvider } from './adapters/CurrencyProvider'
 export type { CurrencyProviderProps } from './adapters/CurrencyProvider'
 
-// Hook
 export { useCurrency } from './hooks/useCurrency'
 
 // Signals (for testing)

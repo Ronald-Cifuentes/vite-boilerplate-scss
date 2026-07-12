@@ -87,7 +87,6 @@ describe('CURRENCY_SYMBOLS', () => {
     // CNY uses CN¥ to distinguish from JPY ¥
     expect(CURRENCY_SYMBOLS.CNY).toBe('CN¥')
     expect(CURRENCY_SYMBOLS.JPY).toBe('¥')
-    // Verify they are different
     expect(CURRENCY_SYMBOLS.CNY).not.toBe(CURRENCY_SYMBOLS.JPY)
   })
 })
@@ -178,7 +177,6 @@ describe('formatAmount', () => {
   it('should format JPY with ¥ symbol and NO decimals (ADR-0011)', () => {
     // JPY has 0 decimals - must NOT have decimal point
     expect(formatAmount(220, 'JPY')).toBe('¥220 JPY')
-    // Verify there is no decimal point in the output
     expect(formatAmount(220, 'JPY')).not.toContain('.')
   })
 

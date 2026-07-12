@@ -16,10 +16,6 @@ export const ja: TranslationDictionary = {
     formattedDate: '今日は',
     formattedPrice: '価格例',
   },
-  languageSelector: {
-    label: '言語',
-    changeLanguage: '言語を変更',
-  },
   mobileMenu: {
     openMenu: 'メニューを開く',
     closeMenu: 'メニューを閉じる',
@@ -30,18 +26,12 @@ export const ja: TranslationDictionary = {
     theme: 'テーマ',
   },
   navbar: {
-    language: '言語',
-    theme: 'テーマ',
-    country: '国',
-    currency: '通貨',
     selectLanguage: '言語を選択',
     selectCountry: '国を選択',
     selectCurrency: '通貨を選択',
     currentLanguage: '現在の言語',
     currentCountry: '現在の国',
     currentCurrency: '現在の通貨',
-    lightMode: 'ライトモード',
-    darkMode: 'ダークモード',
     themeModeLight: 'ライトモード',
     themeModeDark: 'ダークモード',
     themeModeSystem: 'システムテーマ',
@@ -62,13 +52,15 @@ export const ja: TranslationDictionary = {
     partial: '一部の為替レートは利用できません',
   },
   a11y: {
-    languageSelectorDescription: 'ご希望の言語を選択してください',
-    currentLanguage: '現在の言語',
     languageChangedTo: '言語を次に変更しました',
     themeChangedTo: 'テーマを次に変更しました',
     countryChangedTo: '国を次に変更しました',
     currencyChangedTo: '通貨を次に変更しました',
     skipToContent: 'メインコンテンツへスキップ',
     locationDetected: '場所が検出されました',
+  },
+  error: {
+    title: 'エラー',
+    reload: '再試行',
   },
 }

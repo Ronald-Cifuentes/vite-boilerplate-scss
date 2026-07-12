@@ -37,7 +37,6 @@ test.describe('Accessibility', () => {
   test('HTML lang attribute reflects current locale', async ({ page }) => {
     await page.goto('/')
 
-    // Initial state
     await expect(page.locator('html')).toHaveAttribute('lang', 'en')
 
     // After selecting Spanish from dropdown
@@ -98,17 +97,13 @@ test.describe('Accessibility', () => {
 
     const langTrigger = page.getByTestId('app-navbar-language-trigger')
 
-    // Verify trigger has correct ARIA attributes
     await expect(langTrigger).toHaveAttribute('aria-haspopup', 'listbox')
     await expect(langTrigger).toHaveAttribute('aria-expanded', 'false')
 
-    // Open the dropdown
     await langTrigger.click()
 
-    // Verify expanded state
     await expect(langTrigger).toHaveAttribute('aria-expanded', 'true')
 
-    // Verify panel has listbox role
     const panel = page.getByTestId('app-navbar-language-panel')
     await expect(panel).toHaveAttribute('role', 'listbox')
 
@@ -139,19 +134,14 @@ test.describe('Accessibility', () => {
     const langTrigger = page.getByTestId('app-navbar-language-trigger')
     const langPanel = page.getByTestId('app-navbar-language-panel')
 
-    // Initially closed - aria-hidden="true"
     await expect(langPanel).toHaveAttribute('aria-hidden', 'true')
 
-    // Open the dropdown
     await langTrigger.click()
 
-    // Now open - aria-hidden="false"
     await expect(langPanel).toHaveAttribute('aria-hidden', 'false')
 
-    // Close by clicking again
     await langTrigger.click()
 
-    // Back to aria-hidden="true"
     await expect(langPanel).toHaveAttribute('aria-hidden', 'true')
   })
 

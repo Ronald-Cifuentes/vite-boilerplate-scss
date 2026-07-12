@@ -15,7 +15,6 @@ export type GpsResult =
  */
 export function requestGpsPosition(): Promise<GpsResult> {
   return new Promise(resolve => {
-    // Check if geolocation is available
     if (!navigator.geolocation) {
       resolve({ success: false, reason: 'unavailable' })
       return
@@ -32,7 +31,6 @@ export function requestGpsPosition(): Promise<GpsResult> {
         })
       },
       error => {
-        // Map error codes to failure reasons
         const reason: 'denied' | 'unavailable' | 'timeout' =
           error.code === error.PERMISSION_DENIED
             ? 'denied'

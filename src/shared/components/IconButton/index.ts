@@ -1,2 +1,2 @@
-export { IconButton, IconButton as default } from './IconButton'
+export { IconButton } from './IconButton'
 export type { IconButtonProps } from './interfaces'

@@ -1,35 +1,107 @@
-# bold-frontend
+# Vite Boilerplate SCSS
 
-Vite Boilerplate is a template that comes with the necessary preconfiguration for a profesional
-react project.
+A production-ready React template with i18n, theming, geo-detection, currency conversion, and
+mobile-first design.
 
-## What technologies does this project use?
+## Features
 
-| [<img width=190 src=https://cdn.rawgit.com/standard/standard/master/docs/logos/nodejs.png>](https://nodejs.org) | [<img width=190 src=https://cdn.rawgit.com/standard/standard/master/docs/logos/npm.png>](https://www.npmjs.com) | [<img width=190 src=https://github.com/Ronald-Cifuentes/vite-boilerplate/assets/59535805/397072f2-cbdc-41d0-abc2-6bd01d58b327>](https://nextjs.org/) | [<img width=190 src=https://user-images.githubusercontent.com/106139113/204473760-13746fa1-c52e-4fda-ab41-ff3f8ec3e9db.svg>](https://reactjs.org/) |
-| --------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+- **Internationalization**: 4 locales (en, es, zh, ja) with lazy-loaded CJK translations
+- **Geo-detection**: Automatic locale/region/currency via IP + optional GPS
+- **Currency conversion**: Live rates via BanRep SUAMECA + Banxico SIE (7 currencies)
+- **Theming**: Light/dark/system with OS preference following
+- **Mobile menu**: Fullscreen overlay at <768px with focus trap
+- **Accessibility**: WCAG 2.1 AA, aria-labels, screen reader announcements, prefers-reduced-motion
 
-| [<img width=190 src=https://user-images.githubusercontent.com/59535805/206945924-1cbf791a-2cfe-4ce0-af0f-3c8412d8cdd2.svg>](https://www.npmjs.com/package/license) | [<img width=190 src=https://user-images.githubusercontent.com/59535805/206946221-8cc5b214-4605-4e39-a1ca-eeaa36833abf.svg>](https://prettier.io/) | [<img width=190 src=https://user-images.githubusercontent.com/59535805/206931257-724a9801-906e-4009-82bf-d6a63f349298.svg>](https://eslint.org/) | [<img width=190 src=https://user-images.githubusercontent.com/59535805/206952616-2b759e75-c92a-49ac-8a02-c9a5c42672f9.svg>](https://www.typescriptlang.org/) |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+## Requirements
 
-| [<img width=190 src=https://user-images.githubusercontent.com/59535805/206962097-3e2203a1-a00f-4db1-9eae-b0cab850146c.svg>](https://jestjs.io/) | [<img width=190 src=https://user-images.githubusercontent.com/59535805/206964935-1fe8db08-4ffb-492b-adf4-4730acd031d5.svg>](https://testing-library.com/) |
-| ----------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+- Node.js 20+
+- pnpm (never npm)
 
-## How to use it in local?
-
-### 1. Download:
-
-```bash
-git clone
-```
-
-### 2. Install dependencies:
+### Environment Variables
 
 ```bash
-npm install
+# Optional: enables MXN exchange rates via Banxico
+VITE_BANXICO_TOKEN=your_token_here
 ```
 
-### 3. Run the project
+Copy `.env.example` to `.env` for local development.
 
-```bash
-npm run dev
+## Scripts
+
+| Command         | Description                               |
+| --------------- | ----------------------------------------- |
+| `pnpm dev`      | Start dev server (localhost:5173)         |
+| `pnpm build`    | TypeScript check + production build       |
+| `pnpm preview`  | Preview production build (localhost:4173) |
+| `pnpm test`     | Run Jest with 100% coverage               |
+| `pnpm test:e2e` | Run Playwright e2e tests                  |
+| `pnpm lint`     | ESLint check                              |
+| `pnpm format`   | Prettier format                           |
+
+## Project Structure
+
 ```
+src/
+  features/           # Feature modules (greeting, navbar, mobile-menu)
+  i18n/               # Internationalization (locales, signals, translations)
+  theme/              # Theming (signals, adapters, config)
+  region/             # Region/country management
+  currency/           # Currency selection and formatting
+  exchange-rates/     # Live rate fetching (BanRep, Banxico)
+  geo-detection/      # IP/GPS location detection
+  shared/             # Shared components (App, Dropdown, Button, ErrorBoundary)
+```
+
+Each component follows folder-by-feature:
+
+```
+ComponentName/
+  index.ts
+  ComponentName.tsx
+  ComponentName.spec.tsx
+  ComponentName.module.scss
+  interfaces.ts
+```
+
+## Documentation
+
+- [Architecture Contracts](docs/architecture/CONTRACTS.md) - Binding interfaces
+- [Performance Budgets](docs/performance/budgets.md) - Bundle size limits
+- [Requirements Checklist](docs/REQUIREMENTS-CHECKLIST.md) - Implementation tracking
+- ADRs in `docs/architecture/adr-*.md`
+
+### Adding a Feature
+
+See `docs/architecture/CONTRACTS.md` for the full process. Key steps:
+
+1. Create domain folder under `src/`
+2. Add translation keys to all 4 locale files
+3. Write tests first (TDD)
+4. Update CONTRACTS.md with new interfaces
+
+### Adding a Locale
+
+1. Add to `SupportedLocale` union in `src/i18n/types/Locale.ts`
+2. Add to `SUPPORTED_LOCALES` array and `LOCALE_METADATA` in `src/i18n/config/locales.ts`
+3. Create translation file in `src/i18n/translations/`
+4. Add lazy loader in `src/i18n/translations/index.ts` (for non-Latin scripts)
+5. Update tests
+
+## External Origins
+
+The app contacts these external services:
+
+| Origin                 | Purpose                                           |
+| ---------------------- | ------------------------------------------------- |
+| `www.banrep.gov.co`    | USD/EUR/GBP/CNY/JPY exchange rates (SUAMECA)      |
+| `www.banxico.org.mx`   | MXN exchange rates (SIE) - requires token         |
+| `api.country.is`       | IP-based geo-detection (primary)                  |
+| `get.geojs.io`         | IP-based geo-detection (fallback)                 |
+| `api.bigdatacloud.net` | GPS reverse geocoding (when user grants location) |
+
+**Privacy**: GPS coordinates are only sent when the user explicitly grants browser location
+permission.
+
+## License
+
+MIT

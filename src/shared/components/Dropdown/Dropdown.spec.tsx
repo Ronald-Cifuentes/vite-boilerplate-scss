@@ -313,18 +313,15 @@ describe('Dropdown', () => {
         </div>
       )
 
-      // Open the dropdown
       fireEvent.click(screen.getByTestId('dropdown-trigger'))
       expect(screen.getByTestId('dropdown-trigger')).toHaveAttribute('aria-expanded', 'true')
 
-      // Focus on an option
       const option = screen.getByTestId('dropdown-option-en')
       option.focus()
 
       // Fire Tab key - this should trigger handleOptionKeyDown which calls closeDropdown(false)
       fireEvent.keyDown(option, { key: 'Tab', code: 'Tab' })
 
-      // Dropdown should be closed
       expect(screen.getByTestId('dropdown-trigger')).toHaveAttribute('aria-expanded', 'false')
 
       // Verify trigger does NOT have focus (because returnFocus was false)
@@ -395,7 +392,6 @@ describe('Dropdown', () => {
   describe('Edge Cases', () => {
     it('should not open again if already open and key pressed', async () => {
       render(<Dropdown {...defaultProps} />)
-      // Open with click
       await userEvent.click(screen.getByTestId('dropdown-trigger'))
       expect(screen.getByTestId('dropdown-trigger')).toHaveAttribute('aria-expanded', 'true')
 

@@ -320,29 +320,28 @@ export interface TranslationDictionary {
     formattedDate: string
     formattedPrice: string
   }
-  languageSelector: {
-    label: string
-    changeLanguage: string
-  }
-  navbar: {
+  mobileMenu: {
+    openMenu: string
+    closeMenu: string
+    menuLabel: string
     language: string
-    theme: string
     country: string
     currency: string
+    theme: string
+  }
+  navbar: {
     selectLanguage: string
     selectCountry: string
     selectCurrency: string
     currentLanguage: string
     currentCountry: string
     currentCurrency: string
-    lightMode: string
-    darkMode: string
-    // NEW for ThemeModeButton (ADR-0009)
     themeModeLight: string
     themeModeDark: string
     themeModeSystem: string
   }
   currency: {
+    cop: string
     usd: string
     eur: string
     gbp: string
@@ -350,14 +349,19 @@ export interface TranslationDictionary {
     cny: string
     jpy: string
   }
+  rates: {
+    loading: string
+    stale: string
+    unavailable: string
+    partial: string
+  }
   a11y: {
-    languageSelectorDescription: string
-    currentLanguage: string
     languageChangedTo: string
     themeChangedTo: string
     countryChangedTo: string
     currencyChangedTo: string
     skipToContent: string
+    locationDetected: string
   }
 }
 
@@ -375,6 +379,11 @@ type FlattenKeys<T, Prefix extends string = ''> = T extends object
 **Note (v3.1.0):** `navbar.selectTheme` and `navbar.currentTheme` are REMOVED (ThemeDropdown
 deleted). New keys `navbar.themeModeLight`, `navbar.themeModeDark`, `navbar.themeModeSystem` added
 for ThemeModeButton aria-label.
+
+**Note (v3.5.x task-10 cleanup):** Dead keys removed: `languageSelector.*` (whole namespace),
+`navbar.{language,theme,country,currency,lightMode,darkMode}`,
+`a11y.{languageSelectorDescription, currentLanguage}`. Added missing keys to contract:
+`mobileMenu.*`, `rates.*`, `currency.cop`, `a11y.locationDetected`. Contract now matches code.
 
 ### 2.3 Translator Port
 
@@ -2334,13 +2343,27 @@ equivalents.
 
 **Requirements:**
 
-| ID         | Requirement                                   | Implementation                           |
-| ---------- | --------------------------------------------- | ---------------------------------------- |
-| SCROLL-001 | Overlay scrolls when content exceeds viewport | `overflow-y: auto` on `.menu`            |
-| SCROLL-002 | All items reachable at landscape 667x375      | E2E test with Tab navigation             |
-| SCROLL-003 | All items reachable at 320px class heights    | E2E test with Tab navigation             |
-| SCROLL-004 | Scrollbar styled consistent with DS           | `-webkit-scrollbar` rules with DS tokens |
-| SCROLL-005 | Focus-visible items scrolled into view        | `scrollIntoView({ block: 'nearest' })`   |
+| ID         | Requirement                                                | Implementation                                         |
+| ---------- | ---------------------------------------------------------- | ------------------------------------------------------ |
+| SCROLL-001 | Overlay scrolls when content exceeds viewport              | `overflow-y: auto` on `.menu`                          |
+| SCROLL-002 | All items reachable at landscape 667x375                   | E2E test with Tab navigation                           |
+| SCROLL-003 | All items reachable at 320px class heights                 | E2E test with Tab navigation                           |
+| SCROLL-004 | Scrollbar styled consistent with DS                        | `-webkit-scrollbar` rules with DS tokens               |
+| SCROLL-005 | Focus-visible items scrolled into view                     | `scrollIntoView({ block: 'nearest' })`                 |
+| SCROLL-006 | First AND last items reachable after expanding ANY submenu | margin-auto pattern (see note below) + e2e matrix test |
+
+**SCROLL-TOP-1 Fix (Task 11):** The menu overlay uses `display: flex` for centering. When content
+exceeds viewport height, `justify-content: center` distributes overflow ABOVE `flex-start`, making
+the top items unreachable (scrollTop has a floor of 0). The fix is the **margin-auto pattern**:
+
+1. The scroll container (`.menu`) uses `align-items: flex-start; justify-content: flex-start;`
+2. The inner content (`.nav`) uses `margin-block: auto;`
+
+This centers content when it fits the viewport, but top-aligns it when content overflows — keeping
+the first item always scrollable to. The gate is a 12-combo matrix test
+(`menu-scroll-reachability.spec.ts`): 3 submenus × 4 viewports, asserting both first AND last items
+reachable. Task 12 added wheel and touch gesture variants to catch regressions in gesture handling
+that programmatic scrolling would miss.
 
 ### 17.3 Menu Close on Breakpoint Cross Contract (ADR-0012 Amendment 2)
 

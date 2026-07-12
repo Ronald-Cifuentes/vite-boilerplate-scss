@@ -16,10 +16,6 @@ export const zh: TranslationDictionary = {
     formattedDate: '今天是',
     formattedPrice: '示例价格',
   },
-  languageSelector: {
-    label: '语言',
-    changeLanguage: '切换语言',
-  },
   mobileMenu: {
     openMenu: '打开菜单',
     closeMenu: '关闭菜单',
@@ -30,18 +26,12 @@ export const zh: TranslationDictionary = {
     theme: '主题',
   },
   navbar: {
-    language: '语言',
-    theme: '主题',
-    country: '国家',
-    currency: '货币',
     selectLanguage: '选择语言',
     selectCountry: '选择国家',
     selectCurrency: '选择货币',
     currentLanguage: '当前语言',
     currentCountry: '当前国家',
     currentCurrency: '当前货币',
-    lightMode: '浅色模式',
-    darkMode: '深色模式',
     themeModeLight: '浅色模式',
     themeModeDark: '深色模式',
     themeModeSystem: '系统主题',
@@ -62,13 +52,15 @@ export const zh: TranslationDictionary = {
     partial: '部分汇率不可用',
   },
   a11y: {
-    languageSelectorDescription: '选择您偏好的语言',
-    currentLanguage: '当前语言',
     languageChangedTo: '语言已切换为',
     themeChangedTo: '主题已切换为',
     countryChangedTo: '国家已切换为',
     currencyChangedTo: '货币已切换为',
     skipToContent: '跳至主要内容',
     locationDetected: '位置已检测',
+  },
+  error: {
+    title: '错误',
+    reload: '重试',
   },
 }

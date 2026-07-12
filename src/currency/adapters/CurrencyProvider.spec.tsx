@@ -44,7 +44,6 @@ describe('CurrencyProvider', () => {
     currencySignal.value = 'USD'
     userOverriddenSignal.value = false
     resetCurrencyOverride()
-    // Reset region to US
     setRegion('US')
   })
 
@@ -112,7 +111,6 @@ describe('CurrencyProvider', () => {
 
     expect(screen.getByTestId('currency')).toHaveTextContent('USD')
 
-    // Change region
     act(() => {
       setRegion('GB')
     })
@@ -137,7 +135,6 @@ describe('CurrencyProvider', () => {
 
     expect(screen.getByTestId('currency')).toHaveTextContent('EUR')
 
-    // Change region
     act(() => {
       setRegion('GB')
     })
@@ -239,10 +236,8 @@ describe('createCleanupCallback', () => {
 
     const cleanup = createCleanupCallback(disposeRef)
 
-    // Verify it returns a function
     expect(typeof cleanup).toBe('function')
 
-    // Call the cleanup function
     cleanup()
 
     // Verify it called the dispose

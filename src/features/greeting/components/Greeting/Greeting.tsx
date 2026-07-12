@@ -57,5 +57,3 @@ export const Greeting: FC<GreetingProps> = ({ dataTestId = 'greeting', className
     </div>
   )
 }
-
-export default Greeting

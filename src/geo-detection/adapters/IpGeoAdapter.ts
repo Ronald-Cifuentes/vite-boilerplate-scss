@@ -44,12 +44,10 @@ async function fetchFromProvider(url: string): Promise<IpGeoResult> {
  * ADR-0014: api.country.is primary, get.geojs.io fallback
  */
 export async function getIpCountry(): Promise<IpGeoResult> {
-  // Try primary provider first
   const primaryResult = await fetchFromProvider(IP_PRIMARY_URL)
   if (primaryResult.success) {
     return primaryResult
   }
 
-  // Fallback to secondary provider
   return fetchFromProvider(IP_FALLBACK_URL)
 }

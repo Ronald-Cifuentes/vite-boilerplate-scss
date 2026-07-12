@@ -53,7 +53,6 @@ test.describe('Locale Persistence Journey', () => {
     await langTrigger.click()
     await page.getByTestId('app-navbar-language-option-es').click()
 
-    // Verify localStorage was updated
     const storedLocale = await page.evaluate(() => localStorage.getItem('app-locale'))
     expect(storedLocale).toBe('es')
 

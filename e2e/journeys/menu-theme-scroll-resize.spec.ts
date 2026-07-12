@@ -1,12 +1,5 @@
 import { test, expect } from '../helpers/fixtures'
 
-/**
- * E2E tests for Task 9 menu items:
- * - Theme-aware menu colors (items 1+2)
- * - Menu scroll (item 4)
- * - Menu close on breakpoint cross (item 5)
- */
-
 test.describe('Menu Theme Colors (ADR-0012 Amendment 1)', () => {
   test.describe('Light theme', () => {
     test.beforeEach(async ({ page }) => {
@@ -18,7 +11,6 @@ test.describe('Menu Theme Colors (ADR-0012 Amendment 1)', () => {
     })
 
     test('menu overlay is light (gray-50 family)', async ({ page }) => {
-      // Open menu
       await page.getByTestId('app-navbar-hamburger').click()
       await page.waitForTimeout(300)
 
@@ -34,11 +26,9 @@ test.describe('Menu Theme Colors (ADR-0012 Amendment 1)', () => {
     })
 
     test('X bars contrast light overlay (dark highlight)', async ({ page }) => {
-      // Open menu
       await page.getByTestId('app-navbar-hamburger').click()
       await page.waitForTimeout(300)
 
-      // Get computed color of the bars
       const barsColor = await page.evaluate(() => {
         const hamburger = document.querySelector(
           '[data-testid="app-navbar-hamburger"]'
@@ -64,7 +54,6 @@ test.describe('Menu Theme Colors (ADR-0012 Amendment 1)', () => {
     })
 
     test('menu overlay is dark (#18181A)', async ({ page }) => {
-      // Open menu
       await page.getByTestId('app-navbar-hamburger').click()
       await page.waitForTimeout(300)
 
@@ -79,7 +68,6 @@ test.describe('Menu Theme Colors (ADR-0012 Amendment 1)', () => {
     })
 
     test('X bars contrast dark overlay (light highlight)', async ({ page }) => {
-      // Open menu
       await page.getByTestId('app-navbar-hamburger').click()
       await page.waitForTimeout(300)
 
@@ -105,7 +93,6 @@ test.describe('Menu Scroll (ADR-0012 Amendment 2)', () => {
     await page.setViewportSize({ width: 667, height: 375 })
     await page.goto('/')
 
-    // Open menu
     await page.getByTestId('app-navbar-hamburger').click()
     await page.waitForTimeout(300)
 
@@ -148,7 +135,6 @@ test.describe('Menu Scroll (ADR-0012 Amendment 2)', () => {
     await page.setViewportSize({ width: 320, height: 480 })
     await page.goto('/')
 
-    // Open menu
     await page.getByTestId('app-navbar-hamburger').click()
     await page.waitForTimeout(300)
 
@@ -168,11 +154,9 @@ test.describe('Menu Scroll (ADR-0012 Amendment 2)', () => {
     await lastOption.focus()
     await page.waitForTimeout(100)
 
-    // Get the bounding box - should be within viewport
     const box = await lastOption.boundingBox()
     expect(box).not.toBeNull()
 
-    // Verify element is within viewport bounds
     const viewportHeight = 480
     expect(box!.y).toBeGreaterThanOrEqual(0)
     expect(box!.y + box!.height).toBeLessThanOrEqual(viewportHeight)
@@ -183,7 +167,6 @@ test.describe('Menu Scroll (ADR-0012 Amendment 2)', () => {
     await page.setViewportSize({ width: 320, height: 480 })
     await page.goto('/')
 
-    // Open menu
     await page.getByTestId('app-navbar-hamburger').click()
     await page.waitForTimeout(300)
 
@@ -191,12 +174,10 @@ test.describe('Menu Scroll (ADR-0012 Amendment 2)', () => {
     await page.getByTestId('app-mobile-menu-item-currency').click()
     await page.waitForTimeout(200)
 
-    // Focus the last currency option (JPY)
     const lastOption = page.getByTestId('app-mobile-menu-submenu-currency-option-JPY')
     await lastOption.focus()
     await page.waitForTimeout(200)
 
-    // Verify it's in view after focus
     const box = await lastOption.boundingBox()
     expect(box).not.toBeNull()
     expect(box!.y).toBeGreaterThanOrEqual(0)
@@ -206,16 +187,13 @@ test.describe('Menu Scroll (ADR-0012 Amendment 2)', () => {
 
 test.describe('Menu Close on Breakpoint Cross (ADR-0012 Amendment 2)', () => {
   test('resize from mobile to desktop closes menu and releases scroll lock', async ({ page }) => {
-    // Start at mobile width
     await page.setViewportSize({ width: 375, height: 667 })
     await page.goto('/')
 
-    // Open menu
     const hamburger = page.getByTestId('app-navbar-hamburger')
     await hamburger.click()
     await page.waitForTimeout(300)
 
-    // Verify menu is open and scroll is locked
     const menu = page.getByTestId('app-mobile-menu')
     await expect(menu).toBeVisible()
 
@@ -229,14 +207,11 @@ test.describe('Menu Close on Breakpoint Cross (ADR-0012 Amendment 2)', () => {
     // Menu should be closed (removed from DOM since isOpen is false)
     await expect(menu).not.toBeVisible()
 
-    // Scroll lock should be released
     bodyOverflow = await page.evaluate(() => getComputedStyle(document.body).overflow)
     expect(bodyOverflow).not.toBe('hidden')
 
-    // Hamburger should be hidden at desktop
     await expect(hamburger).not.toBeVisible()
 
-    // Inline controls should be visible
     await expect(page.getByTestId('app-navbar-language-trigger')).toBeVisible()
   })
 
@@ -244,15 +219,12 @@ test.describe('Menu Close on Breakpoint Cross (ADR-0012 Amendment 2)', () => {
     await page.setViewportSize({ width: 375, height: 667 })
     await page.goto('/')
 
-    // Open menu
     await page.getByTestId('app-navbar-hamburger').click()
     await page.waitForTimeout(300)
 
-    // Resize to desktop
     await page.setViewportSize({ width: 1024, height: 900 })
     await page.waitForTimeout(500)
 
-    // Verify no overlay elements remain visible
     const overlayCount = await page.evaluate(() => {
       const elements = document.querySelectorAll('[data-testid="app-mobile-menu"]')
       let visibleCount = 0
@@ -272,12 +244,10 @@ test.describe('Menu Close on Breakpoint Cross (ADR-0012 Amendment 2)', () => {
     await page.setViewportSize({ width: 375, height: 667 })
     await page.goto('/')
 
-    // Open menu
     const hamburger = page.getByTestId('app-navbar-hamburger')
     await hamburger.click()
     await page.waitForTimeout(300)
 
-    // Verify aria-expanded is true
     await expect(hamburger).toHaveAttribute('aria-expanded', 'true')
 
     // Resize to desktop then back to mobile
@@ -286,7 +256,6 @@ test.describe('Menu Close on Breakpoint Cross (ADR-0012 Amendment 2)', () => {
     await page.setViewportSize({ width: 375, height: 667 })
     await page.waitForTimeout(300)
 
-    // Hamburger should be visible and aria-expanded should be false
     await expect(hamburger).toBeVisible()
     await expect(hamburger).toHaveAttribute('aria-expanded', 'false')
 
@@ -303,23 +272,50 @@ test.describe('Menu Close on Breakpoint Cross (ADR-0012 Amendment 2)', () => {
     await page.setViewportSize({ width: 375, height: 667 })
     await page.goto('/')
 
-    // Open menu
     const hamburger = page.getByTestId('app-navbar-hamburger')
     await hamburger.click()
     await page.waitForTimeout(300)
 
-    // Verify menu is open
     await expect(page.getByTestId('app-mobile-menu')).toBeVisible()
 
     // Resize to desktop (cross 768px boundary)
     await page.setViewportSize({ width: 1024, height: 900 })
     await page.waitForTimeout(500)
 
-    // Menu should be closed
     await expect(page.getByTestId('app-mobile-menu')).not.toBeVisible()
 
     // Focus should be on the first visible inline control (language trigger)
     const languageTrigger = page.getByTestId('app-navbar-language-trigger')
     await expect(languageTrigger).toBeFocused()
   })
+})
+
+test.describe('App background matches mobile-menu overlay (task 13)', () => {
+  for (const theme of ['light', 'dark'] as const) {
+    test(`${theme}: body background equals menu overlay backdrop`, async ({ page }) => {
+      await page.setViewportSize({ width: 375, height: 667 })
+      await page.goto('/')
+      await page.evaluate(t => localStorage.setItem('app-theme', t), theme)
+      await page.reload()
+      await page.getByTestId('app-navbar-hamburger').click()
+      await expect(page.getByTestId('app-mobile-menu')).toBeVisible()
+      const colors = await page.evaluate(() => {
+        const bodyBg = getComputedStyle(document.body).backgroundColor
+        const menu = document.querySelector('[data-testid="app-mobile-menu"]') as HTMLElement
+        const bandBg = getComputedStyle(menu, '::before').backgroundColor
+        const overlayVar = getComputedStyle(menu)
+          .getPropertyValue('--color-mobile-menu-overlay')
+          .trim()
+        const baseVar = getComputedStyle(document.body)
+          .getPropertyValue('--color-surface-base')
+          .trim()
+        return { bodyBg, bandBg, overlayVar, baseVar }
+      })
+      // same background by construction: overlay token aliases the surface token
+      // (getComputedStyle returns the SUBSTITUTED custom-property value, so we
+      // assert resolved-token equality, not source text)
+      expect(colors.bodyBg).toBe(colors.bandBg)
+      expect(colors.overlayVar).toBe(colors.baseVar)
+    })
+  }
 })

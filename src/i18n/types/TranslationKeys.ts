@@ -8,10 +8,6 @@ export interface TranslationDictionary {
     formattedDate: string
     formattedPrice: string
   }
-  languageSelector: {
-    label: string
-    changeLanguage: string
-  }
   mobileMenu: {
     openMenu: string
     closeMenu: string
@@ -22,18 +18,12 @@ export interface TranslationDictionary {
     theme: string
   }
   navbar: {
-    language: string
-    theme: string
-    country: string
-    currency: string
     selectLanguage: string
     selectCountry: string
     selectCurrency: string
     currentLanguage: string
     currentCountry: string
     currentCurrency: string
-    lightMode: string
-    darkMode: string
     // ThemeModeButton aria-labels (ADR-0009)
     themeModeLight: string
     themeModeDark: string
@@ -55,14 +45,16 @@ export interface TranslationDictionary {
     partial: string
   }
   a11y: {
-    languageSelectorDescription: string
-    currentLanguage: string
     languageChangedTo: string
     themeChangedTo: string
     countryChangedTo: string
     currencyChangedTo: string
     skipToContent: string
     locationDetected: string
+  }
+  error: {
+    title: string
+    reload: string
   }
 }
 

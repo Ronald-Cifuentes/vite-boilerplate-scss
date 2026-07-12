@@ -20,8 +20,11 @@ function TestWrapper({ children }: { children: React.ReactNode }): React.JSX.Ele
 describe('CountryDropdown', () => {
   beforeEach(() => {
     localStorage.clear()
-    regionSignal.value = 'US'
-    resetAnnouncements()
+    // Wrap signal mutations in act
+    act(() => {
+      regionSignal.value = 'US'
+      resetAnnouncements()
+    })
     document.body.innerHTML = ''
   })
 

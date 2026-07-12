@@ -1,5 +1,9 @@
 import { Page, BrowserContext } from '@playwright/test'
 
+// RFC 5737 TEST-NET-1 address — reserved for documentation/testing (SonarQube
+// S1313-safe); the mocked geo providers echo a client IP, any value works.
+const MOCK_CLIENT_IP = '192.0.2.1'
+
 /**
  * E2E mock helpers for geo detection per ADR-0014 mocking seam
  */
@@ -15,14 +19,14 @@ export async function mockIpCountry(page: Page, countryCode: string): Promise<vo
     route.fulfill({
       status: 200,
       contentType: 'application/json',
-      body: JSON.stringify({ ip: '1.2.3.4', country: countryCode }),
+      body: JSON.stringify({ ip: MOCK_CLIENT_IP, country: countryCode }),
     })
   })
   await page.route('https://get.geojs.io/v1/ip/country.json', route => {
     route.fulfill({
       status: 200,
       contentType: 'application/json',
-      body: JSON.stringify({ country: countryCode, ip: '1.2.3.4' }),
+      body: JSON.stringify({ country: countryCode, ip: MOCK_CLIENT_IP }),
     })
   })
 }
@@ -81,36 +85,6 @@ export async function mockGpsDenied(context: BrowserContext): Promise<void> {
   await context.clearPermissions()
 }
 
-// Composite helpers for common scenarios
-
-/**
- * Setup mocks for first-visit GPS scenario
- * GPS granted with coords, reverse geocode returns country
- */
-export async function mockGpsFirstVisit(
-  context: BrowserContext,
-  page: Page,
-  coords: { lat: number; lng: number },
-  countryCode: string
-): Promise<void> {
-  await mockGpsGranted(context, coords)
-  await mockReverseGeocode(page, countryCode)
-  // Also mock IP as fallback (different country to verify precedence)
-  await mockIpCountry(page, 'US')
-}
-
-/**
- * Setup mocks for first-visit IP-only scenario (GPS denied)
- */
-export async function mockIpOnlyFirstVisit(
-  context: BrowserContext,
-  page: Page,
-  countryCode: string
-): Promise<void> {
-  await mockGpsDenied(context)
-  await mockIpCountry(page, countryCode)
-}
-
 /**
  * Setup slow mock for detection (to test non-blocking)
  */
@@ -120,7 +94,7 @@ export async function mockSlowDetection(page: Page, delayMs: number = 2000): Pro
     route.fulfill({
       status: 200,
       contentType: 'application/json',
-      body: JSON.stringify({ ip: '1.2.3.4', country: 'CO' }),
+      body: JSON.stringify({ ip: MOCK_CLIENT_IP, country: 'CO' }),
     })
   })
 }

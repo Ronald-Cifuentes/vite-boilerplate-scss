@@ -62,7 +62,6 @@ describe('Currency Side Effects', () => {
       currencySignal.value = 'GBP'
       expect(loadCurrency()).toBe('GBP')
 
-      // Dispose
       dispose()
 
       // Clear localStorage and change signal

@@ -1,2 +1,2 @@
-export { Navbar, Navbar as default } from './Navbar'
+export { Navbar } from './Navbar'
 export type { NavbarProps } from './interfaces'

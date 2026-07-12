@@ -87,7 +87,7 @@ describe('useGeoDetection - detection and callbacks', () => {
     })
   })
 
-  it('calls onAnnounce when detection succeeds with non-default source', async () => {
+  it('calls onAnnounce with structured i18n data when detection succeeds', async () => {
     mockDetect.mockResolvedValue({
       locale: 'ja',
       region: 'JP',
@@ -100,7 +100,10 @@ describe('useGeoDetection - detection and callbacks', () => {
     renderHook(() => useGeoDetection({ onAnnounce }))
 
     await waitFor(() => {
-      expect(onAnnounce).toHaveBeenCalledWith('Detected location: JP')
+      expect(onAnnounce).toHaveBeenCalledWith({
+        key: 'a11y.locationDetected',
+        region: 'JP',
+      })
     })
   })
 

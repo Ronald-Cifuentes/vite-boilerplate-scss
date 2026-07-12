@@ -13,7 +13,6 @@ import {
 } from '../../signals/announcement-signal'
 import type { CurrencyDropdownProps } from './interfaces'
 
-// Map currencies to their icons
 const CURRENCY_ICONS: Record<SupportedCurrency, typeof MdAttachMoney> = {
   COP: MdAttachMoney, // COP uses dollar sign icon (same as USD/MXN)
   USD: MdAttachMoney,
@@ -21,7 +20,7 @@ const CURRENCY_ICONS: Record<SupportedCurrency, typeof MdAttachMoney> = {
   GBP: MdCurrencyPound,
   MXN: MdAttachMoney, // MXN uses same icon as USD (dollar sign)
   CNY: MdCurrencyYen, // CNY uses yen icon (both CNY/JPY use yen symbol variations)
-  JPY: MdCurrencyYen, // JPY uses yen icon
+  JPY: MdCurrencyYen,
 }
 
 /**
@@ -52,7 +51,6 @@ export const CurrencyDropdown: FC<CurrencyDropdownProps> = ({
       setCurrency(newCurrency)
       onCurrencyChange?.(newCurrency)
 
-      // Announce the change
       const currencyName = t(`currency.${newCurrency.toLowerCase()}` as 'currency.usd')
       setCurrencyAnnouncement(`${t('a11y.currencyChangedTo')} ${currencyName}`)
     },
@@ -81,5 +79,3 @@ export const CurrencyDropdown: FC<CurrencyDropdownProps> = ({
     </>
   )
 }
-
-export default CurrencyDropdown

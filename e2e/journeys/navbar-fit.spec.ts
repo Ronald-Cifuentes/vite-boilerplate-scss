@@ -1,5 +1,5 @@
 /**
- * Navbar Fit Journey - Task 8 permanent regression gate
+ * Navbar Fit Journey - permanent regression gate
  *
  * Verifies:
  * 1. No horizontal scrollbar at any desktop viewport (closed panels don't overflow)
@@ -88,7 +88,6 @@ test.describe('Navbar Fit - Pixel Perfect Gate', () => {
           await page.setViewportSize({ width, height: 900 })
           await page.goto('/')
 
-          // Set theme
           await page.evaluate(t => localStorage.setItem('app-theme', t), theme)
           await page.reload()
           await page.waitForLoadState('domcontentloaded')
@@ -119,7 +118,6 @@ test.describe('Navbar Fit - Pixel Perfect Gate', () => {
           await page.setViewportSize({ width, height: 900 })
           await page.goto('/')
 
-          // Set theme
           await page.evaluate(t => localStorage.setItem('app-theme', t), theme)
           await page.reload()
           await page.waitForLoadState('domcontentloaded')
@@ -136,7 +134,6 @@ test.describe('Navbar Fit - Pixel Perfect Gate', () => {
           for (const triggerId of dropdownTriggers) {
             const trigger = page.getByTestId(triggerId)
             if (await trigger.isVisible()) {
-              // Open
               await trigger.click()
               await expect(trigger).toHaveAttribute('aria-expanded', 'true')
               // Close by clicking outside
@@ -159,26 +156,21 @@ test.describe('Navbar Fit - Pixel Perfect Gate', () => {
         await page.setViewportSize({ width: 375, height: 900 })
         await page.goto('/')
 
-        // Set theme
         await page.evaluate(t => localStorage.setItem('app-theme', t), theme)
         await page.reload()
         await page.waitForLoadState('domcontentloaded')
 
         const ctx = `${theme}/375px mobile-menu-cycle`
 
-        // Initial check
         await assertNoHorizontalScroll(page, ctx + ' before')
 
-        // Open mobile menu
         const hamburger = page.getByTestId('app-navbar-hamburger')
         await expect(hamburger).toBeVisible()
         await hamburger.click()
 
-        // Wait for menu to be visible
         const menu = page.getByTestId('app-mobile-menu')
         await expect(menu).toBeVisible()
 
-        // Close menu
         const closeBtn = page.getByRole('button', { name: /close/i })
         await closeBtn.click()
         await expect(menu).not.toBeVisible()
@@ -199,7 +191,6 @@ test.describe('Navbar Fit - Pixel Perfect Gate', () => {
       // The navbar is position:static (in-flow), so with transparent background
       // the page background should be visible behind it
 
-      // Check both themes
       for (const theme of THEMES) {
         await page.evaluate(t => localStorage.setItem('app-theme', t), theme)
         await page.reload()
@@ -252,7 +243,6 @@ test.describe('Navbar Fit - Pixel Perfect Gate', () => {
       const trigger = page.getByTestId('app-navbar-language-trigger')
       const panel = page.getByTestId('app-navbar-language-panel')
 
-      // Open dropdown
       await trigger.click()
       await expect(trigger).toHaveAttribute('aria-expanded', 'true')
       await expect(panel).toBeVisible()
@@ -291,7 +281,6 @@ test.describe('Navbar Fit - Pixel Perfect Gate', () => {
       await trigger.click()
       await expect(trigger).toHaveAttribute('aria-expanded', 'true')
 
-      // Close it
       await page.mouse.click(10, 10)
       await expect(trigger).toHaveAttribute('aria-expanded', 'false')
 
@@ -311,11 +300,9 @@ test.describe('Navbar Fit - Pixel Perfect Gate', () => {
 
       const trigger = page.getByTestId('app-navbar-language-trigger')
 
-      // Open dropdown
       await trigger.click()
       await expect(trigger).toHaveAttribute('aria-expanded', 'true')
 
-      // Get panel position
       const panel = page.getByTestId('app-navbar-language-panel')
       const panelBox = await panel.boundingBox()
       expect(panelBox).not.toBeNull()
@@ -331,5 +318,67 @@ test.describe('Navbar Fit - Pixel Perfect Gate', () => {
       // Should still be closed (click went through to body, not intercepted by closing panel)
       await expect(trigger).toHaveAttribute('aria-expanded', 'false')
     })
+  })
+})
+
+test.describe('Navbar transparency + scroll-aware shadow (task 21)', () => {
+  for (const theme of ['light', 'dark'] as const) {
+    test(`${theme}: navbar has no background, no border`, async ({ page }) => {
+      await page.setViewportSize({ width: 1280, height: 900 })
+      await page.goto('/')
+      await page.evaluate(t => localStorage.setItem('app-theme', t), theme)
+      await page.reload()
+      const styles = await page.evaluate(() => {
+        const nav = document.querySelector('nav') as HTMLElement
+        const s = getComputedStyle(nav)
+        return {
+          bg: s.backgroundColor,
+          borderBottom: s.borderBottomWidth,
+          borderTop: s.borderTopWidth,
+        }
+      })
+      expect(styles.bg).toBe('rgba(0, 0, 0, 0)')
+      expect(styles.borderBottom).toBe('0px')
+      expect(styles.borderTop).toBe('0px')
+    })
+  }
+
+  test('no shadow when the document has nothing to scroll', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 })
+    await page.goto('/')
+    const result = await page.evaluate(() => ({
+      scrollable: document.documentElement.scrollHeight > document.documentElement.clientHeight,
+      shadow: getComputedStyle(document.querySelector('nav') as HTMLElement).boxShadow,
+    }))
+    // self-validating precondition: this viewport must NOT be scrollable
+    expect(result.scrollable).toBe(false)
+    expect(result.shadow).toBe('none')
+  })
+
+  test('shadow present when the document has scrollable content', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 300 })
+    await page.goto('/')
+    // The app's own content never overflows the document (root layout manages
+    // height), so create the condition the contract governs: a page variant
+    // with enough content to scroll.
+    const scrollable = await page.evaluate(() => {
+      const filler = document.createElement('div')
+      filler.style.height = '200vh'
+      document.body.appendChild(filler)
+      return document.documentElement.scrollHeight > document.documentElement.clientHeight
+    })
+    // self-validating precondition: the document MUST now be scrollable
+    expect(scrollable).toBe(true)
+    // scroll-driven animations activate on a subsequent frame — poll the
+    // computed style instead of racing the animation engine
+    await expect
+      .poll(
+        () =>
+          page.evaluate(
+            () => getComputedStyle(document.querySelector('nav') as HTMLElement).boxShadow
+          ),
+        { timeout: 3000 }
+      )
+      .not.toBe('none')
   })
 })

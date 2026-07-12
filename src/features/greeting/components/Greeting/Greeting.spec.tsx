@@ -1,4 +1,4 @@
-import { render, screen, RenderResult, waitFor } from '@testing-library/react'
+import { render, screen, RenderResult, waitFor, act } from '@testing-library/react'
 import { Greeting } from './Greeting'
 import { I18nProvider } from '../../../../i18n'
 import { localeSignal } from '../../../../i18n/signals/locale-signal'
@@ -8,26 +8,21 @@ import { ThemeProvider } from '../../../../theme'
 import { CurrencyProvider, type SupportedCurrency } from '../../../../currency'
 import { currencySignal, userOverriddenSignal } from '../../../../currency/signals/currency-signal'
 import { ratesStateSignal } from '../../../../exchange-rates/signals/rates-signal'
+import { DEFAULT_MOCK_RATES } from '../../.././../shared/test/act-utils'
 
 describe('Greeting', () => {
   beforeEach(() => {
-    // Reset signals before each test
+    // Reset signals before each test - wrapped in act
     localStorage.clear()
-    localeSignal.value = 'en'
-    regionSignal.value = 'US'
-    currencySignal.value = 'USD'
-    userOverriddenSignal.value = false
-    // Set mock rates for testing - these produce the exact user example values
-    // $4,500 COP = $1.37 USD = EUR1.20 EUR = MX$23.94 MXN = GBP1.02 GBP
-    ratesStateSignal.value = {
-      status: 'live',
-      rates: {
-        USD: { copPerUnit: 3284.6715, sourceDate: new Date(), retrievedAt: new Date() },
-        EUR: { copPerUnit: 3750.0, sourceDate: new Date(), retrievedAt: new Date() },
-        GBP: { copPerUnit: 4411.7647, sourceDate: new Date(), retrievedAt: new Date() },
-        MXN: { copPerUnit: 187.9699, sourceDate: new Date(), retrievedAt: new Date() },
-      },
-    }
+    act(() => {
+      localeSignal.value = 'en'
+      regionSignal.value = 'US'
+      currencySignal.value = 'USD'
+      userOverriddenSignal.value = false
+      // Set mock rates for testing - these produce the exact user example values
+      // $4,500 COP = $1.37 USD = EUR1.20 EUR = MX$23.94 MXN = GBP1.02 GBP
+      ratesStateSignal.value = DEFAULT_MOCK_RATES
+    })
   })
 
   interface RenderOptions {
@@ -132,11 +127,13 @@ describe('Greeting', () => {
 
   describe('Given rates are unavailable', () => {
     it('Then it falls back to COP display', () => {
-      ratesStateSignal.value = {
-        status: 'unavailable',
-        rates: {},
-        error: 'All rate sources failed',
-      }
+      act(() => {
+        ratesStateSignal.value = {
+          status: 'unavailable',
+          rates: {},
+          error: 'All rate sources failed',
+        }
+      })
 
       renderWithProviders({ locale: 'en', currency: 'USD' })
 
@@ -146,11 +143,13 @@ describe('Greeting', () => {
     })
 
     it('Then it shows unavailable status indicator', () => {
-      ratesStateSignal.value = {
-        status: 'unavailable',
-        rates: {},
-        error: 'All rate sources failed',
-      }
+      act(() => {
+        ratesStateSignal.value = {
+          status: 'unavailable',
+          rates: {},
+          error: 'All rate sources failed',
+        }
+      })
 
       renderWithProviders({ locale: 'en', currency: 'USD' })
 
@@ -161,10 +160,12 @@ describe('Greeting', () => {
 
   describe('Given rates are loading', () => {
     it('Then it shows loading status indicator', () => {
-      ratesStateSignal.value = {
-        status: 'loading',
-        rates: {},
-      }
+      act(() => {
+        ratesStateSignal.value = {
+          status: 'loading',
+          rates: {},
+        }
+      })
 
       renderWithProviders({ locale: 'en', currency: 'USD' })
 
@@ -175,13 +176,15 @@ describe('Greeting', () => {
 
   describe('Given rates are stale', () => {
     it('Then it shows stale status indicator with hours and minutes', () => {
-      ratesStateSignal.value = {
-        status: 'stale',
-        rates: {
-          USD: { copPerUnit: 3284.6715, sourceDate: new Date(), retrievedAt: new Date() },
-        },
-        staleAgeMs: 2 * 60 * 60 * 1000 + 30 * 60 * 1000, // 2h 30m
-      }
+      act(() => {
+        ratesStateSignal.value = {
+          status: 'stale',
+          rates: {
+            USD: { copPerUnit: 3284.6715, sourceDate: new Date(), retrievedAt: new Date() },
+          },
+          staleAgeMs: 2 * 60 * 60 * 1000 + 30 * 60 * 1000, // 2h 30m
+        }
+      })
 
       renderWithProviders({ locale: 'en', currency: 'USD' })
 
@@ -190,13 +193,15 @@ describe('Greeting', () => {
     })
 
     it('Then it shows stale status indicator with only minutes when less than 1 hour', () => {
-      ratesStateSignal.value = {
-        status: 'stale',
-        rates: {
-          USD: { copPerUnit: 3284.6715, sourceDate: new Date(), retrievedAt: new Date() },
-        },
-        staleAgeMs: 45 * 60 * 1000, // 45 minutes
-      }
+      act(() => {
+        ratesStateSignal.value = {
+          status: 'stale',
+          rates: {
+            USD: { copPerUnit: 3284.6715, sourceDate: new Date(), retrievedAt: new Date() },
+          },
+          staleAgeMs: 45 * 60 * 1000, // 45 minutes
+        }
+      })
 
       renderWithProviders({ locale: 'en', currency: 'USD' })
 
@@ -205,13 +210,15 @@ describe('Greeting', () => {
     })
 
     it('Then it shows stale status indicator with fallback when staleAgeMs is missing', () => {
-      ratesStateSignal.value = {
-        status: 'stale',
-        rates: {
-          USD: { copPerUnit: 3284.6715, sourceDate: new Date(), retrievedAt: new Date() },
-        },
-        // No staleAgeMs
-      }
+      act(() => {
+        ratesStateSignal.value = {
+          status: 'stale',
+          rates: {
+            USD: { copPerUnit: 3284.6715, sourceDate: new Date(), retrievedAt: new Date() },
+          },
+          // No staleAgeMs
+        }
+      })
 
       renderWithProviders({ locale: 'en', currency: 'USD' })
 
@@ -222,13 +229,15 @@ describe('Greeting', () => {
 
   describe('Given rates are partial', () => {
     it('Then it shows partial status indicator', () => {
-      ratesStateSignal.value = {
-        status: 'partial',
-        rates: {
-          USD: { copPerUnit: 3284.6715, sourceDate: new Date(), retrievedAt: new Date() },
-        },
-        unavailableCurrencies: ['EUR', 'GBP', 'MXN'],
-      }
+      act(() => {
+        ratesStateSignal.value = {
+          status: 'partial',
+          rates: {
+            USD: { copPerUnit: 3284.6715, sourceDate: new Date(), retrievedAt: new Date() },
+          },
+          unavailableCurrencies: ['EUR', 'GBP', 'MXN'],
+        }
+      })
 
       renderWithProviders({ locale: 'en', currency: 'USD' })
 

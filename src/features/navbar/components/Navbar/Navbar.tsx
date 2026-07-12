@@ -28,7 +28,6 @@ export const Navbar: FC<NavbarProps> = ({ dataTestId = 'navbar', className }) =>
   return (
     <>
       <nav className={classNames} data-testid={dataTestId} aria-label='Settings'>
-        {/* Mobile: hamburger button (visible < 768px) */}
         <div className={styles.mobileControls}>
           <HamburgerButton
             isOpen={mobileMenuOpenSignal.value}
@@ -38,7 +37,6 @@ export const Navbar: FC<NavbarProps> = ({ dataTestId = 'navbar', className }) =>
           />
         </div>
 
-        {/* Desktop: inline controls (visible >= 768px) */}
         <div className={styles.desktopControls}>
           <LanguageDropdown dataTestId={`${dataTestId}-language`} />
           <ThemeModeButton dataTestId={`${dataTestId}-theme`} />
@@ -47,7 +45,6 @@ export const Navbar: FC<NavbarProps> = ({ dataTestId = 'navbar', className }) =>
         </div>
       </nav>
 
-      {/* Mobile menu (fullscreen overlay) */}
       <MobileMenu
         isOpen={mobileMenuOpenSignal.value}
         onClose={closeMobileMenu}
@@ -57,5 +54,3 @@ export const Navbar: FC<NavbarProps> = ({ dataTestId = 'navbar', className }) =>
     </>
   )
 }
-
-export default Navbar

@@ -21,5 +21,3 @@ export const I18nProvider: FC<I18nProviderProps> = ({ children, initialLocale })
   })
   return <>{children}</>
 }
-
-export default I18nProvider

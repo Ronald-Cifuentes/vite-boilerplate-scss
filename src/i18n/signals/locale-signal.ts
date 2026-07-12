@@ -22,7 +22,7 @@ export const localeLoadingSignal = signal<boolean>(false)
  * Signal to force dictionary recomputation after lazy load
  * Incremented each time a lazy locale chunk is loaded
  */
-export const dictionaryVersionSignal = signal<number>(0)
+const dictionaryVersionSignal = signal<number>(0)
 
 /**
  * Derived state: the dictionary matching the active locale. Recomputes only

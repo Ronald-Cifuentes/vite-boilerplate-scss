@@ -47,5 +47,3 @@ export const ThemeProvider: FC<ThemeProviderProps> = ({ children, initialPrefere
 
   return <>{children}</>
 }
-
-export default ThemeProvider

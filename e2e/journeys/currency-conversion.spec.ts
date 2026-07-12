@@ -61,7 +61,6 @@ test.describe('Currency Conversion - Exact Example Fixture (ADR-0010 §13, ADR-0
       })
     })
 
-    // Navigate and clear storage
     await page.goto('/')
     await page.evaluate(() => localStorage.clear())
     await page.reload()
@@ -139,7 +138,6 @@ test.describe('Currency Conversion - Exact Example Fixture (ADR-0010 §13, ADR-0
     const priceValue = page.getByTestId('app-greeting-price-value')
     // JPY must display without decimal point (0 decimals)
     await expect(priceValue).toHaveText('¥220 JPY')
-    // Double-check: should NOT contain a decimal point
     const text = await priceValue.textContent()
     expect(text).not.toContain('.')
   })
@@ -160,7 +158,6 @@ test.describe('Currency Conversion - Failure States', () => {
     const priceValue = page.getByTestId('app-greeting-price-value')
     await expect(priceValue).toContainText('COP')
 
-    // Rate status should indicate unavailable
     const rateStatus = page.getByTestId('app-greeting-rate-status')
     await expect(rateStatus).toBeVisible()
   })
@@ -193,7 +190,6 @@ test.describe('Currency Conversion - Stale Rates', () => {
     await page.reload()
     await page.waitForTimeout(1000)
 
-    // Rate status should show stale
     const rateStatus = page.getByTestId('app-greeting-rate-status')
     // The stale indicator should be visible with age
     await expect(rateStatus).toBeVisible()
@@ -246,7 +242,6 @@ test.describe('Dropdown Positioning - Viewport Safety', () => {
       await page.setViewportSize({ width: vp.width, height: vp.height })
       await page.goto('/')
 
-      // Test each dropdown
       const dropdowns = ['language', 'country', 'currency']
       for (const dd of dropdowns) {
         const trigger = page.getByTestId(`app-navbar-${dd}-trigger`)
@@ -265,7 +260,6 @@ test.describe('Dropdown Positioning - Viewport Safety', () => {
           expect(box.y + box.height).toBeLessThanOrEqual(vp.height)
         }
 
-        // Close dropdown
         await page.keyboard.press('Escape')
       }
     })
@@ -276,23 +270,19 @@ test.describe('Dropdown Positioning - Viewport Safety', () => {
     await page.setViewportSize({ width: 375, height: 667 })
     await page.goto('/')
 
-    // Open mobile menu
     const hamburger = page.getByRole('button', { name: /open menu/i })
     await hamburger.click()
     await expect(page.getByRole('dialog', { name: /menu/i })).toBeVisible()
 
-    // Open currency submenu
     const currencyButton = page
       .getByTestId('app-mobile-menu-item-currency')
       .locator('button')
       .first()
     await currencyButton.click()
 
-    // Submenu should be visible
     const submenu = page.getByTestId('app-mobile-menu-submenu-currency')
     await expect(submenu).toBeVisible()
 
-    // Verify submenu is within viewport
     const box = await submenu.boundingBox()
     expect(box).not.toBeNull()
     if (box) {

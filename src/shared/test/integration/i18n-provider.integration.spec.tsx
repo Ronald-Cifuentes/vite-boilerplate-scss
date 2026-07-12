@@ -69,7 +69,6 @@ describe('I18nProvider Integration', () => {
         </TestWrapper>
       )
 
-      // Open dropdown and select Spanish
       fireEvent.click(screen.getByTestId('lang-dropdown-trigger'))
       fireEvent.click(within(screen.getByRole('listbox')).getByText(/espa/i))
 
@@ -91,7 +90,6 @@ describe('I18nProvider Integration', () => {
         </TestWrapper>
       )
 
-      // Open dropdown and select Spanish
       fireEvent.click(screen.getByTestId('lang-dropdown-trigger'))
       fireEvent.click(within(screen.getByRole('listbox')).getByText(/espa/i))
 
@@ -127,7 +125,6 @@ describe('I18nProvider Integration', () => {
 
       expect(document.documentElement.lang).toBe('en')
 
-      // Open dropdown and select Spanish
       fireEvent.click(screen.getByTestId('lang-dropdown-trigger'))
       fireEvent.click(within(screen.getByRole('listbox')).getByText(/espa/i))
 

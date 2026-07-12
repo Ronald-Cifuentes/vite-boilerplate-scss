@@ -39,7 +39,6 @@ export const LanguageDropdown: FC<LanguageDropdownProps> = ({
       setLocale(newLocale)
       onLocaleChange?.(newLocale)
 
-      // Announce the change
       const langName = LOCALE_METADATA[newLocale].nativeName
       setLanguageAnnouncement(`${t('a11y.languageChangedTo')} ${langName}`)
     },
@@ -68,5 +67,3 @@ export const LanguageDropdown: FC<LanguageDropdownProps> = ({
     </>
   )
 }
-
-export default LanguageDropdown

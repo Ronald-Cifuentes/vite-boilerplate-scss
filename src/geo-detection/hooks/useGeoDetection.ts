@@ -24,9 +24,14 @@ export interface GeoDetectionApplied {
   source: string
 }
 
+export interface GeoAnnouncement {
+  key: 'a11y.locationDetected'
+  region: string
+}
+
 interface UseGeoDetectionOptions {
   onDetected?: (result: GeoDetectionApplied) => void
-  onAnnounce?: (message: string) => void
+  onAnnounce?: (announcement: GeoAnnouncement) => void
 }
 
 /**
@@ -69,14 +74,13 @@ export function useGeoDetection(options: UseGeoDetectionOptions = {}): void {
           return // User made choices during detection - discard result
         }
 
-        // Apply detected preferences via callback
         if (options.onDetected) {
           options.onDetected(result)
         }
 
-        // Announce if callback provided
+        // Announce if callback provided (structured data for i18n)
         if (options.onAnnounce) {
-          options.onAnnounce(`Detected location: ${result.region}`)
+          options.onAnnounce({ key: 'a11y.locationDetected', region: result.region })
         }
       } catch {
         // Detection failed - no action needed, app continues with defaults

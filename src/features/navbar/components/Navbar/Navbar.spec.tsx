@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, act } from '@testing-library/react'
 import { Navbar } from './Navbar'
 import { ThemeProvider } from '../../../../theme'
 import { RegionProvider } from '../../../../region'
@@ -9,11 +9,16 @@ import { resetMobileMenuState } from '../../../mobile-menu/signals/mobile-menu-s
 describe('Navbar', () => {
   beforeEach(() => {
     localStorage.clear()
-    resetMobileMenuState()
+    // Wrap in act since resetMobileMenuState mutates signals
+    act(() => {
+      resetMobileMenuState()
+    })
   })
 
   afterEach(() => {
-    resetMobileMenuState()
+    act(() => {
+      resetMobileMenuState()
+    })
   })
 
   const renderWithProviders = (props = {}): ReturnType<typeof render> =>
@@ -136,7 +141,6 @@ describe('Navbar', () => {
 
       expect(screen.getByTestId('app-mobile-menu')).toBeInTheDocument()
 
-      // Press Escape
       fireEvent.keyDown(document, { key: 'Escape' })
 
       expect(screen.queryByTestId('app-mobile-menu')).not.toBeInTheDocument()

@@ -152,21 +152,17 @@ test.describe('Mobile Menu (375px viewport)', () => {
     test('changes language when option is selected', async ({ page }) => {
       await openMobileMenuIfNeeded(page)
 
-      // Open language submenu
       const languageButton = page
         .getByTestId('app-mobile-menu-item-language')
         .locator('button')
         .first()
       await languageButton.click()
 
-      // Select Spanish
       const esOption = page.getByTestId('app-mobile-menu-submenu-language-option-es')
       await esOption.click()
 
-      // Submenu should close
       await expect(languageButton).toHaveAttribute('aria-expanded', 'false')
 
-      // Verify language changed (greeting should be in Spanish)
       await expect(page.getByText(/Hola/i)).toBeVisible()
     })
   })
@@ -175,18 +171,15 @@ test.describe('Mobile Menu (375px viewport)', () => {
     test('changes country when option is selected', async ({ page }) => {
       await openMobileMenuIfNeeded(page)
 
-      // Open country submenu
       const countryButton = page
         .getByTestId('app-mobile-menu-item-country')
         .locator('button')
         .first()
       await countryButton.click()
 
-      // Select Spain
       const esOption = page.getByTestId('app-mobile-menu-submenu-country-option-ES')
       await esOption.click()
 
-      // Submenu should close
       await expect(countryButton).toHaveAttribute('aria-expanded', 'false')
     })
   })
@@ -195,18 +188,15 @@ test.describe('Mobile Menu (375px viewport)', () => {
     test('changes currency when option is selected', async ({ page }) => {
       await openMobileMenuIfNeeded(page)
 
-      // Open currency submenu
       const currencyButton = page
         .getByTestId('app-mobile-menu-item-currency')
         .locator('button')
         .first()
       await currencyButton.click()
 
-      // Select EUR
       const eurOption = page.getByTestId('app-mobile-menu-submenu-currency-option-EUR')
       await eurOption.click()
 
-      // Submenu should close
       await expect(currencyButton).toHaveAttribute('aria-expanded', 'false')
     })
   })
@@ -220,7 +210,6 @@ test.describe('Mobile Menu (375px viewport)', () => {
       // Should not have aria-haspopup (no submenu)
       await expect(themeButton).not.toHaveAttribute('aria-haspopup')
 
-      // Click to cycle theme
       await themeButton.click()
 
       // Should still be visible (no submenu to collapse)
@@ -238,7 +227,6 @@ test.describe('Mobile Menu (375px viewport)', () => {
         const activeElement = page.locator(':focus')
         const menu = getMobileMenu(page)
         await expect(activeElement).toBeVisible()
-        // Active element should be inside the menu
         const isInsideMenu = await activeElement.evaluate((el, menuSelector) => {
           const menu = document.querySelector(menuSelector)
           return menu?.contains(el) ?? false

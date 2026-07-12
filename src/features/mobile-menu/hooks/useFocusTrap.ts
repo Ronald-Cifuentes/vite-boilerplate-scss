@@ -56,7 +56,6 @@ export function useFocusTrap(
     const focusableElements = container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTORS)
     const firstFocusable = focusableElements[0]
 
-    // Move focus into the container
     firstFocusable?.focus()
 
     const handleKeyDown = (e: KeyboardEvent): void => {

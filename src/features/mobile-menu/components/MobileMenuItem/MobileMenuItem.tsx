@@ -88,5 +88,3 @@ export const MobileMenuItem: FC<MobileMenuItemProps> = ({
     </li>
   )
 }
-
-export default MobileMenuItem

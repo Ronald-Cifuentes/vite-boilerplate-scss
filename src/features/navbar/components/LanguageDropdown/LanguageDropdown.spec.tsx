@@ -20,8 +20,11 @@ function TestWrapper({ children }: { children: React.ReactNode }): React.JSX.Ele
 describe('LanguageDropdown', () => {
   beforeEach(() => {
     localStorage.clear()
-    localeSignal.value = 'en'
-    resetAnnouncements()
+    // Wrap signal mutations in act - safe even before components mounted
+    act(() => {
+      localeSignal.value = 'en'
+      resetAnnouncements()
+    })
     // Clear any DOM state
     document.body.innerHTML = ''
   })

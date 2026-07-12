@@ -149,10 +149,13 @@ dist
 .yarn/
 .pnp.*
 
+# Lock files from non-sanctioned package managers (npm, yarn) are ignored
+# because they should never be in this repository.
+# CRITICAL: pnpm is the ONLY sanctioned package manager per project constitution.
+# pnpm-lock.yaml MUST be committed for reproducible builds in CI/Docker.
+# Ignoring pnpm lockfiles is a common template anti-pattern that breaks production builds.
 package-lock.json
 yarn.lock
-pnpm-lock.yaml
-pnpm-lock.yml
 
 # Playwright / e2e artifacts
 test-results/

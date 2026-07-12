@@ -59,7 +59,7 @@
   left: 0;
   margin-top: t.$space-1;
 
-  // Task-8 FIX: Closed panels use display:none to prevent overflow
+  // Closed panels use display:none to prevent overflow
   // (FE-005 click-through: solved by removal from layout, no pointer-events needed)
   // (POS-RACE-1: flip calc still runs in useLayoutEffect when isOpen becomes true,
   //  measuring the panel after React renders it with display:block but before paint)
@@ -110,7 +110,6 @@
   }
 }
 
-// Keyframes for dropdown entrance animations
 @keyframes dropdownFadeIn {
   from {
     opacity: 0;
@@ -135,7 +134,6 @@
   }
 }
 
-// Exit animations (reverse of entrance)
 @keyframes dropdownFadeOut {
   from {
     opacity: 1;

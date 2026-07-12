@@ -15,10 +15,7 @@ export interface CurrencyProviderProps {
   initialCurrency?: SupportedCurrency
 }
 
-export function initializeCurrency(
-  init: SupportedCurrency | undefined,
-  region: SupportedRegion
-): void {
+function initializeCurrency(init: SupportedCurrency | undefined, region: SupportedRegion): void {
   const wo = loadUserOverridden()
   userOverriddenSignal.value = wo
   if (init) {

@@ -33,5 +33,3 @@ export const HamburgerButton: FC<HamburgerButtonProps> = ({
     </button>
   )
 }
-
-export default HamburgerButton

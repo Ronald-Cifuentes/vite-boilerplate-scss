@@ -50,7 +50,6 @@ export const MobileMenu: FC<MobileMenuProps> = ({
   const { currency, setCurrency } = useCurrency()
   const { preference, cyclePreference } = useTheme()
 
-  // Focus trap
   useFocusTrap(menuRef, hamburgerRef, isOpen)
 
   // Lock body scroll when open
@@ -70,7 +69,6 @@ export const MobileMenu: FC<MobileMenuProps> = ({
   // ADR-0012 Amendment 2: close menu when viewport crosses to desktop (768px)
   // Uses matchMedia change listener, NOT resize event polling
   useEffect(() => {
-    // Skip if menu is not open
     if (!isOpen) return
 
     const mql = window.matchMedia('(min-width: 768px)')
@@ -89,7 +87,6 @@ export const MobileMenu: FC<MobileMenuProps> = ({
     }
   }, [isOpen, onClose])
 
-  // Escape to close
   useEffect(() => {
     if (!isOpen) return
 
@@ -105,21 +102,18 @@ export const MobileMenu: FC<MobileMenuProps> = ({
     }
   }, [isOpen, onClose])
 
-  // Language options
   const languageOptions: SubmenuOption<SupportedLocale>[] = SUPPORTED_LOCALES.map(loc => ({
     value: loc,
     label: LOCALE_METADATA[loc].nativeName,
     icon: <MdLanguage />,
   }))
 
-  // Country options
   const countryOptions: SubmenuOption<SupportedRegion>[] = SUPPORTED_REGIONS.map(reg => ({
     value: reg,
     label: REGION_METADATA[reg].nativeName,
     icon: <MdPublic />,
   }))
 
-  // Currency options
   const currencyOptions: SubmenuOption<SupportedCurrency>[] = SUPPORTED_CURRENCIES.map(cur => ({
     value: cur,
     label: `${CURRENCY_METADATA[cur].symbol} ${CURRENCY_METADATA[cur].name}`,
@@ -250,7 +244,6 @@ export const MobileMenu: FC<MobileMenuProps> = ({
         </ul>
       </nav>
 
-      {/* Announcers for accessibility */}
       <Announcer
         message={languageAnnouncementSignal.value}
         dataTestId={`${dataTestId}-language-announcer`}
@@ -270,5 +263,3 @@ export const MobileMenu: FC<MobileMenuProps> = ({
     </div>
   )
 }
-
-export default MobileMenu

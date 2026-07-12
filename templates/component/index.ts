@@ -1,2 +1,2 @@
-export { default } from './TemplateName'
+export { TemplateName } from './TemplateName'
 export type { TemplateNameProps } from './interfaces'

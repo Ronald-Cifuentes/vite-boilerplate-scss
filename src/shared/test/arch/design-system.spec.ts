@@ -9,7 +9,6 @@ import { IconButton } from '../../components/IconButton'
 import { Link } from '../../components/Link'
 import { Announcer } from '../../components/Announcer'
 
-// Import domain modules
 import {
   ThemeProvider,
   useTheme,

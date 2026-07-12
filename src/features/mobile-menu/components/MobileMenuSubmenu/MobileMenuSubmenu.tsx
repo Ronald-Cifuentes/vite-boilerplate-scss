@@ -68,5 +68,3 @@ export function MobileMenuSubmenu<T extends string>({
     </ul>
   )
 }
-
-export default MobileMenuSubmenu

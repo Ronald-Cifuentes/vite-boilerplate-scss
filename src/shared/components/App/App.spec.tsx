@@ -1,11 +1,14 @@
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, act, waitFor } from '@testing-library/react'
 import { App } from './App'
-import { themePreferenceSignal, osPrefersDarkSignal } from '../../../theme/signals/theme-signal'
+import { themePreferenceSignal } from '../../../theme/signals/theme-signal'
 import { localeSignal } from '../../../i18n/signals/locale-signal'
 import { regionSignal } from '../../../region/signals/region-signal'
 import { currencySignal, userOverriddenSignal } from '../../../currency/signals/currency-signal'
-import { ratesStateSignal } from '../../../exchange-rates/signals/rates-signal'
+import { LOCALE_STORAGE_KEY } from '../../../i18n/config/locales'
+import { REGION_STORAGE_KEY } from '../../../region/config/regions'
+import { CURRENCY_STORAGE_KEY } from '../../../currency/config/currencies'
 import * as GeoDetectionHook from '../../../geo-detection/hooks/useGeoDetection'
+import { resetAppState } from '../../test/act-utils'
 
 // Mock the exchange-rates module to prevent actual network calls
 jest.mock('../../../exchange-rates', () => ({
@@ -16,34 +19,27 @@ jest.mock('../../../exchange-rates', () => ({
 // Mock the geo-detection hook to prevent actual detection calls
 jest.mock('../../../geo-detection/hooks/useGeoDetection')
 
+// Mock the lazy locale loading to be synchronous for tests
+// This prevents the async promise from triggering act() violations
+jest.mock('../../../i18n/translations', () => ({
+  translations: {
+    en: { greeting: { hello: 'Hello' } },
+    es: { greeting: { hello: 'Hola' } },
+    zh: { greeting: { hello: '你好' } },
+    ja: { greeting: { hello: 'こんにちは' } },
+  },
+  isLocaleLoaded: (): boolean => true, // Pretend all locales are already loaded
+  loadLocale: async (): Promise<void> => {}, // No-op since already "loaded"
+}))
+
 const mockUseGeoDetection = GeoDetectionHook.useGeoDetection as jest.Mock
 
 describe('App', () => {
   let matchMediaMock: jest.Mock
 
   beforeEach(() => {
-    localStorage.clear()
-    document.documentElement.lang = 'en'
-    document.documentElement.removeAttribute('data-theme')
-
-    // Reset signals
-    themePreferenceSignal.value = 'system'
-    osPrefersDarkSignal.value = false
-    localeSignal.value = 'en'
-    regionSignal.value = 'US'
-    currencySignal.value = 'USD'
-    userOverriddenSignal.value = false
-
-    // Set mock rates for testing
-    ratesStateSignal.value = {
-      status: 'live',
-      rates: {
-        USD: { copPerUnit: 3284.6715, sourceDate: new Date(), retrievedAt: new Date() },
-        EUR: { copPerUnit: 3750.0, sourceDate: new Date(), retrievedAt: new Date() },
-        GBP: { copPerUnit: 4411.7647, sourceDate: new Date(), retrievedAt: new Date() },
-        MXN: { copPerUnit: 187.9699, sourceDate: new Date(), retrievedAt: new Date() },
-      },
-    }
+    // Use consolidated reset - act-wrapped and includes all signals
+    resetAppState()
 
     // Mock matchMedia
     matchMediaMock = jest.fn().mockReturnValue({
@@ -89,11 +85,9 @@ describe('App', () => {
       // Initially English
       expect(screen.getByTestId('app-greeting-title')).toHaveTextContent('Hello')
 
-      // Open language dropdown and select Spanish
       fireEvent.click(screen.getByTestId('app-navbar-language-trigger'))
       fireEvent.click(screen.getByTestId('app-navbar-language-option-es'))
 
-      // Now Spanish
       expect(screen.getByTestId('app-greeting-title')).toHaveTextContent('Hola')
       expect(document.documentElement.lang).toBe('es')
     })
@@ -140,7 +134,6 @@ describe('App', () => {
 
       expect(regionSignal.value).toBe('US')
 
-      // Open country dropdown and select Spain
       fireEvent.click(screen.getByTestId('app-navbar-country-trigger'))
       fireEvent.click(screen.getByTestId('app-navbar-country-option-ES'))
 
@@ -150,7 +143,6 @@ describe('App', () => {
     it('Then formatted date updates', () => {
       render(<App />)
 
-      // Open country dropdown and select Spain
       fireEvent.click(screen.getByTestId('app-navbar-country-trigger'))
       fireEvent.click(screen.getByTestId('app-navbar-country-option-ES'))
 
@@ -166,7 +158,6 @@ describe('App', () => {
 
       expect(currencySignal.value).toBe('USD')
 
-      // Open currency dropdown and select Euro
       fireEvent.click(screen.getByTestId('app-navbar-currency-trigger'))
       fireEvent.click(screen.getByTestId('app-navbar-currency-option-EUR'))
 
@@ -180,7 +171,6 @@ describe('App', () => {
       const priceElement = screen.getByTestId('app-greeting-price-value')
       expect(priceElement.textContent).toBe('$1.37 USD')
 
-      // Open currency dropdown and select Euro
       fireEvent.click(screen.getByTestId('app-navbar-currency-trigger'))
       fireEvent.click(screen.getByTestId('app-navbar-currency-option-EUR'))
 
@@ -199,15 +189,9 @@ describe('App', () => {
 
 describe('Geo detection integration', () => {
   beforeEach(() => {
-    localStorage.clear()
-    document.documentElement.lang = 'en'
-    document.documentElement.removeAttribute('data-theme')
-    themePreferenceSignal.value = 'system'
-    osPrefersDarkSignal.value = false
-    localeSignal.value = 'en'
-    regionSignal.value = 'US'
-    currencySignal.value = 'USD'
-    userOverriddenSignal.value = false
+    // Use consolidated reset - act-wrapped
+    resetAppState()
+
     window.matchMedia = jest.fn().mockReturnValue({
       matches: false,
       addEventListener: jest.fn(),
@@ -243,29 +227,35 @@ describe('Geo detection integration', () => {
           }
         }
       )
-      // Reset to known state
-      localeSignal.value = 'en'
-      regionSignal.value = 'US'
-      currencySignal.value = 'USD'
-      userOverriddenSignal.value = false
     })
 
     describe('PATH 1: Full detection success (gps/ip)', () => {
-      it('GPS source: applies all three prefs and locks currency', () => {
+      it('GPS source: applies all three prefs and locks currency', async () => {
         render(<App />)
-        capturedCallback!({ locale: 'es', region: 'CO', currency: 'COP', source: 'gps' })
+        // Wrap callback invocation in act - it triggers signal writes
+        act(() => {
+          capturedCallback!({ locale: 'es', region: 'CO', currency: 'COP', source: 'gps' })
+        })
 
-        expect(localeSignal.value).toBe('es')
+        await waitFor(() => {
+          expect(localeSignal.value).toBe('es')
+        })
         expect(regionSignal.value).toBe('CO')
         expect(currencySignal.value).toBe('COP')
         expect(userOverriddenSignal.value).toBe(true)
       })
 
-      it('IP source: applies all three prefs and locks currency', () => {
+      it('IP source: applies all three prefs and locks currency', async () => {
         render(<App />)
-        capturedCallback!({ locale: 'ja', region: 'JP', currency: 'JPY', source: 'ip' })
+        // Wrap callback invocation in act - it triggers signal writes
+        act(() => {
+          capturedCallback!({ locale: 'ja', region: 'JP', currency: 'JPY', source: 'ip' })
+        })
 
-        expect(localeSignal.value).toBe('ja')
+        // Wait for any async updates to settle (locale lazy loading is mocked to be sync)
+        await waitFor(() => {
+          expect(localeSignal.value).toBe('ja')
+        })
         expect(regionSignal.value).toBe('JP')
         expect(currencySignal.value).toBe('JPY')
         expect(userOverriddenSignal.value).toBe(true)
@@ -273,18 +263,21 @@ describe('Geo detection integration', () => {
     })
 
     describe('PATH 2: Device-language fallback', () => {
-      it('applies ONLY locale, leaves region/currency pristine', () => {
+      it('applies ONLY locale, leaves region/currency pristine', async () => {
         render(<App />)
         // device-language only provides locale, region/currency are defaults
-        capturedCallback!({
-          locale: 'es',
-          region: 'US',
-          currency: 'USD',
-          source: 'device-language',
+        act(() => {
+          capturedCallback!({
+            locale: 'es',
+            region: 'US',
+            currency: 'USD',
+            source: 'device-language',
+          })
         })
 
-        // Locale should change
-        expect(localeSignal.value).toBe('es')
+        await waitFor(() => {
+          expect(localeSignal.value).toBe('es')
+        })
         // Region should stay pristine (unchanged from initial US)
         expect(regionSignal.value).toBe('US')
         // Currency should stay pristine (unchanged from initial USD)
@@ -293,15 +286,21 @@ describe('Geo detection integration', () => {
         expect(userOverriddenSignal.value).toBe(false)
       })
 
-      it('does NOT lock currency - region sync remains functional', () => {
+      it('does NOT lock currency - region sync remains functional', async () => {
         render(<App />)
-        capturedCallback!({
-          locale: 'ja',
-          region: 'US',
-          currency: 'USD',
-          source: 'device-language',
+        act(() => {
+          capturedCallback!({
+            locale: 'ja',
+            region: 'US',
+            currency: 'USD',
+            source: 'device-language',
+          })
         })
 
+        // Wait for async updates to settle
+        await waitFor(() => {
+          expect(localeSignal.value).toBe('ja')
+        })
         // userOverridden must be false so syncCurrencyToRegion works
         expect(userOverriddenSignal.value).toBe(false)
       })
@@ -309,35 +308,41 @@ describe('Geo detection integration', () => {
       it('ignores invalid locale in device-language fallback', () => {
         render(<App />)
         // device-language with invalid locale - should not change anything
-        capturedCallback!({
-          locale: 'invalid',
-          region: 'US',
-          currency: 'USD',
-          source: 'device-language',
+        act(() => {
+          capturedCallback!({
+            locale: 'invalid',
+            region: 'US',
+            currency: 'USD',
+            source: 'device-language',
+          })
         })
 
-        // Locale should stay unchanged
         expect(localeSignal.value).toBe('en')
-        // Region stays pristine
         expect(regionSignal.value).toBe('US')
-        // Currency stays pristine
         expect(currencySignal.value).toBe('USD')
-        // userOverridden stays false
         expect(userOverriddenSignal.value).toBe(false)
       })
     })
 
     describe('PATH 3: Total failure (default)', () => {
       it('applies NOTHING - all signals stay pristine', () => {
+        // Pre-populate localStorage so providers preserve these values on mount
+        localStorage.setItem(LOCALE_STORAGE_KEY, 'zh')
+        localStorage.setItem(REGION_STORAGE_KEY, 'CN')
+        localStorage.setItem(CURRENCY_STORAGE_KEY, 'CNY')
+
         render(<App />)
-        // Set non-default values first to prove nothing changes
-        localeSignal.value = 'zh'
-        regionSignal.value = 'CN'
-        currencySignal.value = 'CNY'
 
-        capturedCallback!({ locale: 'en', region: 'US', currency: 'USD', source: 'default' })
+        // Verify the values were preserved through mount
+        expect(localeSignal.value).toBe('zh')
+        expect(regionSignal.value).toBe('CN')
+        expect(currencySignal.value).toBe('CNY')
 
-        // Nothing should change
+        act(() => {
+          capturedCallback!({ locale: 'en', region: 'US', currency: 'USD', source: 'default' })
+        })
+
+        // Nothing should change - source: 'default' does nothing
         expect(localeSignal.value).toBe('zh')
         expect(regionSignal.value).toBe('CN')
         expect(currencySignal.value).toBe('CNY')
@@ -346,7 +351,9 @@ describe('Geo detection integration', () => {
 
       it('does NOT lock currency - region sync remains functional', () => {
         render(<App />)
-        capturedCallback!({ locale: 'en', region: 'US', currency: 'USD', source: 'default' })
+        act(() => {
+          capturedCallback!({ locale: 'en', region: 'US', currency: 'USD', source: 'default' })
+        })
 
         expect(userOverriddenSignal.value).toBe(false)
       })
@@ -369,13 +376,10 @@ describe('Geo detection integration', () => {
 
     render(<App />)
 
-    // Reset to known state
-    localeSignal.value = 'en'
-    regionSignal.value = 'US'
-    currencySignal.value = 'USD'
-
     // Simulate with invalid values - should not throw or change valid signals
-    capturedCallback!({ locale: 'invalid', region: 'XX', currency: 'ZZZ', source: 'ip' })
+    act(() => {
+      capturedCallback!({ locale: 'invalid', region: 'XX', currency: 'ZZZ', source: 'ip' })
+    })
 
     // Should not change from defaults
     expect(localeSignal.value).toBe('en')

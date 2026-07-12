@@ -76,7 +76,7 @@ test.describe('Language Selection Journey', () => {
   })
 
   /**
-   * Task 6 PROOF TEST: Chinese locale renders actual zh UI strings (not just option existing).
+   * PROOF TEST: Chinese locale renders actual zh UI strings (not just option existing).
    * Proves zh.ts translations are complete and wired up correctly.
    */
   test('Given a user on the app, When they switch to Chinese, Then UI renders in Chinese', async ({
@@ -85,7 +85,6 @@ test.describe('Language Selection Journey', () => {
     await page.goto('/')
     await expect(page.getByTestId('app-greeting-title')).toHaveText('Hello')
 
-    // Switch to Chinese
     const langTrigger = page.getByTestId('app-navbar-language-trigger')
     await langTrigger.click()
     await page.getByTestId('app-navbar-language-option-zh').click()
@@ -97,7 +96,7 @@ test.describe('Language Selection Journey', () => {
   })
 
   /**
-   * Task 6 PROOF TEST: Japanese locale renders actual ja UI strings.
+   * PROOF TEST: Japanese locale renders actual ja UI strings.
    * Proves ja.ts translations are complete and wired up correctly.
    */
   test('Given a user on the app, When they switch to Japanese, Then UI renders in Japanese', async ({
@@ -106,7 +105,6 @@ test.describe('Language Selection Journey', () => {
     await page.goto('/')
     await expect(page.getByTestId('app-greeting-title')).toHaveText('Hello')
 
-    // Switch to Japanese
     const langTrigger = page.getByTestId('app-navbar-language-trigger')
     await langTrigger.click()
     await page.getByTestId('app-navbar-language-option-ja').click()

@@ -14,7 +14,6 @@
   @include anim.transition(background-color, color, transform);
   @include anim.press-animation;
 
-  // Size variants
   &--sm {
     width: t.$touch-target-min;
     height: t.$touch-target-min;
@@ -33,7 +32,6 @@
     font-size: 1.5rem;
   }
 
-  // Variant styles
   &--primary {
     background-color: var(--color-interactive-primary);
     color: var(--color-text-inverse);

@@ -22,7 +22,8 @@
     "lint": "eslint src --ext ts,tsx",
     "ts-check": "tsc --noEmit --skipLibCheck",
     "depcheck": "out=\"$(npx depcheck 2>&1)\"; code=$?; printf '%s\\n' \"$out\"; [ \"$code\" -eq 0 ] && [ \"$out\" = \"No depcheck issue\" ]",
-    "sonar:report": "./scripts/quality-gate-report.sh"
+    "sonar:report": "./scripts/quality-gate-report.sh",
+    "check:css": "node scripts/check-empty-css-rules.mjs"
   },
   "dependencies": {
     "@preact/signals-react": "3.10.2",

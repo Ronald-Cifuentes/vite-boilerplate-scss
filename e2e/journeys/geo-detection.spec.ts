@@ -28,11 +28,9 @@ test.describe('Geo Auto-Detection', () => {
       await page.goto('/')
       await page.waitForTimeout(1000) // Wait for detection to complete
 
-      // Verify preferences applied
       const html = await page.locator('html')
       await expect(html).toHaveAttribute('lang', 'es')
 
-      // Check localStorage was set
       const locale = await page.evaluate(() => localStorage.getItem('app-locale'))
       const region = await page.evaluate(() => localStorage.getItem('app-region'))
       const currency = await page.evaluate(() => localStorage.getItem('app-currency'))
@@ -176,7 +174,6 @@ test.describe('Geo Auto-Detection', () => {
       await page.goto('/')
       await page.waitForTimeout(1000)
 
-      // Verify initial detection
       let region = await page.evaluate(() => localStorage.getItem('app-region'))
       expect(region).toBe('CO')
 

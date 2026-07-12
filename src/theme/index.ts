@@ -1,8 +1,6 @@
-// Types
 export type { ThemePort } from './ports/Theme'
 export type { ThemePreference, ThemeMode, ThemeConfig } from './types/Theme'
 
-// Config
 export {
   DEFAULT_PREFERENCE,
   SUPPORTED_PREFERENCES,
@@ -15,9 +13,7 @@ export {
   getNextPreference,
 } from './config/themes'
 
-// Adapter
 export { ThemeProvider } from './adapters/ThemeProvider'
 export type { ThemeProviderProps } from './adapters/ThemeProvider'
 
-// Hook
 export { useTheme } from './hooks/useTheme'

@@ -1,3 +1,1 @@
-// Region domain side effects
-// Currently empty - region doesn't sync to DOM like locale or theme
-// This file exists for architectural consistency and future extensibility
+// Intentionally empty: region has no DOM sync (unlike locale/theme); kept for domain symmetry.

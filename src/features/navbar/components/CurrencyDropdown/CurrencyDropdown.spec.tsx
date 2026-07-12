@@ -29,10 +29,13 @@ describe('CurrencyDropdown', () => {
   beforeEach(() => {
     localStorage.clear()
     clearCurrencyStorage()
-    currencySignal.value = 'USD'
-    userOverriddenSignal.value = false
-    resetCurrencyOverride()
-    resetAnnouncements()
+    // Wrap signal mutations in act
+    act(() => {
+      currencySignal.value = 'USD'
+      userOverriddenSignal.value = false
+      resetCurrencyOverride()
+      resetAnnouncements()
+    })
     document.body.innerHTML = ''
   })
 

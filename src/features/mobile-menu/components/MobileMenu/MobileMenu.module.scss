@@ -11,14 +11,18 @@
   height: 100%;
   z-index: 100;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  // SCROLL-TOP-1 fix: use flex-start + margin-auto on child instead of justify-content: center.
+  // justify-content: center on a scroll container distributes overflow ABOVE flex-start,
+  // making top items unreachable (scrollTop has floor 0). margin-block: auto on the child
+  // centers when content fits, top-aligns when it overflows — keeping top reachable.
+  // See CONTRACTS.md scroll-contract note.
+  align-items: flex-start;
+  justify-content: flex-start;
 
   // ADR-0012 Amendment 2: menu scrolls when content exceeds viewport
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 
-  // Scrollbar styling consistent with DS
   &::-webkit-scrollbar {
     width: 8px;
   }
@@ -78,6 +82,13 @@
   text-align: center;
   width: 100%;
   max-width: 90vw;
+  // SCROLL-TOP-1 fix: margin-auto centers when content fits viewport,
+  // but top-aligns when content overflows — keeping first item scrollable.
+  margin-block: auto;
+  // Vertical breathing room using DS token $space-5 (24px = 1.5rem).
+  // padding-block participates in scrollable area — scrolling to ends reveals the gap.
+  // This guarantees min 24px edge gap regardless of margin-auto centering state.
+  padding-block: t.$space-5;
 }
 
 .list {
@@ -87,8 +98,5 @@
   position: relative;
 }
 
-// Make menu items visible when menu is open
-// This triggers the staggered entrance animation
-:global(.menuOpen) {
-  // Items will animate in via their individual transition-delay
-}
+// The global .menuOpen class set by MobileMenu.tsx is consumed by sibling
+// modules' selectors (e.g. MobileMenuItem's rest-state rules), not here.

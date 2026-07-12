@@ -39,9 +39,12 @@ describe('ThemeModeButton', () => {
   beforeEach(() => {
     localStorage.clear()
     document.documentElement.removeAttribute('data-theme')
-    themePreferenceSignal.value = 'system'
-    osPrefersDarkSignal.value = false
-    resetAnnouncements()
+    // Wrap signal mutations in act
+    act(() => {
+      themePreferenceSignal.value = 'system'
+      osPrefersDarkSignal.value = false
+      resetAnnouncements()
+    })
     document.body.innerHTML = ''
     mockMatchMedia(false)
   })

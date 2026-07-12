@@ -88,7 +88,6 @@ export async function refreshRates(): Promise<void> {
   const br = await fetchAllBanrepRates()
   const mxn = br.USD ? await fetchMxnRateViaCrossRate(br.USD.copPerUnit) : null
   const unavail: SupportedCurrency[] = []
-  // Check all BanRep currencies
   for (const c of ['USD', 'EUR', 'GBP', 'CNY', 'JPY'] as const) if (!br[c]) unavail.push(c)
   if (!mxn) unavail.push('MXN')
   const all: Partial<Record<SupportedCurrency, RateSnapshot>> = { ...br }

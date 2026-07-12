@@ -27,5 +27,3 @@ export const Announcer: FC<AnnouncerProps> = ({
     </div>
   )
 }
-
-export default Announcer

@@ -210,5 +210,3 @@ export function Dropdown<T extends string = string>({
     </div>
   )
 }
-
-export default Dropdown

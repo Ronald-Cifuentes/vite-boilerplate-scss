@@ -41,7 +41,6 @@ export const CountryDropdown: FC<CountryDropdownProps> = ({
       setRegion(newRegion)
       onRegionChange?.(newRegion)
 
-      // Announce the change
       const countryName = REGION_METADATA[newRegion].englishName
       setCountryAnnouncement(`${t('a11y.countryChangedTo')} ${countryName}`)
     },
@@ -67,5 +66,3 @@ export const CountryDropdown: FC<CountryDropdownProps> = ({
     </>
   )
 }
-
-export default CountryDropdown

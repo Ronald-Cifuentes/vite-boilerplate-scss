@@ -48,5 +48,3 @@ export const RegionProvider: FC<RegionProviderProps> = ({ children, initialRegio
 
   return <>{children}</>
 }
-
-export default RegionProvider

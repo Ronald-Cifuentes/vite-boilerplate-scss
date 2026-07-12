@@ -7,8 +7,7 @@ on:
     branches: [master, develop]
 
 env:
-  NODE_VERSION: '24.18.0'
-  PNPM_VERSION: '9'
+  NODE_VERSION: '24'
 
 jobs:
   quality-gates:
@@ -18,22 +17,19 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0 # Full history for SonarQube analysis
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: Enable Corepack for pnpm
-        run: corepack enable
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
+      - name: Setup pnpm via corepack (reads packageManager from package.json)
+        uses: pnpm/action-setup@v6
+        # No version specified - pnpm/action-setup reads "packageManager" field from package.json
+        # Single source of truth: package.json declares pnpm@11.5.1
 
       - name: Get pnpm store directory
         id: pnpm-cache
@@ -41,7 +37,7 @@ jobs:
         run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
 
       - name: Setup pnpm cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -51,11 +47,17 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --pm-on-fail=ignore
 
+      - name: Dependency check (HIGH-004 parity with pre-commit)
+        run: pnpm depcheck
+
       - name: Format check
         run: ./node_modules/.bin/prettier --check .
 
       - name: Lint
         run: ./node_modules/.bin/eslint src
+
+      - name: Empty CSS rulesets gate
+        run: pnpm check:css
 
       - name: Type check
         run: ./node_modules/.bin/tsc --noEmit
@@ -80,6 +82,9 @@ jobs:
 
       - name: Build production bundle
         run: ./node_modules/.bin/vite build
+
+      - name: Enforce bundle budgets (HIGH-002)
+        run: ./scripts/check-budgets.sh
 
       - name: Install Playwright browsers
         working-directory: e2e
@@ -107,14 +112,14 @@ jobs:
 
       - name: Upload Playwright report
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-report
           path: e2e/playwright-report/
           retention-days: 7
 
       - name: Upload coverage to artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: coverage-report
           path: coverage/
@@ -143,16 +148,20 @@ jobs:
     name: Docker Build & Scan
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      contents: read
+      security-events: write
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Build Docker image
-        uses: docker/build-push-action@v5
+        id: docker-build
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: ./Dockerfile
@@ -180,7 +189,8 @@ jobs:
           echo "OK: No secrets found in image layers"
 
       - name: Container vulnerability scan (Trivy)
-        uses: aquasecurity/trivy-action@master
+        id: trivy-scan
+        uses: aquasecurity/trivy-action@0.36.0
         with:
           image-ref: vite-boilerplate-scss:${{ github.sha }}
           format: 'sarif'
@@ -189,8 +199,8 @@ jobs:
           exit-code: '1'
 
       - name: Upload Trivy results to GitHub Security
-        if: always()
-        uses: github/codeql-action/upload-sarif@v3
+        if: always() && steps.trivy-scan.outcome == 'success'
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: 'trivy-results.sarif'
 
@@ -208,7 +218,7 @@ jobs:
           echo "OK: SBOM generated at sbom.json"
 
       - name: Upload SBOM
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: sbom
           path: sbom.json

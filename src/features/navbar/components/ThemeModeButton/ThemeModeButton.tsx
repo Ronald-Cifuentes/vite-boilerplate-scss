@@ -26,14 +26,12 @@ export const ThemeModeButton: FC<ThemeModeButtonProps> = ({
   const handleClick = useCallback((): void => {
     cyclePreference()
     // Get the next preference for announcement (cycle already happened)
-    // We need to compute what the next preference will be
     const order: ThemePreference[] = ['light', 'dark', 'system']
     const currentIndex = order.indexOf(preference)
     const nextPreference = order[(currentIndex + 1) % order.length]
 
     onPreferenceChange?.(nextPreference)
 
-    // Announce the change
     const preferenceName = t(PREFERENCE_LABEL_KEYS[nextPreference])
     setThemeAnnouncement(`${t('a11y.themeChangedTo')} ${preferenceName}`)
   }, [cyclePreference, preference, onPreferenceChange, t])
@@ -55,5 +53,3 @@ export const ThemeModeButton: FC<ThemeModeButtonProps> = ({
     </div>
   )
 }
-
-export default ThemeModeButton

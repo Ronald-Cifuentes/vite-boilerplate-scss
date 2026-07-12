@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import { useRef } from 'react'
 import { MobileMenu } from './MobileMenu'
 import { I18nProvider } from '../../../../i18n'
@@ -38,12 +38,18 @@ const TestWrapper = ({
 describe('MobileMenu', () => {
   beforeEach(() => {
     document.body.style.overflow = ''
-    resetMobileMenuState()
+    // Wrap in act since resetMobileMenuState mutates signals
+    act(() => {
+      resetMobileMenuState()
+    })
   })
 
   afterEach(() => {
     document.body.style.overflow = ''
-    resetMobileMenuState()
+    // Wrap in act since resetMobileMenuState mutates signals
+    act(() => {
+      resetMobileMenuState()
+    })
   })
 
   it('renders when open', () => {
@@ -143,13 +149,11 @@ describe('MobileMenu', () => {
     const languageItem = screen.getByTestId('app-mobile-menu-item-language')
     const button = languageItem.querySelector('button')!
 
-    // Open
     fireEvent.click(button)
     await waitFor(() => {
       expect(button).toHaveAttribute('aria-expanded', 'true')
     })
 
-    // Close
     fireEvent.click(button)
     await waitFor(() => {
       expect(button).toHaveAttribute('aria-expanded', 'false')
@@ -159,17 +163,14 @@ describe('MobileMenu', () => {
   it('changes language when option is selected', async () => {
     render(<TestWrapper isOpen={true} onClose={jest.fn()} />)
 
-    // Open language submenu
     const languageItem = screen.getByTestId('app-mobile-menu-item-language')
     fireEvent.click(languageItem.querySelector('button')!)
 
-    // Select Spanish
     await waitFor(() => {
       const esOption = screen.getByTestId('app-mobile-menu-submenu-language-option-es')
       fireEvent.click(esOption)
     })
 
-    // Submenu should close after selection
     await waitFor(() => {
       const button = languageItem.querySelector('button')!
       expect(button).toHaveAttribute('aria-expanded', 'false')
@@ -182,7 +183,6 @@ describe('MobileMenu', () => {
     const themeItem = screen.getByTestId('app-mobile-menu-item-theme')
     const button = themeItem.querySelector('button')!
 
-    // Click to cycle theme
     fireEvent.click(button)
 
     // The theme should cycle (exact result depends on initial state)
@@ -193,17 +193,14 @@ describe('MobileMenu', () => {
   it('changes country when option is selected', async () => {
     render(<TestWrapper isOpen={true} onClose={jest.fn()} />)
 
-    // Open country submenu
     const countryItem = screen.getByTestId('app-mobile-menu-item-country')
     fireEvent.click(countryItem.querySelector('button')!)
 
-    // Select Spain
     await waitFor(() => {
       const esOption = screen.getByTestId('app-mobile-menu-submenu-country-option-ES')
       fireEvent.click(esOption)
     })
 
-    // Submenu should close after selection
     await waitFor(() => {
       const button = countryItem.querySelector('button')!
       expect(button).toHaveAttribute('aria-expanded', 'false')
@@ -213,17 +210,14 @@ describe('MobileMenu', () => {
   it('changes currency when option is selected', async () => {
     render(<TestWrapper isOpen={true} onClose={jest.fn()} />)
 
-    // Open currency submenu
     const currencyItem = screen.getByTestId('app-mobile-menu-item-currency')
     fireEvent.click(currencyItem.querySelector('button')!)
 
-    // Select EUR
     await waitFor(() => {
       const eurOption = screen.getByTestId('app-mobile-menu-submenu-currency-option-EUR')
       fireEvent.click(eurOption)
     })
 
-    // Submenu should close after selection
     await waitFor(() => {
       const button = currencyItem.querySelector('button')!
       expect(button).toHaveAttribute('aria-expanded', 'false')
@@ -233,7 +227,6 @@ describe('MobileMenu', () => {
   it('only one submenu can be expanded at a time', async () => {
     render(<TestWrapper isOpen={true} onClose={jest.fn()} />)
 
-    // Open language
     const languageItem = screen.getByTestId('app-mobile-menu-item-language')
     fireEvent.click(languageItem.querySelector('button')!)
 
@@ -254,7 +247,6 @@ describe('MobileMenu', () => {
   it('resets expanded item when menu closes', async () => {
     const { rerender } = render(<TestWrapper isOpen={true} onClose={jest.fn()} />)
 
-    // Open language submenu
     const languageItem = screen.getByTestId('app-mobile-menu-item-language')
     fireEvent.click(languageItem.querySelector('button')!)
 
@@ -262,13 +254,10 @@ describe('MobileMenu', () => {
       expect(languageItem.querySelector('button')).toHaveAttribute('aria-expanded', 'true')
     })
 
-    // Close menu
     rerender(<TestWrapper isOpen={false} onClose={jest.fn()} />)
 
-    // Reopen menu
     rerender(<TestWrapper isOpen={true} onClose={jest.fn()} />)
 
-    // Submenu should be closed
     const newLanguageItem = screen.getByTestId('app-mobile-menu-item-language')
     expect(newLanguageItem.querySelector('button')).toHaveAttribute('aria-expanded', 'false')
   })
@@ -297,12 +286,16 @@ describe('MobileMenu breakpoint cross (ADR-0012 Amendment 2)', () => {
 
   beforeEach(() => {
     document.body.style.overflow = ''
-    resetMobileMenuState()
+    act(() => {
+      resetMobileMenuState()
+    })
   })
 
   afterEach(() => {
     document.body.style.overflow = ''
-    resetMobileMenuState()
+    act(() => {
+      resetMobileMenuState()
+    })
   })
 
   it('sets up matchMedia listener for 768px when open', () => {

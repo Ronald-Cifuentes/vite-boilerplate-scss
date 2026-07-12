@@ -4,21 +4,24 @@
 # ========================================
 # Stage 1: Builder
 # ========================================
-FROM node:22.13.1-alpine AS builder
-
-# Enable corepack and install specific pnpm version
-RUN corepack enable && \
-    corepack prepare pnpm@9.15.4 --activate
+FROM node:24-alpine@sha256:a0b9bf06e4e6193cf7a0f58816cc935ff8c2a908f81e6f1a95432d679c54fbfd AS builder
 
 WORKDIR /build
 
-# Copy package manager lockfiles first (layer caching)
-COPY package.json pnpm-lock.yaml .npmrc ./
+# Copy package manager config files first to read packageManager field and workspace settings
+COPY package.json pnpm-workspace.yaml .npmrc ./
 
-# Install dependencies with pnpm (bypass packageManager guard)
+# Enable corepack and install pnpm version from packageManager field
+# This reads "packageManager": "pnpm@11.5.1" from package.json
+# Single source of truth - no hardcoded pnpm version
+RUN corepack enable && \
+    corepack install
+
+# Copy lockfile after corepack setup (layer caching)
+COPY pnpm-lock.yaml ./
+
+# Install dependencies with pnpm
 # --frozen-lockfile ensures reproducible builds
-# COREPACK_ENABLE_STRICT=0 disables corepack's packageManager field enforcement
-ENV COREPACK_ENABLE_STRICT=0
 RUN pnpm install --frozen-lockfile
 
 # Copy source code and configs

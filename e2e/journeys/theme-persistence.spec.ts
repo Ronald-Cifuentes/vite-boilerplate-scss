@@ -5,17 +5,14 @@ test.describe('Theme Persistence (Tri-State per ADR-0009)', () => {
     test('persists light preference across page reloads', async ({ page }) => {
       await page.goto('/')
 
-      // Find theme button and click to cycle: system -> light
       const themeButton = page.getByTestId('app-navbar-theme-button')
 
       // Default is system, first click goes to light
       await themeButton.click()
       await expect(page.locator('html')).toHaveAttribute('data-theme', 'light')
 
-      // Reload the page
       await page.reload()
 
-      // Theme should persist as light
       await expect(page.locator('html')).toHaveAttribute('data-theme', 'light')
     })
 
@@ -29,10 +26,8 @@ test.describe('Theme Persistence (Tri-State per ADR-0009)', () => {
       await themeButton.click() // dark
       await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
 
-      // Reload the page
       await page.reload()
 
-      // Theme should persist as dark
       await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
     })
 
@@ -47,7 +42,6 @@ test.describe('Theme Persistence (Tri-State per ADR-0009)', () => {
       await themeButton.click() // system
       await expect(themeButton).toHaveAccessibleName(/system/i)
 
-      // Reload the page
       await page.reload()
 
       // Preference should still be system (resolved based on OS)
@@ -57,7 +51,6 @@ test.describe('Theme Persistence (Tri-State per ADR-0009)', () => {
 
   test.describe('Tri-state cycle order', () => {
     test('cycles light -> dark -> system -> light', async ({ page }) => {
-      // Set initial state to light
       await page.goto('/')
       const themeButton = page.getByTestId('app-navbar-theme-button')
 
@@ -85,7 +78,6 @@ test.describe('Theme Persistence (Tri-State per ADR-0009)', () => {
       await page.goto('/')
       const themeButton = page.getByTestId('app-navbar-theme-button')
 
-      // Get initial icon (system)
       const systemIcon = await themeButton.locator('svg').innerHTML()
 
       // Cycle to light
@@ -172,7 +164,6 @@ test.describe('Theme Persistence (Tri-State per ADR-0009)', () => {
     })
 
     test('FOUC script resolves system preference via matchMedia', async ({ page }) => {
-      // Emulate dark mode preference
       await page.emulateMedia({ colorScheme: 'dark' })
       await page.goto('/')
 
@@ -181,12 +172,10 @@ test.describe('Theme Persistence (Tri-State per ADR-0009)', () => {
     })
 
     test('FOUC script respects explicit light preference', async ({ page, context }) => {
-      // Set preference to light in storage
       await context.addInitScript(() => {
         localStorage.setItem('app-theme', 'light')
       })
 
-      // Emulate dark OS preference
       await page.emulateMedia({ colorScheme: 'dark' })
       await page.goto('/')
 
@@ -195,12 +184,10 @@ test.describe('Theme Persistence (Tri-State per ADR-0009)', () => {
     })
 
     test('FOUC script respects explicit dark preference', async ({ page, context }) => {
-      // Set preference to dark in storage
       await context.addInitScript(() => {
         localStorage.setItem('app-theme', 'dark')
       })
 
-      // Emulate light OS preference
       await page.emulateMedia({ colorScheme: 'light' })
       await page.goto('/')
 
@@ -209,12 +196,10 @@ test.describe('Theme Persistence (Tri-State per ADR-0009)', () => {
     })
 
     test('FOUC script handles stored system value via matchMedia', async ({ page, context }) => {
-      // Set preference to 'system' in storage
       await context.addInitScript(() => {
         localStorage.setItem('app-theme', 'system')
       })
 
-      // Emulate dark OS preference
       await page.emulateMedia({ colorScheme: 'dark' })
       await page.goto('/')
 
@@ -225,7 +210,6 @@ test.describe('Theme Persistence (Tri-State per ADR-0009)', () => {
 
   test.describe('Default preference', () => {
     test('new users default to system preference', async ({ page, context }) => {
-      // Clear storage
       await context.clearCookies()
 
       await page.goto('/')

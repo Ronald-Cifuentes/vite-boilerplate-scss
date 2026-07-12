@@ -10,7 +10,6 @@ test.describe('Country Selection Journey', () => {
     await page.goto('/')
     await page.waitForLoadState('networkidle')
 
-    // Verify we're starting with USD (default)
     const priceValue = page.getByTestId('app-greeting-price-value')
     await expect(priceValue).toContainText('USD')
   })
@@ -24,7 +23,6 @@ test.describe('Country Selection Journey', () => {
       const usDateText = await dateDisplay.textContent()
       expect(usDateText).toBeTruthy()
 
-      // Open dropdown and select Spain (ES)
       await countryTrigger.click()
       await page.getByTestId('app-navbar-country-option-ES').click()
       await expect(countryTrigger).toHaveAccessibleName(/spain/i)
@@ -54,7 +52,6 @@ test.describe('Country Selection Journey', () => {
       // Capture initial date format (US format)
       const usDateText = await dateDisplay.textContent()
 
-      // Open dropdown and select Spain (ES)
       await countryTrigger.click()
       await page.getByTestId('app-navbar-country-option-ES').click()
       await expect(countryTrigger).toHaveAccessibleName(/spain/i)
@@ -116,18 +113,14 @@ test.describe('Country Selection Journey', () => {
     test('When the page is reloaded, Then the chosen country persists', async ({ page }) => {
       const countryTrigger = page.getByTestId('app-navbar-country-trigger')
 
-      // Initial state should be US
       await expect(countryTrigger).toHaveAccessibleName(/united states/i)
 
-      // Open dropdown and select Spain
       await countryTrigger.click()
       await page.getByTestId('app-navbar-country-option-ES').click()
       await expect(countryTrigger).toHaveAccessibleName(/spain/i)
 
-      // Reload the page
       await page.reload()
 
-      // Country should still be Spain after reload
       const countryTriggerAfterReload = page.getByTestId('app-navbar-country-trigger')
       await expect(countryTriggerAfterReload).toHaveAccessibleName(/spain/i)
     })
@@ -135,15 +128,12 @@ test.describe('Country Selection Journey', () => {
     test('When selecting UK and reloading, Then UK persists', async ({ page }) => {
       const countryTrigger = page.getByTestId('app-navbar-country-trigger')
 
-      // Open dropdown and select UK
       await countryTrigger.click()
       await page.getByTestId('app-navbar-country-option-GB').click()
       await expect(countryTrigger).toHaveAccessibleName(/united kingdom/i)
 
-      // Reload
       await page.reload()
 
-      // Should still be UK
       await expect(page.getByTestId('app-navbar-country-trigger')).toHaveAccessibleName(
         /united kingdom/i
       )
@@ -152,15 +142,12 @@ test.describe('Country Selection Journey', () => {
     test('When selecting Mexico and reloading, Then Mexico persists', async ({ page }) => {
       const countryTrigger = page.getByTestId('app-navbar-country-trigger')
 
-      // Open dropdown and select Mexico
       await countryTrigger.click()
       await page.getByTestId('app-navbar-country-option-MX').click()
       await expect(countryTrigger).toHaveAccessibleName(/mexico/i)
 
-      // Reload
       await page.reload()
 
-      // Should still be Mexico
       await expect(page.getByTestId('app-navbar-country-trigger')).toHaveAccessibleName(/mexico/i)
     })
   })
@@ -173,7 +160,6 @@ test.describe('Country Selection Journey', () => {
       // Initially announcer should be empty or have no announcement
       await expect(announcer).toBeVisible()
 
-      // Open dropdown and select Spain
       await countryTrigger.click()
       await page.getByTestId('app-navbar-country-option-ES').click()
 
@@ -192,14 +178,12 @@ test.describe('Country Selection Journey', () => {
       const countryTrigger = page.getByTestId('app-navbar-country-trigger')
       const announcer = page.getByTestId('app-navbar-country-announcer')
 
-      // Open dropdown and select a different country
       await countryTrigger.click()
       await page.getByTestId('app-navbar-country-option-ES').click()
 
       // Wait for the announcement to appear (condition-based wait)
       await expect(announcer).not.toBeEmpty()
 
-      // The announcement should be in Spanish (contains Spanish text)
       const announcerText = await announcer.textContent()
       // Check for Spanish region change text (could be "Pais cambiado a" or similar)
       expect(announcerText).toMatch(/cambiado|region|pais|espana|spain/i)
@@ -238,7 +222,6 @@ test.describe('Country Selection Journey', () => {
       // Capture US date format first (MM/DD/YYYY)
       const usDateText = await dateDisplay.textContent()
 
-      // Select Colombia
       await countryTrigger.click()
       await page.getByTestId('app-navbar-country-option-CO').click()
 
@@ -269,15 +252,12 @@ test.describe('Country Selection Journey', () => {
     test('Colombia persists after reload', async ({ page }) => {
       const countryTrigger = page.getByTestId('app-navbar-country-trigger')
 
-      // Select Colombia
       await countryTrigger.click()
       await page.getByTestId('app-navbar-country-option-CO').click()
       await expect(countryTrigger).toHaveAccessibleName(/colombia/i)
 
-      // Reload the page
       await page.reload()
 
-      // Colombia should persist
       await expect(page.getByTestId('app-navbar-country-trigger')).toHaveAccessibleName(/colombia/i)
     })
   })
@@ -301,10 +281,8 @@ test.describe('Country Selection Journey', () => {
       const countryTrigger = page.getByTestId('app-navbar-country-trigger')
       const dateDisplay = page.getByTestId('app-greeting-date')
 
-      // Capture US date format first
       const usDateText = await dateDisplay.textContent()
 
-      // Select China
       await countryTrigger.click()
       await page.getByTestId('app-navbar-country-option-CN').click()
 
@@ -333,15 +311,12 @@ test.describe('Country Selection Journey', () => {
     test('China persists after reload', async ({ page }) => {
       const countryTrigger = page.getByTestId('app-navbar-country-trigger')
 
-      // Select China
       await countryTrigger.click()
       await page.getByTestId('app-navbar-country-option-CN').click()
       await expect(countryTrigger).toHaveAccessibleName(/china/i)
 
-      // Reload
       await page.reload()
 
-      // China should persist
       await expect(page.getByTestId('app-navbar-country-trigger')).toHaveAccessibleName(/china/i)
     })
   })
@@ -365,10 +340,8 @@ test.describe('Country Selection Journey', () => {
       const countryTrigger = page.getByTestId('app-navbar-country-trigger')
       const dateDisplay = page.getByTestId('app-greeting-date')
 
-      // Capture US date format first
       const usDateText = await dateDisplay.textContent()
 
-      // Select Japan
       await countryTrigger.click()
       await page.getByTestId('app-navbar-country-option-JP').click()
 
@@ -397,15 +370,12 @@ test.describe('Country Selection Journey', () => {
     test('Japan persists after reload', async ({ page }) => {
       const countryTrigger = page.getByTestId('app-navbar-country-trigger')
 
-      // Select Japan
       await countryTrigger.click()
       await page.getByTestId('app-navbar-country-option-JP').click()
       await expect(countryTrigger).toHaveAccessibleName(/japan/i)
 
-      // Reload
       await page.reload()
 
-      // Japan should persist
       await expect(page.getByTestId('app-navbar-country-trigger')).toHaveAccessibleName(/japan/i)
     })
   })

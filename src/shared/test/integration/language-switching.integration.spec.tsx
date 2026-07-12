@@ -42,22 +42,18 @@ describe('Language Switching Integration', () => {
     it('Then both display initial English content', () => {
       renderComponents()
 
-      // Trigger shows language icon with proper aria-label
       expect(screen.getByTestId('lang-dropdown-trigger')).toHaveAttribute(
         'aria-label',
         expect.stringMatching(/english/i)
       )
-      // Greeting shows English text
       expect(screen.getByTestId('greeting-title')).toHaveTextContent('Hello')
     })
 
     it('When Spanish is selected via dropdown, Then both update', () => {
       renderComponents()
 
-      // Open the dropdown
       fireEvent.click(screen.getByTestId('lang-dropdown-trigger'))
 
-      // Find and click Spanish option
       const panel = screen.getByRole('listbox')
       const spanishOption = within(panel).getByText(/espa/i)
       fireEvent.click(spanishOption)
@@ -67,12 +63,10 @@ describe('Language Switching Integration', () => {
         jest.advanceTimersByTime(100)
       })
 
-      // Trigger shows Spanish in aria-label
       expect(screen.getByTestId('lang-dropdown-trigger')).toHaveAttribute(
         'aria-label',
         expect.stringMatching(/espa/i)
       )
-      // Greeting shows Spanish text
       expect(screen.getByTestId('greeting-title')).toHaveTextContent('Hola')
       expect(screen.getByTestId('greeting-subtitle')).toHaveTextContent(
         'Bienvenido a la aplicacion'

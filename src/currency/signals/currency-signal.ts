@@ -47,7 +47,6 @@ export function syncCurrencyToRegion(region: SupportedRegion): void {
  */
 export function formatCurrency(value: number): string {
   const currency = currencySignal.value
-  // Use appropriate locale for currency formatting
   const localeMap: Record<SupportedCurrency, string> = {
     COP: 'es-CO',
     USD: 'en-US',

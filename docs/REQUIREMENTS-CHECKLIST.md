@@ -554,13 +554,14 @@ ADR-0013, ADR-0014 + GPS amendment + CONTRACTS v3.5.0.
 
 ### SCROLL9. Menu Scroll Contract (ADR-0012 Amendment 2)
 
-| ID         | Requirement                                   | Test Location          | Status | Evidence                                                                               |
-| ---------- | --------------------------------------------- | ---------------------- | ------ | -------------------------------------------------------------------------------------- |
-| SCROLL9-01 | .menu has overflow-y: auto                    | MobileMenu.module.scss | [x]    | menu-theme-scroll-resize.spec.ts:134-143                                               |
-| SCROLL9-02 | Scrollbar uses DS tokens                      | MobileMenu.module.scss | [x]    | MobileMenu.module.scss:30 (--color-border-default)                                     |
-| SCROLL9-03 | All items reachable at 667x375 (landscape)    | e2e                    | [x]    | menu-theme-scroll-resize.spec.ts:103-132                                               |
-| SCROLL9-04 | All items reachable at 320x480 (small height) | e2e                    | [x]    | menu-theme-scroll-resize.spec.ts:145 (FE att.2); full suite green                      |
-| SCROLL9-05 | Focus-visible items scrolled into view        | MobileMenuItem.tsx     | [x]    | scrollIntoView on focus impl (FE att.2, helper deduped to utils/motion.ts); unit + e2e |
+| ID         | Requirement                                   | Test Location          | Status | Evidence                                                                                                                                               |
+| ---------- | --------------------------------------------- | ---------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| SCROLL9-01 | .menu has overflow-y: auto                    | MobileMenu.module.scss | [x]    | menu-theme-scroll-resize.spec.ts:134-143                                                                                                               |
+| SCROLL9-02 | Scrollbar uses DS tokens                      | MobileMenu.module.scss | [x]    | MobileMenu.module.scss:30 (--color-border-default)                                                                                                     |
+| SCROLL9-03 | All items reachable at 667x375 (landscape)    | e2e                    | [x]    | menu-theme-scroll-resize.spec.ts:103-132                                                                                                               |
+| SCROLL9-04 | All items reachable at 320x480 (small height) | e2e                    | [x]    | menu-theme-scroll-resize.spec.ts:145 (FE att.2); full suite green                                                                                      |
+| SCROLL9-05 | Focus-visible items scrolled into view        | MobileMenuItem.tsx     | [x]    | scrollIntoView on focus impl (FE att.2, helper deduped to utils/motion.ts); unit + e2e                                                                 |
+| SCROLL9-06 | First AND last items reachable (SCROLL-TOP-1) | e2e matrix             | [x]    | menu-scroll-reachability.spec.ts (12 combos: 3 submenus x 4 viewports); margin-auto fix Task-11; Task-12 added wheel+touch gesture variants (15 tests) |
 
 ### CROSS9. Menu Close on Breakpoint Cross (ADR-0012 Amendment 2)
 
@@ -664,3 +665,18 @@ ADR-0013, ADR-0014 + GPS amendment + CONTRACTS v3.5.0.
 implementation/test. CROSS9-04 is partially met (controls visible, focus not explicitly asserted).
 These are LOW severity gaps that do not block sign-off per the 6 user items (which are all PASS),
 but should be addressed in a future iteration.
+
+---
+
+## TASK 10: Dead-Code Sweep (2026-07-11)
+
+| ID      | Requirement                                 | Verification     | Status | Evidence                                    |
+| ------- | ------------------------------------------- | ---------------- | ------ | ------------------------------------------- |
+| DC10-01 | SAFE-DELETE items (28) removed per register | git diff + gates | [x]    | DEADCODE-REGISTER execution summary         |
+| DC10-02 | NJ-11 defect fixed (hardcoded announcement) | grep + test      | [x]    | useGeoDetection.ts:79 wired to i18n key     |
+| DC10-03 | CONTRACTS.md i18n dictionary amended        | File diff        | [x]    | CONTRACTS.md v3.5.x cleanup note            |
+| DC10-04 | Bundle size DOWN or equal (never up)        | stat + gzip      | [x]    | 240,933->240,396 raw; 75,687->75,594 gzip   |
+| DC10-05 | All gates green post-sweep                  | CI gates         | [x]    | lint 0, tsc 0, jest 879 100%x4, e2e 192/192 |
+| DC10-06 | No hardcoded strings introduced             | grep             | [x]    | grep TODO/FIXME/hardcoded -> 0 violations   |
+| DC10-07 | No secrets introduced                       | grep             | [x]    | secret pattern grep -> 0 matches            |
+| DC10-08 | Register updated with execution status      | File content     | [x]    | DEADCODE-REGISTER-20260711.md updated       |

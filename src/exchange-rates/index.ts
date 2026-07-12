@@ -1,8 +1,6 @@
-// Types
 export type { ExchangeRatesPort } from './ports/ExchangeRates'
 export type { RateStatus, RateSnapshot, RatesState, CachedRates } from './types/Rate'
 
-// Config
 export {
   BANREP_SERIES,
   BANXICO_SERIES,

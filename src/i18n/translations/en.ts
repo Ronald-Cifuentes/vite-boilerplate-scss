@@ -10,10 +10,6 @@ export const en: TranslationDictionary = {
     formattedDate: 'Today is',
     formattedPrice: 'Sample price',
   },
-  languageSelector: {
-    label: 'Language',
-    changeLanguage: 'Change language',
-  },
   mobileMenu: {
     openMenu: 'Open menu',
     closeMenu: 'Close menu',
@@ -24,18 +20,12 @@ export const en: TranslationDictionary = {
     theme: 'Theme',
   },
   navbar: {
-    language: 'Language',
-    theme: 'Theme',
-    country: 'Country',
-    currency: 'Currency',
     selectLanguage: 'Select language',
     selectCountry: 'Select country',
     selectCurrency: 'Select currency',
     currentLanguage: 'current language',
     currentCountry: 'current country',
     currentCurrency: 'current currency',
-    lightMode: 'Light mode',
-    darkMode: 'Dark mode',
     themeModeLight: 'Light mode',
     themeModeDark: 'Dark mode',
     themeModeSystem: 'System theme',
@@ -56,13 +46,15 @@ export const en: TranslationDictionary = {
     partial: 'Some rates unavailable',
   },
   a11y: {
-    languageSelectorDescription: 'Select your preferred language',
-    currentLanguage: 'Current language',
     languageChangedTo: 'Language changed to',
     themeChangedTo: 'Theme changed to',
     countryChangedTo: 'Country changed to',
     currencyChangedTo: 'Currency changed to',
     skipToContent: 'Skip to content',
     locationDetected: 'Location detected',
+  },
+  error: {
+    title: 'Error',
+    reload: 'Retry',
   },
 }

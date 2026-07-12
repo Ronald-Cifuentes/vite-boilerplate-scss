@@ -7,11 +7,20 @@
   align-items: center;
   justify-content: flex-end;
   padding: t.$space-3 t.$space-4;
-  // Task-8: Transparent navbar per user requirement; position:static (in-flow)
-  // so transparency reveals the page background. Controls use theme tokens
-  // (--color-text-primary) so contrast is maintained in both themes.
+  // Fully transparent: no background, border, or color of its own — controls
+  // carry their own theme-token contrast. The ONLY allowed adornment is a
+  // shadow, and ONLY when the document actually has scrollable content:
+  // the scroll() timeline is inactive in non-scrolling documents, so the
+  // animation (whose every keyframe holds the shadow) never applies there.
+  // Non-supporting browsers degrade to no shadow, never to a wrong visual.
   background-color: transparent;
-  border-bottom: 1px solid var(--color-border-default);
+  border: none;
+  // Longhand on purpose: minifiers illegally fold animation-timeline into the
+  // `animation` shorthand (which resets timeline per spec), breaking the rule.
+  animation-name: navbar-scroll-shadow;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+  animation-timeline: scroll();
   @include anim.theme-transition;
 
   @include r.media-md {
@@ -19,8 +28,6 @@
   }
 }
 
-// Mobile controls: hamburger button
-// Visible at < 768px (base styles)
 .mobileControls {
   display: flex;
   align-items: center;
@@ -30,8 +37,6 @@
   }
 }
 
-// Desktop controls: inline dropdowns
-// Hidden at < 768px (base), visible at >= 768px
 .desktopControls {
   display: none;
   align-items: center;
@@ -40,5 +45,15 @@
   @include r.media-md {
     display: flex;
     gap: t.$space-3;
+  }
+}
+
+// Static keyframes (presence-only, no motion): paired with the scroll()
+// timeline above, the shadow exists only when the document can scroll.
+// Kept in-module so CSS-modules scoping keeps name and keyframes matched.
+@keyframes navbar-scroll-shadow {
+  from,
+  to {
+    box-shadow: var(--shadow-md);
   }
 }

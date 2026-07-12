@@ -1,2 +1,2 @@
-export { Greeting, default } from './Greeting'
+export { Greeting } from './Greeting'
 export type { GreetingProps } from './interfaces'

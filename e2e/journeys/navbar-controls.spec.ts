@@ -10,13 +10,10 @@ test.describe('Navbar Controls', () => {
       const langTrigger = page.getByTestId('app-navbar-language-trigger')
       await expect(langTrigger).toBeVisible()
 
-      // Click to open dropdown
       await langTrigger.click()
 
-      // Verify dropdown is open
       await expect(langTrigger).toHaveAttribute('aria-expanded', 'true')
 
-      // Verify options are visible
       await expect(page.getByTestId('app-navbar-language-option-en')).toBeVisible()
       await expect(page.getByTestId('app-navbar-language-option-es')).toBeVisible()
     })
@@ -27,7 +24,6 @@ test.describe('Navbar Controls', () => {
       // Initial state should show English in the aria-label
       await expect(langTrigger).toHaveAccessibleName(/english/i)
 
-      // Open dropdown and select Spanish
       await langTrigger.click()
       await expect(langTrigger).toHaveAttribute('aria-expanded', 'true')
 
@@ -35,7 +31,6 @@ test.describe('Navbar Controls', () => {
       await expect(spanishOption).toBeVisible()
       await spanishOption.click()
 
-      // Dropdown should close and language should change
       await expect(langTrigger).toHaveAttribute('aria-expanded', 'false')
 
       // HTML lang should update (Playwright auto-waits for condition)
@@ -45,7 +40,6 @@ test.describe('Navbar Controls', () => {
     test('trigger is focusable and has keyboard support', async ({ page }) => {
       const langTrigger = page.getByTestId('app-navbar-language-trigger')
 
-      // Trigger is focusable
       await langTrigger.focus()
       await expect(langTrigger).toBeFocused()
 
@@ -126,7 +120,6 @@ test.describe('Navbar Controls', () => {
     test('icon changes per preference', async ({ page }) => {
       const themeButton = page.getByTestId('app-navbar-theme-button')
 
-      // Get system icon
       const systemIcon = await themeButton.locator('svg').innerHTML()
 
       // Cycle to light
@@ -143,7 +136,6 @@ test.describe('Navbar Controls', () => {
     test('is icon-only (no visible text)', async ({ page }) => {
       const themeButton = page.getByTestId('app-navbar-theme-button')
 
-      // Button should have an SVG icon
       await expect(themeButton.locator('svg')).toBeVisible()
 
       // Button text content should be empty (icon-only)
@@ -166,31 +158,25 @@ test.describe('Navbar Controls', () => {
       const countryTrigger = page.getByTestId('app-navbar-country-trigger')
       await expect(countryTrigger).toBeVisible()
 
-      // Click to open dropdown
       await countryTrigger.click()
 
-      // Verify dropdown is open
       await expect(countryTrigger).toHaveAttribute('aria-expanded', 'true')
     })
 
     test('selects country from dropdown', async ({ page }) => {
       const countryTrigger = page.getByTestId('app-navbar-country-trigger')
 
-      // Initial state - US
       await expect(countryTrigger).toHaveAccessibleName(/united states/i)
 
-      // Open dropdown and select Spain
       await countryTrigger.click()
       await page.getByTestId('app-navbar-country-option-ES').click()
 
-      // Country should change
       await expect(countryTrigger).toHaveAccessibleName(/spain/i)
     })
 
     test('trigger is focusable and has keyboard support', async ({ page }) => {
       const countryTrigger = page.getByTestId('app-navbar-country-trigger')
 
-      // Trigger is focusable
       await countryTrigger.focus()
       await expect(countryTrigger).toBeFocused()
 
@@ -209,21 +195,17 @@ test.describe('Navbar Controls', () => {
       const currencyTrigger = page.getByTestId('app-navbar-currency-trigger')
       await expect(currencyTrigger).toBeVisible()
 
-      // Click to open dropdown
       await currencyTrigger.click()
 
-      // Verify dropdown is open
       await expect(currencyTrigger).toHaveAttribute('aria-expanded', 'true')
     })
 
     test('selects currency from dropdown', async ({ page }) => {
       const currencyTrigger = page.getByTestId('app-navbar-currency-trigger')
 
-      // Open dropdown and select EUR
       await currencyTrigger.click()
       await page.getByTestId('app-navbar-currency-option-EUR').click()
 
-      // Currency should change
       await expect(currencyTrigger).toHaveAccessibleName(/eur/i)
     })
   })
@@ -241,7 +223,6 @@ test.describe('Navbar Controls', () => {
     })
 
     test('respects prefers-reduced-motion', async ({ page }) => {
-      // Emulate reduced motion preference
       await page.emulateMedia({ reducedMotion: 'reduce' })
 
       // Verify the theme button still works (functionality not affected)

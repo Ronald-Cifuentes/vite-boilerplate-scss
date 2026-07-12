@@ -1,2 +1,2 @@
-export { Announcer, Announcer as default } from './Announcer'
+export { Announcer } from './Announcer'
 export type { AnnouncerProps } from './interfaces'
