@@ -1,33 +1,35 @@
 {
-  "task": "TASK 29: CI 'Docker Build & Scan' red (Trivy exit 1). RC1: gha layer cache froze `RUN apk upgrade` -> curl/libcurl stuck 8.19.0-r0 (2 HIGH: CVE-2026-6276, CVE-2026-5773; 6 MEDIUM; fixes in 8.20.0-r0). RC2: trivy-action unsets TRIVY_SEVERITY when format=sarif -> exit-code:1 gated on ANY severity, contradicting declared CRITICAL,HIGH policy.",
-  "startedAt": "20260718-1524",
-  "completedAt": "20260718-1536",
-  "previousTask": "logs/state-20260713-task28-final.json",
+  "task": "TASK 31: Vercel deploy red #2 at commit 05cd40d (prod logs 17:17 and 17:23 no-cache retry, identical ERR_INVALID_THIS). RC PROVEN: PATH shadowing — corepack shims land in node's bin dir; Vercel provisions pnpm 6 earlier in PATH ('oldest available' rule, active because installCommand mentioned pnpm and no lockfile committed); bare `pnpm install` ran pnpm 6 on Node 24 → node-fetch ERR_INVALID_THIS on every registry GET. corepack itself worked in both failed builds ('Adding pnpm@11.5.1 to the cache...'). Fingerprints: 'Scope: all 2 workspace projects' (pnpm-6 default packages ** catching e2e/; pnpm-workspace.yaml has no packages field so pnpm 11 sees 1 project).",
+  "startedAt": "20260718-1732",
+  "completedAt": "20260718-1744",
+  "previousTask": "logs/state-20260718-task30-final.json",
   "taskClass": "small",
-  "baseline": "6e47484 (clean tree, = commit of the failing CI run image tag)",
-  "changedDomains": ["devops", "security-triage"],
-  "deliveredScope": ["Dockerfile", ".github/workflows/ci.yml"],
+  "baseline": "05cd40d (clean tree)",
+  "changedDomains": ["devops"],
+  "deliveredScope": ["vercel.json (2 lines): installCommand 'corepack install && corepack pnpm install --no-frozen-lockfile'; buildCommand 'corepack pnpm run build' — corepack-prefixed invocation executes the packageManager-pinned 11.5.1 from corepack's cache regardless of PATH; 'corepack enable' dropped (proven not load-bearing: it succeeded on Vercel and the failure still occurred)"],
   "requiredGates": {
-    "lint_clean": { "status": true, "evidence": "if pnpm lint -> LINT=PASS (if/else channel per INC-006)" },
-    "typecheck_clean": { "status": true, "evidence": "if pnpm exec tsc --noEmit -> TSC=PASS" },
-    "build_ok": { "status": true, "evidence": "if pnpm exec vite build -> BUILD=PASS" },
-    "affected_tests_pass": { "status": true, "evidence": "vacuous: no src/test files in diff (git diff --name-only vs 6e47484)" },
-    "no_hardcoded": { "status": true, "evidence": "declarative CI config only; no date-based cache-busts" },
-    "no_todo_fixme": { "status": true, "evidence": "diff grep TODO|FIXME|HACK -> 0" },
-    "yaml_valid": { "status": true, "evidence": "pyyaml safe_load -> 'yaml OK' (output-based)" },
-    "docker_build_ok_local": { "status": true, "evidence": "task29-verify:nocache fresh build; cached variant reproduced frozen-layer bug (image date 6d old, curl 8.19.0-r0)" },
-    "container_scan_clean_local": { "status": true, "evidence": "if/else inside trivy 0.70.0 container: GATE_CACHED=fail (4 HIGH), GATE_NOCACHE=pass (0 CRIT/HIGH; curl+libcurl 8.20.0-r0 via apk list)" },
-    "ci_green": { "status": "pending_user_push", "evidence": "INC-005 prohibits orchestrator git ops; local gate simulation flag-equivalent to new CI gate step" }
+    "lint_clean": { "status": true, "evidence": "LINT=PASS (orchestrator fresh 1744 + QA 1738, if/else channel)" },
+    "typecheck_clean": { "status": true, "evidence": "TSC=PASS (x2 independent)" },
+    "build_ok": { "status": true, "evidence": "BUILD=PASS (x2 independent)" },
+    "affected_tests_pass": { "status": true, "evidence": "vacuous: zero src/test files in diff (QA adjudicated, task-29/30 precedent)" },
+    "no_hardcoded": { "status": true, "evidence": "QA BARE_PNPM_COUNT=0, COREPACK_PNPM_COUNT=2; no version literals; packageManager field remains single source of truth" },
+    "no_secrets": { "status": true, "evidence": "Security grep NO_MATCHES; 0 findings" },
+    "no_todo_fixme": { "status": true, "evidence": "QA TODO_FIXME_COUNT=0" },
+    "vercel_json_valid": { "status": true, "evidence": "VJSON=OK (DevOps + QA independent)" },
+    "sim_e2e_rogue_path_pass": { "status": true, "evidence": "3 independent executions green (DevOps 1736, refuter R3 with control+fidelity variant, orchestrator 1744 with LOCKFILE=ABSENT → RESOLUTION=FULL): SIM_INSTALL=PASS, SIM_BUILD=PASS, DIST=OK, ROGUE_INVOKED=NO, COREPACK_PNPM_VERSION=11.5.1; exact command strings parsed from working-tree vercel.json; R3 control: old task-30 command under same rogue PATH → CONTROL_ROGUE_INVOKED=YES (harness proven non-vacuous, corepack enable proven not to fix bare resolution)" },
+    "adversarial_refutation": { "status": true, "evidence": "3 lenses refuted=false at high confidence: corepack-semantics (README/Node-24 docs cited + container probes incl. COREPACK_ENABLE_NETWORK=0 offline build-step proof), vercel-pipeline (docs cited: single container, full command overrides, vite preset auto outputDirectory dist, no api/ dir), e2e-repro (independent scripts)" },
+    "vercel_deploy_green": { "status": "pending_user_push", "evidence": "INC-005; sim is command-equivalent + docs-verified pipeline equivalence" }
   },
+  "failBeforeEvidence": "Two prod Vercel logs at 05cd40d (17:17 fresh, 17:23 cache-skipped retry): corepack cache-add OK, then 16 parallel registry GETs all ERR_INVALID_THIS through retries → ERR_PNPM_META_FETCH_FAIL → exit 1. Local rogue-PATH experiment: BARE_PNPM_RESOLVES_TO=6.35.1 vs COREPACK_PNPM_RESOLVES_TO=11.5.1 after identical corepack steps.",
   "profiles": {
-    "orchestrator": { "status": "signed_off", "log": "logs/20260718-1536-Orchestrator_Master.md" },
-    "architect": { "status": "not_applicable", "log": "logs/20260718-1536-Architect.md" },
-    "backend-engineer": { "status": "not_applicable", "log": "logs/20260718-1536-Backend_Engineer.md" },
-    "frontend-engineer": { "status": "not_applicable", "log": "logs/20260718-1536-Frontend_Engineer.md" },
-    "qa-engineer": { "status": "passed", "log": "logs/20260718-1535-QA_Engineer.md" },
-    "security-auditor": { "status": "passed", "log": "logs/20260718-1535-Security_Auditor.md" },
-    "performance-engineer": { "status": "not_applicable", "log": "logs/20260718-1536-Performance_Engineer.md" },
-    "devops-engineer": { "status": "passed", "log": "logs/20260718-1524-DevOps_Engineer.md" }
+    "orchestrator": { "status": "signed_off", "log": "logs/20260718-1744-Orchestrator_Master.md" },
+    "architect": { "status": "not_applicable", "log": "logs/20260718-1744-Architect.md" },
+    "backend-engineer": { "status": "not_applicable", "log": "logs/20260718-1744-Backend_Engineer.md" },
+    "frontend-engineer": { "status": "not_applicable", "log": "logs/20260718-1744-Frontend_Engineer.md" },
+    "qa-engineer": { "status": "passed", "log": "logs/20260718-1738-QA_Engineer.md", "note": "0 defects; DEVOPS_TOKENS_MATCH=8/8; GIT_STATUS_FILE_COUNT=2 (scope clean)" },
+    "security-auditor": { "status": "passed", "log": "logs/20260718-1737-Security_Auditor.md", "note": "0 findings; PATH-shadowing class eliminated on deploy path" },
+    "performance-engineer": { "status": "not_applicable", "log": "logs/20260718-1744-Performance_Engineer.md" },
+    "devops-engineer": { "status": "passed", "log": "logs/20260718-1736-DevOps_Engineer.md", "note": "scope clean this time — filesTouched fully disclosed and verified (DEVOPS-SCOPE-1 countermeasure held)" }
   },
   "iteration": 1,
   "maxIterations": 6,
@@ -35,40 +37,26 @@
   "noProgressLimit": 3,
   "noProgressStreak": 0,
   "openFindings": [
-    "QA-ADV-1 (task 23, carried): accessibility.spec.ts:59 wall-clock <500ms — owner decision pending",
-    "REGISTER hard-sleep (partial, carried): waitForTimeout remains in menu-theme-scroll-resize.spec.ts, geo-detection.spec.ts, geo-mock.ts",
-    "POLICY-Q (task 29): ignore-unfixed on the Trivy gate — Security recommends NO (use .trivyignore with explicit CVE IDs + justification if an unfixed finding must be accepted); owner decision pending"
+    "QA-ADV-1 (task 23, carried)",
+    "REGISTER hard-sleep (partial, carried)",
+    "POLICY-Q (task 29, carried)",
+    "JUNK-1 (task 30, carried): 1necho committed garbage — owner decision",
+    "UPSTREAM-1 (task 30, carried): npm-path ERESOLVE accepted until eslint-plugin-react ships eslint-10 peer range",
+    "PATH-SHIM-ADV-1 (task 31, NEW, advisory): corepack does not shim PATH for child processes (refuter-proven) — any future deploy-path script invoking bare pnpm under 'corepack pnpm run' resolves to Vercel's PATH pnpm 6 and reintroduces ERR_INVALID_THIS; deploy path clean today (build='tsc && vite build', prepare='husky'). Also: Node 25+ drops bundled corepack — revisit vercel.json before engines moves past 24.x (loud failure mode)."
   ],
   "incidentsCarriedOver": [
     "INC-001 destructive git prohibition",
-    "PATTERN FE gate-glossing — orchestrator re-verifies everything",
-    "INC-002 stale sign-off evidence — fresh gates at sign-off",
-    "INC-003 QA soft-classification — orchestrator re-adjudicates severity",
-    "INC-004 FE unverified claims — all agent gate numbers re-measured by orchestrator (absolute)",
-    "INC-005 no commit without explicit per-commit user authorization — end-of-task recommendation only",
-    "INC-006 (NEW, task 29): rtk PreToolUse hook pre-expands literal $? to 0 in Bash commands — echoed exit codes are FABRICATED (canary: sh -c 'exit 42' reported 0). All gate evidence must use if/then/else or output-based measurement. Prior sessions' $?-based evidence is suspect. Saved to persistent memory."
+    "INC-002 fresh gates at sign-off",
+    "INC-003 orchestrator re-adjudicates severity",
+    "INC-004 orchestrator re-measures all agent gate numbers; diff-scope check standing after every implementation dispatch",
+    "INC-005 no commit/stage without explicit per-commit user authorization",
+    "INC-006 rtk hook fabricates $? (if/else evidence only) + corrupts docker sh -c $VAR one-liners (script-file workaround) + blocks standalone npm/npx words"
   ],
   "history": [
-    {
-      "iteration": 1,
-      "ts": "20260718-1524",
-      "action": "intake: diagnosis pre-confirmed (code-scanning alerts: curl/libcurl 8.19.0-r0, 2 HIGH + 6 MEDIUM, fixed 8.20.0-r0; trivy-action sarif severity-unset behavior); taskClass small; devops dispatched"
-    },
-    {
-      "iteration": 1,
-      "ts": "20260718-1530",
-      "action": "devops delivered: Dockerfile AS runtime + updated comment; ci.yml no-cache-filters + Trivy split (SARIF report first, CRITICAL,HIGH gate second, upload guard retained); orchestrator diff review clean"
-    },
-    {
-      "iteration": 1,
-      "ts": "20260718-1533",
-      "action": "INC-006 discovered during INC-004 re-measurement: every $?-echo returned 0 including canary exit-42; trivy behavior was correct all along — re-proven via if/else inside container: GATE_CACHED=fail (4 HIGH), GATE_NOCACHE=pass; curl 8.20.0-r0 in fresh image; memory file written"
-    },
-    {
-      "iteration": 1,
-      "ts": "20260718-1536",
-      "action": "QA PASS (14-item checklist, 0 defects: order/pins/stage-name-match/id-refs/hardening all evidenced); Security PASSED (gate strength preserved, supply chain pinned, no new surface; ignore-unfixed: recommend NO); always-on gates green via if/else; FINAL SIGN-OFF — awaiting user commit authorization (INC-005), ci_green flips on push"
-    }
+    { "iteration": 1, "ts": "20260718-1732", "action": "intake: two identical prod failures at 05cd40d; root cause proven via rogue-PATH experiment; ultracode workflow dispatched" },
+    { "iteration": 1, "ts": "20260718-1736", "action": "DevOps delivered 2-line vercel.json fix, all 8 tokens green, filesTouched fully disclosed (scope verified clean by orchestrator + QA)" },
+    { "iteration": 1, "ts": "20260718-1738", "action": "verification fleet: QA PASSED (0 defects), Security PASSED (0 findings), 3 refuters refuted=false high-confidence; R3 control proved harness non-vacuous and caught git-ignored-lockfile sim-fidelity gap, closed via full-resolution re-run" },
+    { "iteration": 1, "ts": "20260718-1744", "action": "orchestrator INC-004 re-measure: hostile-PATH no-lockfile sim → RESOLUTION=FULL + all tokens green; fresh host gates green; PATH-SHIM-ADV-1 opened; FINAL SIGN-OFF; awaiting user commit (INC-005)" }
   ],
-  "finalStatus": "Task 29 delivered and verified; working tree awaiting user commit (Dockerfile, .github/workflows/ci.yml, logs/, state.json); ci_green pending push."
+  "finalStatus": "Task 31 delivered and verified; working tree awaiting user commit (vercel.json + state.json/logs bookkeeping); vercel_deploy_green flips on push."
 }
