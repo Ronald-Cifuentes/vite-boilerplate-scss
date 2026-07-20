@@ -4,6 +4,18 @@
 // Fullscreen overlay with band-slide animation
 
 .menu {
+  // Native <dialog> UA style resets:
+  // Browsers apply position:absolute, margin:auto, border:solid, padding:1em,
+  // background:Canvas, color:CanvasText, max-width/max-height, etc.
+  // These overrides neutralize them so the box model matches the prior div.
+  margin: 0;
+  border: 0;
+  padding: 0;
+  max-width: none;
+  max-height: none;
+  background: transparent;
+  color: inherit;
+
   position: fixed;
   top: 0;
   left: 0;

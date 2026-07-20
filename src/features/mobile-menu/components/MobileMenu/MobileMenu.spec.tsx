@@ -267,7 +267,8 @@ describe('MobileMenu', () => {
 
     const menu = screen.getByTestId('app-mobile-menu')
     expect(menu).toBeInTheDocument()
-    expect(menu).toHaveAttribute('role', 'dialog')
+    // Native <dialog> element has implicit dialog role (no role attribute needed)
+    expect(menu.tagName).toBe('DIALOG')
   })
 
   it('renders announcers for accessibility', () => {

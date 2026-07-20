@@ -15,7 +15,7 @@ export const Greeting: FC<GreetingProps> = ({ dataTestId = 'greeting', className
 
   const date = formatDate(new Date())
   const cp = convert(BASE_PRICE_COP, currency)
-  const price = cp !== null ? formatAmount(cp, currency) : formatAmount(BASE_PRICE_COP, 'COP')
+  const price = cp === null ? formatAmount(BASE_PRICE_COP, 'COP') : formatAmount(cp, currency)
 
   const getStatus = (): string | null => {
     const { status: s, staleAgeMs: a } = state

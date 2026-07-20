@@ -30,7 +30,7 @@ function getDeviceLanguageLocale(): SupportedLocale | null {
     // Extract language code (e.g., 'en-US' -> 'en')
     const langCode = lang.split('-')[0].toLowerCase()
     if (isSupportedLocale(langCode)) {
-      return langCode as SupportedLocale
+      return langCode
     }
   }
   return null

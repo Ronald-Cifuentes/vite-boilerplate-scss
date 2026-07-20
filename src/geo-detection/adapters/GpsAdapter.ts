@@ -5,9 +5,24 @@ export interface GpsCoords {
   readonly longitude: number
 }
 
+export type GpsErrorReason = 'denied' | 'unavailable' | 'timeout'
+
 export type GpsResult =
   | { readonly success: true; readonly coords: GpsCoords }
-  | { readonly success: false; readonly reason: 'denied' | 'unavailable' | 'timeout' }
+  | { readonly success: false; readonly reason: GpsErrorReason }
+
+/**
+ * Map GeolocationPositionError code to a user-friendly reason string
+ */
+function mapGpsErrorToReason(error: GeolocationPositionError): GpsErrorReason {
+  if (error.code === error.PERMISSION_DENIED) {
+    return 'denied'
+  }
+  if (error.code === error.TIMEOUT) {
+    return 'timeout'
+  }
+  return 'unavailable'
+}
 
 /**
  * Request GPS position from browser
@@ -31,13 +46,7 @@ export function requestGpsPosition(): Promise<GpsResult> {
         })
       },
       error => {
-        const reason: 'denied' | 'unavailable' | 'timeout' =
-          error.code === error.PERMISSION_DENIED
-            ? 'denied'
-            : error.code === error.TIMEOUT
-              ? 'timeout'
-              : 'unavailable'
-        resolve({ success: false, reason })
+        resolve({ success: false, reason: mapGpsErrorToReason(error) })
       },
       {
         timeout: GPS_TIMEOUT_MS,

@@ -9,7 +9,7 @@ FROM node:24-alpine@sha256:a0b9bf06e4e6193cf7a0f58816cc935ff8c2a908f81e6f1a95432
 WORKDIR /build
 
 # Copy package manager config files first to read packageManager field and workspace settings
-COPY package.json pnpm-workspace.yaml .npmrc ./
+COPY package.json pnpm-workspace.yaml ./
 
 # Enable corepack and install pnpm version from packageManager field
 # This reads "packageManager": "pnpm@11.5.1" from package.json

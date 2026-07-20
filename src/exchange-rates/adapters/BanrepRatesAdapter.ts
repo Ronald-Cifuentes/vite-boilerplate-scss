@@ -22,7 +22,7 @@ export async function fetchBanrepRate(currency: BanrepCurrency): Promise<RateSna
 
   const e = data[0] as SuamecaEntry
   const m = typeof e.unidad === 'string' ? UNIDAD_RE.exec(e.unidad) : null
-  if (!m || m[1] !== currency) return null
+  if (m?.[1] !== currency) return null
 
   const copPerUnit = parseNum(e.valor)
   if (!copPerUnit) return null

@@ -61,4 +61,3 @@ yarn.lock
 
 # Misc
 .allow-test-config-edits
-remote.config.json

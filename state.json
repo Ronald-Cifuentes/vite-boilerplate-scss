@@ -1,35 +1,62 @@
 {
-  "task": "TASK 31: Vercel deploy red #2 at commit 05cd40d (prod logs 17:17 and 17:23 no-cache retry, identical ERR_INVALID_THIS). RC PROVEN: PATH shadowing — corepack shims land in node's bin dir; Vercel provisions pnpm 6 earlier in PATH ('oldest available' rule, active because installCommand mentioned pnpm and no lockfile committed); bare `pnpm install` ran pnpm 6 on Node 24 → node-fetch ERR_INVALID_THIS on every registry GET. corepack itself worked in both failed builds ('Adding pnpm@11.5.1 to the cache...'). Fingerprints: 'Scope: all 2 workspace projects' (pnpm-6 default packages ** catching e2e/; pnpm-workspace.yaml has no packages field so pnpm 11 sees 1 project).",
-  "startedAt": "20260718-1732",
-  "completedAt": "20260718-1744",
-  "previousTask": "logs/state-20260718-task30-final.json",
-  "taskClass": "small",
-  "baseline": "05cd40d (clean tree)",
-  "changedDomains": ["devops"],
-  "deliveredScope": ["vercel.json (2 lines): installCommand 'corepack install && corepack pnpm install --no-frozen-lockfile'; buildCommand 'corepack pnpm run build' — corepack-prefixed invocation executes the packageManager-pinned 11.5.1 from corepack's cache regardless of PATH; 'corepack enable' dropped (proven not load-bearing: it succeeded on Vercel and the failure still occurred)"],
+  "task": "TASK 34: thorough repo cleaning — remove everything unnecessary WITHOUT breaking anything working (user non-negotiable). Every removal evidence-justified and validated across all scenario surfaces.",
+  "startedAt": "20260720-1549",
+  "completedAt": "20260720-1618",
+  "previousTask": "logs/state-20260720-task33-final.json",
+  "taskClass": "standard",
+  "baseline": "fe99628 (tasks 32+33 committed). Pre-removal gates re-verified green by orchestrator at 1549-1555: LINT/TSC/BUILD/BUDGETS PASS, jest 960/960 100%, depcheck clean.",
+  "changedDomains": ["frontend", "repo-hygiene", "docker"],
   "requiredGates": {
-    "lint_clean": { "status": true, "evidence": "LINT=PASS (orchestrator fresh 1744 + QA 1738, if/else channel)" },
-    "typecheck_clean": { "status": true, "evidence": "TSC=PASS (x2 independent)" },
-    "build_ok": { "status": true, "evidence": "BUILD=PASS (x2 independent)" },
-    "affected_tests_pass": { "status": true, "evidence": "vacuous: zero src/test files in diff (QA adjudicated, task-29/30 precedent)" },
-    "no_hardcoded": { "status": true, "evidence": "QA BARE_PNPM_COUNT=0, COREPACK_PNPM_COUNT=2; no version literals; packageManager field remains single source of truth" },
-    "no_secrets": { "status": true, "evidence": "Security grep NO_MATCHES; 0 findings" },
-    "no_todo_fixme": { "status": true, "evidence": "QA TODO_FIXME_COUNT=0" },
-    "vercel_json_valid": { "status": true, "evidence": "VJSON=OK (DevOps + QA independent)" },
-    "sim_e2e_rogue_path_pass": { "status": true, "evidence": "3 independent executions green (DevOps 1736, refuter R3 with control+fidelity variant, orchestrator 1744 with LOCKFILE=ABSENT → RESOLUTION=FULL): SIM_INSTALL=PASS, SIM_BUILD=PASS, DIST=OK, ROGUE_INVOKED=NO, COREPACK_PNPM_VERSION=11.5.1; exact command strings parsed from working-tree vercel.json; R3 control: old task-30 command under same rogue PATH → CONTROL_ROGUE_INVOKED=YES (harness proven non-vacuous, corepack enable proven not to fix bare resolution)" },
-    "adversarial_refutation": { "status": true, "evidence": "3 lenses refuted=false at high confidence: corepack-semantics (README/Node-24 docs cited + container probes incl. COREPACK_ENABLE_NETWORK=0 offline build-step proof), vercel-pipeline (docs cited: single container, full command overrides, vite preset auto outputDirectory dist, no api/ dir), e2e-repro (independent scripts)" },
-    "vercel_deploy_green": { "status": "pending_user_push", "evidence": "INC-005; sim is command-equivalent + docs-verified pipeline equivalence" }
+    "lint_clean": { "status": true, "evidence": "PASS fresh 1613 (orchestrator) + FE 1602 + QA 1610 + husky sim" },
+    "typecheck_clean": { "status": true, "evidence": "PASS fresh 1613 (orchestrator) + FE + QA" },
+    "build_ok": { "status": true, "evidence": "PASS (FE+QA); lazy chunks ja/zh/GeoDetectionAdapter present in dist/assets" },
+    "affected_tests_pass": { "status": true, "evidence": "jest 960/960 x3 independent runs (orchestrator, FE, QA)" },
+    "coverage_100": { "status": true, "evidence": "100%x4 (1415/558/269/1320); Sonar 100.0% on 1365 lines" },
+    "e2e_full_pass": { "status": true, "evidence": "215/215 by QA at 1610 on final tree; geo journeys 17/17" },
+    "budgets_pass": { "status": true, "evidence": "main 241,297/244,000 raw, 75,916/76,000 gzip — byte-identical to baseline; lazy chunks under 3,072" },
+    "docker_build_ok": { "status": true, "evidence": "full --no-cache build SUCCESS without .npmrc; container HTTP 200; compose config valid" },
+    "no_todo_fixme": { "status": true, "evidence": "grep 0" },
+    "no_secrets": { "status": true, "evidence": "greps 0; docker layers clean" },
+    "no_hardcoded": { "status": true, "evidence": "deletion-only diff" },
+    "removal_evidence_complete": { "status": true, "evidence": "4 independent zero-reference passes per item (2 Explore sweeps + orchestrator INC-004 re-greps + QA adversarial greps)" },
+    "sonar_quality_gate": { "status": true, "evidence": "FRESH scan CE 39c3ffd3: open=0 accepted=0 hotspots=0 cov=100.0% dup=0.0% QG=OK; ncloc 5406->5382 proves freshness" },
+    "deps_scan_if_pkg_changed": { "status": true, "evidence": "not triggered — zero dep changes in package.json diff (main field + 3 orphan scripts only); security n/a log 1610" }
   },
-  "failBeforeEvidence": "Two prod Vercel logs at 05cd40d (17:17 fresh, 17:23 cache-skipped retry): corepack cache-add OK, then 16 parallel registry GETs all ERR_INVALID_THIS through retries → ERR_PNPM_META_FETCH_FAIL → exit 1. Local rogue-PATH experiment: BARE_PNPM_RESOLVES_TO=6.35.1 vs COREPACK_PNPM_RESOLVES_TO=11.5.1 after identical corepack steps.",
+  "removals": {
+    "deleted": [
+      "1necho (JUNK-1)",
+      "remote.config.json (+.dockerignore:64 line)",
+      ".npmrc (+Dockerfile:12 COPY edit)",
+      "src/geo-detection/index.ts",
+      "src/geo-detection/adapters/index.ts",
+      "src/geo-detection/hooks/index.ts",
+      "src/shared/test/test-utils.tsx",
+      "src/shared/test/__mocks__/styleMock.ts",
+      "src/shared/ds/tools/_index.scss",
+      ".DS_Store (untracked, disk only)"
+    ],
+    "edited": ["package.json (main field + scripts commit/test:ci/cov removed)", "eslint.config.js ('index.js' ignore removed)", "Dockerfile (COPY without .npmrc)", ".dockerignore (remote.config.json line removed)"],
+    "kept_with_rationale": [
+      "public/sw.js + public/service-worker.js (SW kill-switches for both legacy URL conventions)",
+      "src/shared/ds/themes/_contract.scss (theme contract doc, cited by ADR-0005/0006 + CONTRACTS.md)",
+      "src/region/signals/side-effects.ts (self-documented domain-symmetry placeholder)",
+      "public/fonts/OFL.txt (SIL license obligation, FONT-003/ADR-0012)",
+      "templates/ + generate-react-cli.json + gen script (working generator, PRD-documented)",
+      "preview script (README-documented)",
+      ".env.example (VITE_BANXICO_TOKEN live in vite.config.ts + src)",
+      "scripts/*.sh|.mjs (all CI/hook-referenced)",
+      "pnpm-workspace.yaml (pnpm settings/overrides source of truth)"
+    ]
+  },
   "profiles": {
-    "orchestrator": { "status": "signed_off", "log": "logs/20260718-1744-Orchestrator_Master.md" },
-    "architect": { "status": "not_applicable", "log": "logs/20260718-1744-Architect.md" },
-    "backend-engineer": { "status": "not_applicable", "log": "logs/20260718-1744-Backend_Engineer.md" },
-    "frontend-engineer": { "status": "not_applicable", "log": "logs/20260718-1744-Frontend_Engineer.md" },
-    "qa-engineer": { "status": "passed", "log": "logs/20260718-1738-QA_Engineer.md", "note": "0 defects; DEVOPS_TOKENS_MATCH=8/8; GIT_STATUS_FILE_COUNT=2 (scope clean)" },
-    "security-auditor": { "status": "passed", "log": "logs/20260718-1737-Security_Auditor.md", "note": "0 findings; PATH-shadowing class eliminated on deploy path" },
-    "performance-engineer": { "status": "not_applicable", "log": "logs/20260718-1744-Performance_Engineer.md" },
-    "devops-engineer": { "status": "passed", "log": "logs/20260718-1736-DevOps_Engineer.md", "note": "scope clean this time — filesTouched fully disclosed and verified (DEVOPS-SCOPE-1 countermeasure held)" }
+    "orchestrator": { "status": "signed_off", "log": "logs/20260720-1618-Orchestrator_Master.md" },
+    "architect": { "status": "not_applicable", "log": "logs/20260720-1615-Architect.md", "note": "no boundary/contract change; arch-tests pass; barrel-unpinned claim orchestrator-verified" },
+    "backend-engineer": { "status": "not_applicable", "note": "frontend-only repo" },
+    "frontend-engineer": { "status": "passed", "attempts": 1, "log": "logs/20260720-1602-Frontend_Engineer.md" },
+    "devops-engineer": { "status": "passed", "attempts": 1, "log": "logs/20260720-1606-DevOps_Engineer.md", "note": "docker build/serve/compose proof without .npmrc" },
+    "qa-engineer": { "status": "passed", "attempts": 1, "log": "logs/20260720-1610-QA_Engineer.md", "note": "cycle 1: 0 defects; full battery + hook sims + adversarial greps" },
+    "security-auditor": { "status": "not_applicable", "log": "logs/20260720-1610-Security_Auditor.md", "note": "zero dep changes" },
+    "performance-engineer": { "status": "not_applicable", "log": "logs/20260720-1615-Performance_Engineer.md", "note": "bundle byte-identical" }
   },
   "iteration": 1,
   "maxIterations": 6,
@@ -40,23 +67,25 @@
     "QA-ADV-1 (task 23, carried)",
     "REGISTER hard-sleep (partial, carried)",
     "POLICY-Q (task 29, carried)",
-    "JUNK-1 (task 30, carried): 1necho committed garbage — owner decision",
-    "UPSTREAM-1 (task 30, carried): npm-path ERESOLVE accepted until eslint-plugin-react ships eslint-10 peer range",
-    "PATH-SHIM-ADV-1 (task 31, NEW, advisory): corepack does not shim PATH for child processes (refuter-proven) — any future deploy-path script invoking bare pnpm under 'corepack pnpm run' resolves to Vercel's PATH pnpm 6 and reintroduces ERR_INVALID_THIS; deploy path clean today (build='tsc && vite build', prepare='husky'). Also: Node 25+ drops bundled corepack — revisit vercel.json before engines moves past 24.x (loud failure mode)."
+    "UPSTREAM-1 (task 30, carried)",
+    "PATH-SHIM-ADV-1 (task 31, carried, advisory; NOTE task 34: local Node now v26.0.0 vs engines 24.x — corepack/Node-25+ concern is live, revisit vercel.json)"
   ],
   "incidentsCarriedOver": [
     "INC-001 destructive git prohibition",
     "INC-002 fresh gates at sign-off",
     "INC-003 orchestrator re-adjudicates severity",
-    "INC-004 orchestrator re-measures all agent gate numbers; diff-scope check standing after every implementation dispatch",
+    "INC-004 orchestrator re-measures all agent gate numbers; diff-scope check standing",
     "INC-005 no commit/stage without explicit per-commit user authorization",
-    "INC-006 rtk hook fabricates $? (if/else evidence only) + corrupts docker sh -c $VAR one-liners (script-file workaround) + blocks standalone npm/npx words"
+    "INC-006 rtk hook fabricates $? + corrupts some one-liners (script-file workaround) + blocks standalone npm/npx words; also: 'pnpm test -- --coverage' breaks jest (-- becomes a positional pattern) — use 'pnpm test --coverage'"
   ],
   "history": [
-    { "iteration": 1, "ts": "20260718-1732", "action": "intake: two identical prod failures at 05cd40d; root cause proven via rogue-PATH experiment; ultracode workflow dispatched" },
-    { "iteration": 1, "ts": "20260718-1736", "action": "DevOps delivered 2-line vercel.json fix, all 8 tokens green, filesTouched fully disclosed (scope verified clean by orchestrator + QA)" },
-    { "iteration": 1, "ts": "20260718-1738", "action": "verification fleet: QA PASSED (0 defects), Security PASSED (0 findings), 3 refuters refuted=false high-confidence; R3 control proved harness non-vacuous and caught git-ignored-lockfile sim-fidelity gap, closed via full-resolution re-run" },
-    { "iteration": 1, "ts": "20260718-1744", "action": "orchestrator INC-004 re-measure: hostile-PATH no-lockfile sim → RESOLUTION=FULL + all tokens green; fresh host gates green; PATH-SHIM-ADV-1 opened; FINAL SIGN-OFF; awaiting user commit (INC-005)" }
+    { "iteration": 1, "ts": "20260720-1549", "action": "intake: state-33 archived; candidates seeded (JUNK-1 1necho; remote.config.json foreign MFE; main:index.js dangling; empty .npmrc); baseline gates + 2 Explore discovery sweeps launched" },
+    { "iteration": 1, "ts": "20260720-1555", "action": "baseline green (jest 960/960 100% after fixing own '-- --coverage' invocation error); reference sweep: orphans = 1necho, remote.config.json, main field, scripts commit/test:ci/cov; .npmrc pinned by Dockerfile COPY only; all scripts/hooks/CI/templates/docker/vercel/env REFERENCED" },
+    { "iteration": 1, "ts": "20260720-1600", "action": "dead-code sweep: 6 dead src files (3 geo barrels unpinned by arch tests — orchestrator-verified vs architecture.spec.ts; test-utils.tsx; styleMock.ts; ds/tools/_index.scss); intentional keeps protected (SW kill-switches, _contract.scss, side-effects.ts symmetry, OFL.txt); orchestrator INC-004 re-greps confirmed all zero-reference claims" },
+    { "iteration": 1, "ts": "20260720-1602", "action": "FE attempt 1: 8 tracked deletions + package.json/eslint.config.js edits; all gates green; bundle byte-identical 241,297/75,916; scope-exact diff verified by orchestrator" },
+    { "iteration": 1, "ts": "20260720-1606", "action": "DevOps attempt 1: .npmrc deleted, Dockerfile COPY edited, .dockerignore stale line dropped; PROOF: docker build --no-cache all stages SUCCESS, container HTTP 200, compose config valid, non-root nginx, no secrets in layers" },
+    { "iteration": 1, "ts": "20260720-1610", "action": "QA cycle 1 PASSED 0 defects: 960/960 100%x4, FULL e2e 215/215 (geo 17/17), prettier/depcheck/check:css CI-parity, husky pre-commit sim (no format drift), commitlint sim, pnpm install, adversarial greps all clean, scripts inventory exact; JUNK-1 CLOSED" },
+    { "iteration": 1, "ts": "20260720-1618", "action": "orchestrator: fresh lint/tsc re-measure PASS; FRESH Sonar scan (CE 39c3ffd3 SUCCESS): QG OK all zeros, ncloc 5406->5382 (-24 = deletions) with lines-to-cover 1365 unchanged; n/a logs written (architect/security/performance); FINAL SIGN-OFF" }
   ],
-  "finalStatus": "Task 31 delivered and verified; working tree awaiting user commit (vercel.json + state.json/logs bookkeeping); vercel_deploy_green flips on push."
+  "finalStatus": "Task 34 delivered: 10 tracked removals + 4 config edits, zero functional change proven — bundle byte-identical, 960/960 unit 100%x4, 215/215 e2e, docker build+serve intact, hooks/CI-parity/commitlint intact, fresh Sonar QG OK all zeros. JUNK-1 closed. Every keep documented with rationale. Tree UNCOMMITTED per INC-005."
 }

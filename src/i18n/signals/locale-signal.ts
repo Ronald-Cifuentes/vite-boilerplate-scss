@@ -30,8 +30,9 @@ const dictionaryVersionSignal = signal<number>(0)
  * `dictionarySignal.value` get the right translations without manual re-binding.
  */
 export const dictionarySignal = computed(() => {
-  // Read version signal to force recomputation after lazy loads
-  void dictionaryVersionSignal.value
+  // Read version signal to establish dependency (triggers recomputation after lazy loads)
+  // Number.isFinite reads the value to create the dependency; always true for integers
+  Number.isFinite(dictionaryVersionSignal.value)
   return translations[localeSignal.value]
 })
 

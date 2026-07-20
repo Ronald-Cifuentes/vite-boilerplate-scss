@@ -9,5 +9,5 @@ export function handleUnhandledRejection(event: PromiseRejectionEvent): void {
 }
 
 export function registerUnhandledRejectionHandler(): void {
-  window.addEventListener('unhandledrejection', handleUnhandledRejection)
+  globalThis.addEventListener('unhandledrejection', handleUnhandledRejection)
 }

@@ -44,7 +44,7 @@ export const MobileMenu: FC<MobileMenuProps> = ({
   className,
 }) => {
   useSignals()
-  const menuRef = useRef<HTMLDivElement>(null)
+  const menuRef = useRef<HTMLDialogElement>(null)
   const { t, locale, setLocale } = useTranslation()
   const { region, setRegion } = useRegion()
   const { currency, setCurrency } = useCurrency()
@@ -71,7 +71,7 @@ export const MobileMenu: FC<MobileMenuProps> = ({
   useEffect(() => {
     if (!isOpen) return
 
-    const mql = window.matchMedia('(min-width: 768px)')
+    const mql = globalThis.matchMedia('(min-width: 768px)')
 
     const handleChange = (e: MediaQueryListEvent): void => {
       if (e.matches) {
@@ -169,10 +169,10 @@ export const MobileMenu: FC<MobileMenuProps> = ({
   }
 
   return (
-    <div
+    <dialog
+      open
       ref={menuRef}
       id='mobile-menu'
-      role='dialog'
       aria-modal='true'
       aria-label={t('mobileMenu.menuLabel')}
       className={classNames}
@@ -260,6 +260,6 @@ export const MobileMenu: FC<MobileMenuProps> = ({
         message={themeAnnouncementSignal.value}
         dataTestId={`${dataTestId}-theme-announcer`}
       />
-    </div>
+    </dialog>
   )
 }

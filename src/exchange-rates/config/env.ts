@@ -6,10 +6,12 @@ export const resetMockBanxicoToken = (): void => {
   m = undefined
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-declare const process: any
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const v: string | undefined = (globalThis as any).__VITE_BANXICO_TOKEN__
+// Vite's define config replaces this pattern at build time (must match exactly)
+const v: string | undefined = (globalThis as Record<string, unknown>).__VITE_BANXICO_TOKEN__ as
+  string | undefined
 export const getBanxicoToken = (): string | undefined =>
   // istanbul ignore next
-  m ?? v ?? (typeof process !== 'undefined' ? process?.env?.VITE_BANXICO_TOKEN : undefined)
+  m ??
+  v ??
+  (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env
+    ?.VITE_BANXICO_TOKEN

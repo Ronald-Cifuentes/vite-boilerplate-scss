@@ -3,9 +3,11 @@ import { Announcer } from './Announcer'
 
 describe('Announcer', () => {
   describe('Given an Announcer is rendered', () => {
-    it('Then it has role="status"', () => {
+    it('Then it uses native output element (implicit role=status)', () => {
       render(<Announcer message='Test' />)
       expect(screen.getByRole('status')).toBeInTheDocument()
+      // Verify it's a native <output> element (not div with role)
+      expect(screen.getByRole('status').tagName.toLowerCase()).toBe('output')
     })
 
     it('Then it has aria-live="polite" by default', () => {
@@ -21,9 +23,9 @@ describe('Announcer', () => {
     it('Then it is visually hidden', () => {
       render(<Announcer message='Test' dataTestId='ann' />)
       const element = screen.getByTestId('ann')
-      // Verify element exists and has the sr-only role pattern
+      // Verify element exists and is native <output>
       expect(element).toBeInTheDocument()
-      expect(element).toHaveAttribute('role', 'status')
+      expect(element.tagName.toLowerCase()).toBe('output')
     })
   })
 

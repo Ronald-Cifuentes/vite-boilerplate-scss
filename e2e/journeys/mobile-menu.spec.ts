@@ -71,11 +71,13 @@ test.describe('Mobile Menu (375px viewport)', () => {
   })
 
   test.describe('Menu Accessibility', () => {
-    test('has role=dialog', async ({ page }) => {
+    test('is a native dialog element with implicit dialog role', async ({ page }) => {
       await openMobileMenuIfNeeded(page)
 
       const menu = getMobileMenu(page)
-      await expect(menu).toHaveAttribute('role', 'dialog')
+      // Native <dialog> element has implicit dialog role (no explicit role attribute needed)
+      const tagName = await menu.evaluate(el => el.tagName)
+      expect(tagName).toBe('DIALOG')
     })
 
     test('has aria-modal=true', async ({ page }) => {

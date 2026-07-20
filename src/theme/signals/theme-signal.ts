@@ -15,7 +15,7 @@ export const themePreferenceSignal = signal<ThemePreference>(DEFAULT_PREFERENCE)
  */
 export const osPrefersDarkSignal = signal<boolean>(
   /* istanbul ignore next -- @preserve SSR guard */
-  typeof window !== 'undefined' ? window.matchMedia('(prefers-color-scheme: dark)').matches : false
+  globalThis.window?.matchMedia('(prefers-color-scheme: dark)').matches ?? false
 )
 
 /**

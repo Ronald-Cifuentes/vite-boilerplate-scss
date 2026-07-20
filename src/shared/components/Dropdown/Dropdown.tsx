@@ -17,7 +17,7 @@ export function Dropdown<T extends string = string>({
   id,
   dataTestId = 'dropdown',
   className,
-}: DropdownProps<T>): ReturnType<FC> {
+}: Readonly<DropdownProps<T>>): ReturnType<FC> {
   useSignals()
   const isOpen = useSignal(false)
   const isClosing = useSignal(false)
@@ -76,7 +76,7 @@ export function Dropdown<T extends string = string>({
   const open = useCallback((): void => {
     justOpened.current = true
     isOpen.value = true
-    focusIdx.value = selIdx >= 0 ? selIdx : 0
+    focusIdx.value = Math.max(selIdx, 0)
   }, [selIdx, isOpen, focusIdx])
   const close = useCallback(
     (rf?: boolean): void => {
@@ -127,7 +127,7 @@ export function Dropdown<T extends string = string>({
         case 'Enter':
         case ' ':
           e.preventDefault()
-          select(options[i] as DropdownOption<T>)
+          select(options[i])
           break
         case 'ArrowDown':
           e.preventDefault()
@@ -196,7 +196,7 @@ export function Dropdown<T extends string = string>({
             option={o}
             isSelected={o.value === value}
             isFocused={i === focusIdx.value}
-            onClick={(): void => onOptClick(o as DropdownOption<T>)}
+            onClick={(): void => onOptClick(o)}
             onKeyDown={(e): void => onOptKey(e, i)}
             id={`${id}-option-${o.value}`}
             tabIndex={i === focusIdx.value ? 0 : -1}

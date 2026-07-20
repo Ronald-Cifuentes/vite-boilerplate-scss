@@ -9,7 +9,6 @@ export class ErrorBoundaryCore extends Component<P, { e: boolean }> {
   static getDerivedStateFromError(): { e: boolean } {
     return { e: true }
   }
-  componentDidCatch(): void {} // SEAM: reporters
   render(): ReactNode {
     const { e } = this.state
     const { t, b, children } = this.props

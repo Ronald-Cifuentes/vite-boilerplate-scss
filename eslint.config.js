@@ -48,7 +48,6 @@ export default [
       '*.config.ts',
       '*.config.cjs',
       'jest-setup.ts',
-      'index.js',
     ],
   },
   {

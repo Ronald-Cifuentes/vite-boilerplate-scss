@@ -171,3 +171,5 @@ e2e/playwright-report/
 
 # Engagement authorization marker (test/sonar config edits)
 .allow-test-config-edits
+
+.lean-ctx

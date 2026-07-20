@@ -188,6 +188,32 @@ describe('formatAmount', () => {
     expect(formatAmount(12345, 'JPY')).toBe('¥12,345 JPY')
     expect(formatAmount(12345, 'JPY')).not.toContain('.')
   })
+
+  // Edge cases for format parity with original regex implementation (Intl.NumberFormat)
+  it('should format negative values with thousands separators (USD)', () => {
+    expect(formatAmount(-1234.56, 'USD')).toBe('$-1,234.56 USD')
+  })
+
+  it('should format negative values for 0-decimal currencies (COP)', () => {
+    expect(formatAmount(-4500, 'COP')).toBe('$-4,500 COP')
+  })
+
+  it('should format small values under 1000 (USD)', () => {
+    expect(formatAmount(5, 'USD')).toBe('$5.00 USD')
+    expect(formatAmount(100, 'USD')).toBe('$100.00 USD')
+    expect(formatAmount(999.99, 'USD')).toBe('$999.99 USD')
+  })
+
+  it('should format very large values >= 1e6 (COP)', () => {
+    expect(formatAmount(1000000, 'COP')).toBe('$1,000,000 COP')
+    expect(formatAmount(12345678, 'COP')).toBe('$12,345,678 COP')
+  })
+
+  it('should format zero correctly for all decimal types', () => {
+    expect(formatAmount(0, 'COP')).toBe('$0 COP')
+    expect(formatAmount(0, 'USD')).toBe('$0.00 USD')
+    expect(formatAmount(0, 'JPY')).toBe('¥0 JPY')
+  })
 })
 
 describe('getLastRefresh', () => {

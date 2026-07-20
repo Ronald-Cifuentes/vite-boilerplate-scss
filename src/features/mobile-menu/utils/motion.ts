@@ -3,7 +3,6 @@
  * CONTRACTS §17: respect prefers-reduced-motion for scroll behavior.
  */
 export function prefersReducedMotion(): boolean {
-  return (
-    typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  )
+  /* istanbul ignore next -- @preserve SSR guard: window undefined in SSR */
+  return globalThis.window?.matchMedia('(prefers-reduced-motion: reduce)').matches ?? false
 }

@@ -1,5 +1,4 @@
 {
-  "main": "index.js",
   "repository": "git@github.p.com:Ronald-Cifuentes/vite-boilerplate.git",
   "author": "Ronald Cifuentes <ronald.cifuentes2020@gmail.com>",
   "license": "MIT",
@@ -11,12 +10,9 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "commit": "npx gitmoji-cli -c",
     "gen": "npx generate-react-cli c",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:ci": "npm run lint && npm run format && npm run test",
-    "cov": "npm run test \"$src\" -- --coverage --collectCoverageFrom=\"$(echo $src | sed 's/.spec//')\"",
     "prepare": "husky",
     "format": "prettier --write .",
     "lint": "eslint src --ext ts,tsx",

@@ -1,0 +1,58 @@
+{
+  "common": {
+    "appName": "Plantilla Vite"
+  },
+  "greeting": {
+    "hello": "Hola",
+    "welcome": "Bienvenido a la aplicacion",
+    "formattedDate": "Hoy es",
+    "formattedPrice": "Precio de muestra"
+  },
+  "mobileMenu": {
+    "openMenu": "Abrir menu",
+    "closeMenu": "Cerrar menu",
+    "menuLabel": "Menu principal",
+    "language": "Idioma",
+    "country": "Pais",
+    "currency": "Moneda",
+    "theme": "Tema"
+  },
+  "navbar": {
+    "selectLanguage": "Seleccionar idioma",
+    "selectCountry": "Seleccionar pais",
+    "selectCurrency": "Seleccionar moneda",
+    "currentLanguage": "idioma actual",
+    "currentCountry": "pais actual",
+    "currentCurrency": "moneda actual",
+    "themeModeLight": "Modo claro",
+    "themeModeDark": "Modo oscuro",
+    "themeModeSystem": "Tema del sistema"
+  },
+  "currency": {
+    "cop": "Peso Colombiano",
+    "usd": "Dolar estadounidense",
+    "eur": "Euro",
+    "gbp": "Libra esterlina",
+    "mxn": "Peso mexicano",
+    "cny": "Yuan Chino",
+    "jpy": "Yen Japones"
+  },
+  "rates": {
+    "loading": "Cargando tasas...",
+    "stale": "Tasas de hace {age}",
+    "unavailable": "Tasas no disponibles",
+    "partial": "Algunas tasas no disponibles"
+  },
+  "a11y": {
+    "languageChangedTo": "Idioma cambiado a",
+    "themeChangedTo": "Tema cambiado a",
+    "countryChangedTo": "Pais cambiado a",
+    "currencyChangedTo": "Moneda cambiada a",
+    "skipToContent": "Saltar al contenido",
+    "locationDetected": "Ubicacion detectada"
+  },
+  "error": {
+    "title": "Error",
+    "reload": "Reintentar"
+  }
+}

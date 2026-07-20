@@ -7,6 +7,6 @@ import type { ThemeMode } from '../types/Theme'
 export function syncDataTheme(mode: ThemeMode): void {
   /* istanbul ignore else -- @preserve SSR guard: document undefined in SSR */
   if (typeof document !== 'undefined') {
-    document.documentElement.setAttribute('data-theme', mode)
+    document.documentElement.dataset.theme = mode
   }
 }

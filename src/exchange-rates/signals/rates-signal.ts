@@ -114,11 +114,27 @@ export function convertCopTo(amountCop: number, to: SupportedCurrency): number |
   return Math.round((amountCop / r.copPerUnit) * 10 ** dec) / 10 ** dec
 }
 
+/**
+ * Intl.NumberFormat formatter for en-US locale with thousands separators.
+ * Caches formatters per decimals count for performance.
+ */
+const numberFormatters: Record<number, Intl.NumberFormat> = {}
+
+function getNumberFormatter(decimals: number): Intl.NumberFormat {
+  if (!numberFormatters[decimals]) {
+    numberFormatters[decimals] = new Intl.NumberFormat('en-US', {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals,
+    })
+  }
+  return numberFormatters[decimals]
+}
+
 export function formatAmount(v: number, c: SupportedCurrency): string {
-  const f = v.toFixed(CURRENCY_DECIMALS[c])
-  const [i, d] = f.split('.')
-  const x = i.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-  return `${CURRENCY_SYMBOLS[c]}${d ? `${x}.${d}` : x} ${c}`
+  const decimals = CURRENCY_DECIMALS[c]
+  const formatted = getNumberFormatter(decimals).format(v)
+  const symbol = CURRENCY_SYMBOLS[c]
+  return symbol + formatted + ' ' + c
 }
 
 export function initializeRates(): void {

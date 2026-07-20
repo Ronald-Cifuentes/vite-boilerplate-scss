@@ -35,8 +35,8 @@ export const ThemeProvider: FC<ThemeProviderProps> = ({ children, initialPrefere
 
   useEffect(() => {
     /* istanbul ignore if -- @preserve SSR guard */
-    if (typeof window === 'undefined') return
-    const mq = window.matchMedia('(prefers-color-scheme: dark)')
+    if (globalThis.window === undefined) return
+    const mq = globalThis.window.matchMedia('(prefers-color-scheme: dark)')
     setOsPrefersDark(mq.matches)
     const h = (e: MediaQueryListEvent): void => {
       setOsPrefersDark(e.matches)

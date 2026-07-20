@@ -16,14 +16,13 @@ export const Announcer: FC<AnnouncerProps> = ({
   dataTestId = 'announcer',
 }) => {
   return (
-    <div
-      role='status'
+    <output
       aria-live={politeness}
       aria-atomic='true'
       className={styles.announcer}
       data-testid={dataTestId}
     >
       {message}
-    </div>
+    </output>
   )
 }

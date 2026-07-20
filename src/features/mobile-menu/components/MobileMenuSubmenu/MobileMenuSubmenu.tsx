@@ -14,7 +14,7 @@ export function MobileMenuSubmenu<T extends string>({
   isVisible,
   dataTestId,
   className,
-}: MobileMenuSubmenuProps<T>): ReturnType<FC> {
+}: Readonly<MobileMenuSubmenuProps<T>>): ReturnType<FC> {
   const handleOptionClick = useCallback(
     (value: T) => {
       onSelect(value)
@@ -46,9 +46,9 @@ export function MobileMenuSubmenu<T extends string>({
     .join(' ')
 
   return (
-    <ul className={classNames} role='menu' data-testid={dataTestId} aria-hidden={!isVisible}>
+    <div className={classNames} role='menu' data-testid={dataTestId} aria-hidden={!isVisible}>
       {options.map(option => (
-        <li key={option.value} className={styles.option} role='none'>
+        <div key={option.value} className={styles.option} role='none'>
           <button
             type='button'
             role='menuitem'
@@ -63,8 +63,8 @@ export function MobileMenuSubmenu<T extends string>({
             {option.icon && <span className={styles.icon}>{option.icon}</span>}
             <span className={styles.label}>{option.label}</span>
           </button>
-        </li>
+        </div>
       ))}
-    </ul>
+    </div>
   )
 }

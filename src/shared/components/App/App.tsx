@@ -16,9 +16,6 @@ import { Navbar } from '../../../features/navbar'
 import { Greeting } from '../../../features/greeting'
 import { ErrorBoundary } from '../ErrorBoundary'
 import type { AppProps } from './interfaces'
-import type { SupportedLocale } from '../../../i18n'
-import type { SupportedRegion } from '../../../region'
-import type { SupportedCurrency } from '../../../currency'
 import styles from './App.module.scss'
 
 export const App: FC<AppProps> = ({ dataTestId = 'app' }) => {
@@ -37,21 +34,21 @@ export const App: FC<AppProps> = ({ dataTestId = 'app' }) => {
       }
       if (source === 'gps' || source === 'ip') {
         if (isSupportedLocale(locale)) {
-          setLocale(locale as SupportedLocale)
+          setLocale(locale)
         }
         if (isValidRegion(region)) {
-          setRegion(region as SupportedRegion)
+          setRegion(region)
           save(REGION_STORAGE_KEY, region)
         }
         if (isValidCurrency(currency)) {
-          setCurrency(currency as SupportedCurrency, true)
+          setCurrency(currency, true)
           save(CURRENCY_STORAGE_KEY, currency)
         }
         return
       }
       if (source === 'device-language') {
         if (isSupportedLocale(locale)) {
-          setLocale(locale as SupportedLocale)
+          setLocale(locale)
         }
       }
     },
